@@ -7,230 +7,1180 @@
 
 <style>
 *{box-sizing:border-box}
-
+:root{
+  --bg:#f7f1ec;
+  --ink:#1f171d;
+  --muted:#8b7b84;
+  --card:#fffaf6;
+  --line:#eadbd3;
+  --pink:#ff6fb5;
+  --hot:#ff4c9d;
+  --violet:#7c5cff;
+  --yellow:#ffd76b;
+  --mint:#8af0d1;
+  --shadow:0 22px 60px rgba(42,25,33,.13);
+}
+html{scroll-behavior:smooth}
 body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont;
-background:#faf7f3;
-color:#222;
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 0% 0%,rgba(255,111,181,.22),transparent 34%),
+    radial-gradient(circle at 100% 0%,rgba(124,92,255,.16),transparent 38%),
+    linear-gradient(180deg,#fff7f1 0%,#f7f1ec 62%,#efe6df 100%);
+  min-height:100vh;
 }
+button,input,select,textarea{font:inherit}
+button{border:0;cursor:pointer}
+button:active{transform:scale(.98)}
 
-/* 🔥 상단 헤더 */
 .header{
-position:sticky;
-top:0;
-background:#faf7f3;
-padding:16px;
-z-index:10;
-transition:.3s;
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:rgba(255,247,241,.82);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(234,219,211,.85);
+  transition:.28s;
 }
-
-/* 스크롤하면 숨김 */
 .header.hide{
-transform:translateY(-100%);
-opacity:0;
+  transform:translateY(-105%);
 }
-
-/* 로고 */
+.header-inner{
+  max-width:1080px;
+  margin:auto;
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
 .logo{
-display:flex;
-align-items:center;
-gap:12px;
+  width:48px;
+  height:48px;
+  border-radius:18px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--yellow),var(--pink));
+  color:#24111b;
+  font-size:25px;
+  font-weight:950;
+  box-shadow:0 14px 28px rgba(255,76,157,.24);
+}
+.brand h1{
+  margin:0;
+  font-size:19px;
+  letter-spacing:.04em;
+}
+.brand p{
+  margin:2px 0 0;
+  color:var(--muted);
+  font-size:12px;
+}
+.nav{
+  display:flex;
+  gap:8px;
+}
+.nav a,.nav button{
+  min-width:82px;
+  text-align:center;
+  padding:11px 14px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid var(--line);
+  color:var(--ink);
+  text-decoration:none;
+  font-size:13px;
+  font-weight:900;
+  box-shadow:0 8px 18px rgba(42,25,33,.06);
 }
 
-.logo-box{
-width:50px;
-height:50px;
-border-radius:16px;
-background:linear-gradient(135deg,#ffb86c,#ff6fb5);
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:900;
-font-size:22px;
+.app{
+  max-width:1080px;
+  margin:auto;
+  padding:24px 18px 90px;
 }
 
-/* 버튼 */
-.menu{
-display:flex;
-gap:10px;
-margin-top:14px;
+.hero{
+  display:grid;
+  grid-template-columns:1.04fr .96fr;
+  gap:24px;
+  align-items:center;
+  padding:28px 0 22px;
+}
+.badge{
+  display:inline-flex;
+  width:max-content;
+  align-items:center;
+  gap:6px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid var(--line);
+  color:var(--hot);
+  font-size:12px;
+  font-weight:950;
+  letter-spacing:.08em;
+}
+.hero h2{
+  margin:16px 0 12px;
+  font-size:clamp(44px,8vw,88px);
+  line-height:.92;
+  letter-spacing:-.075em;
+}
+.hero p{
+  margin:0;
+  max-width:600px;
+  color:var(--muted);
+  font-size:16px;
+  line-height:1.75;
+}
+.hero-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:24px;
+}
+.btn{
+  min-height:48px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 18px;
+  border-radius:16px;
+  font-weight:950;
+  text-decoration:none;
+}
+.primary{
+  background:linear-gradient(135deg,var(--yellow),var(--pink));
+  color:#2b1320;
+  box-shadow:0 14px 30px rgba(255,76,157,.22);
+}
+.ghost{
+  background:#fff;
+  color:var(--ink);
+  border:1px solid var(--line);
+}
+.dark{
+  background:#241b20;
+  color:#fff;
 }
 
-.menu button{
-flex:1;
-padding:14px;
-border-radius:30px;
-border:none;
-background:#fff;
-box-shadow:0 4px 10px rgba(0,0,0,0.08);
-font-weight:700;
+.ticket-card{
+  position:relative;
+  min-height:470px;
+  padding:22px;
+  border-radius:34px;
+  background:
+    linear-gradient(145deg,#fff,#fff1e7),
+    radial-gradient(circle at 80% 80%,rgba(255,111,181,.22),transparent 38%);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.ticket-top,.ticket-bottom{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.ticket-body{
+  min-height:390px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+}
+.mystery{
+  width:182px;
+  height:182px;
+  border-radius:42px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--yellow),var(--pink),var(--violet));
+  color:#24111b;
+  font-size:94px;
+  font-weight:950;
+  transform:rotate(-6deg);
+  box-shadow:0 24px 58px rgba(124,92,255,.22);
+}
+.ticket-body p{
+  margin:22px 0 4px;
+  color:var(--muted);
+  font-weight:850;
+}
+.ticket-body h3{
+  margin:0;
+  font-size:44px;
+  letter-spacing:-.05em;
 }
 
-/* 본문 여백 넉넉하게 */
-.container{
-padding:20px;
-max-width:600px;
-margin:auto;
+.section{
+  margin-top:42px;
+}
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  gap:14px;
+  margin-bottom:16px;
+}
+.section-title{
+  display:flex;
+  align-items:end;
+  gap:10px;
+}
+.section-title span{
+  color:var(--hot);
+  font-weight:950;
+}
+.section-title h2{
+  margin:0;
+  font-size:30px;
+  letter-spacing:-.04em;
 }
 
-/* DRAW 버튼 */
-.draw{
-width:140px;
-height:140px;
-border-radius:50%;
-background:linear-gradient(135deg,#ffd86b,#ff6fb5);
-font-size:22px;
-margin:30px auto;
-display:block;
+.grid{
+  display:grid;
+  grid-template-columns:.9fr 1.1fr;
+  gap:18px;
+}
+.panel{
+  background:rgba(255,250,246,.82);
+  border:1px solid var(--line);
+  border-radius:30px;
+  padding:22px;
+  box-shadow:0 14px 38px rgba(42,25,33,.07);
+}
+.machine-wrap{
+  display:grid;
+  place-items:center;
+  gap:16px;
+}
+.machine{
+  width:min(330px,100%);
+  aspect-ratio:1;
+  border-radius:48px;
+  background:linear-gradient(145deg,#fff,#f7ecff);
+  border:1px solid var(--line);
+  box-shadow:inset 0 0 0 12px rgba(255,255,255,.55),0 22px 46px rgba(124,92,255,.12);
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
+.capsules{
+  width:76%;
+  height:76%;
+  display:flex;
+  flex-wrap:wrap;
+  align-content:center;
+  justify-content:center;
+  gap:12px;
+}
+.cap{
+  width:56px;
+  height:56px;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  font-weight:950;
+  color:#2b1320;
+  background:linear-gradient(135deg,#fff,var(--yellow));
+  box-shadow:0 8px 16px rgba(42,25,33,.12);
+}
+.machine.spin .cap{animation:bounce .62s ease}
+.machine.spin .cap:nth-child(2n){animation-delay:.05s}
+.machine.spin .cap:nth-child(3n){animation-delay:.1s}
+@keyframes bounce{
+  0%,100%{transform:translate(0,0) rotate(0)}
+  25%{transform:translate(-16px,8px) rotate(-18deg)}
+  55%{transform:translate(14px,-12px) rotate(22deg)}
+  80%{transform:translate(-8px,5px) rotate(-10deg)}
+}
+.draw-btn{
+  width:164px;
+  height:164px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--yellow),var(--hot));
+  color:#2b1320;
+  font-size:27px;
+  font-weight:950;
+  letter-spacing:.04em;
+  box-shadow:0 22px 42px rgba(255,76,157,.28);
+}
+.draw-btn[disabled]{opacity:.65}
+.stock{
+  color:var(--muted);
+  font-weight:850;
+  text-align:center;
+}
+.result-preview{
+  min-height:418px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  border:1px dashed #decfc5;
+  border-radius:24px;
+  color:var(--muted);
+  padding:22px;
+  background:rgba(255,255,255,.48);
 }
 
-/* 결과 */
-.result{
-text-align:center;
-margin-top:30px;
+.prize-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+.prize-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:14px;
+  box-shadow:0 10px 28px rgba(42,25,33,.06);
+  overflow:hidden;
+}
+.prize-img{
+  width:100%;
+  aspect-ratio:1/1;
+  border-radius:18px;
+  background:linear-gradient(135deg,#f0e6df,#fff);
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  color:#b8a8a0;
+  font-weight:900;
+}
+.prize-img img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.prize-card h3{
+  margin:12px 0 6px;
+  font-size:17px;
+  line-height:1.25;
+}
+.prize-card p{
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.45;
+}
+.prize-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:12px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:850;
+}
+.rank-pill{
+  display:inline-flex;
+  width:max-content;
+  padding:6px 10px;
+  border-radius:999px;
+  background:var(--mint);
+  color:#11251d;
+  font-size:12px;
+  font-weight:950;
+  margin-top:12px;
 }
 
-.result img{
-width:200px;
-border-radius:16px;
-margin-top:10px;
+.history-list{
+  display:grid;
+  gap:10px;
+}
+.history-item{
+  display:grid;
+  grid-template-columns:72px 64px 1fr auto;
+  gap:12px;
+  align-items:center;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:10px;
+}
+.history-thumb{
+  width:64px;
+  height:64px;
+  border-radius:14px;
+  background:#f1e8e1;
+  overflow:hidden;
+}
+.history-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.empty{
+  padding:22px;
+  border:1px dashed #decfc5;
+  border-radius:20px;
+  color:var(--muted);
+  text-align:center;
+  background:rgba(255,255,255,.48);
 }
 
-/* 관리자 */
-.admin{
-display:none;
-margin-top:30px;
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(28,18,24,.55);
+  backdrop-filter:blur(12px);
+}
+.modal.show{display:flex}
+.win-modal-card{
+  width:min(520px,100%);
+  background:#fffaf4;
+  border:1px solid var(--line);
+  border-radius:34px;
+  padding:18px;
+  box-shadow:0 34px 100px rgba(0,0,0,.28);
+  animation:pop .34s cubic-bezier(.2,1.2,.3,1);
+}
+@keyframes pop{
+  from{transform:scale(.82) translateY(18px);opacity:0}
+  to{transform:scale(1) translateY(0);opacity:1}
+}
+.win-img{
+  width:100%;
+  aspect-ratio:1/1;
+  border-radius:26px;
+  background:#efe5dd;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  color:#a39188;
+  font-weight:900;
+}
+.win-img img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.win-rank{
+  margin:16px auto 10px;
+  width:max-content;
+  padding:9px 16px;
+  border-radius:999px;
+  background:linear-gradient(135deg,var(--yellow),var(--pink));
+  color:#2b1320;
+  font-weight:950;
+}
+.win-modal-card h2{
+  margin:0;
+  font-size:32px;
+  letter-spacing:-.04em;
+  text-align:center;
+}
+.win-modal-card p{
+  margin:8px 0 18px;
+  color:var(--muted);
+  text-align:center;
+  line-height:1.55;
 }
 
-input{
-width:100%;
-padding:12px;
-margin:8px 0;
-border-radius:10px;
-border:1px solid #ddd;
+.admin-drawer{
+  position:fixed;
+  inset:0 0 0 auto;
+  z-index:80;
+  width:min(480px,100%);
+  background:#fffaf4;
+  border-left:1px solid var(--line);
+  box-shadow:-24px 0 70px rgba(42,25,33,.18);
+  transform:translateX(105%);
+  transition:.25s transform;
+  overflow:auto;
+  padding:20px;
+}
+.admin-drawer.open{transform:translateX(0)}
+.admin-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+.admin-top h2{
+  margin:0;
+  font-size:26px;
+}
+.form{
+  display:grid;
+  gap:12px;
+}
+label{
+  text-align:left;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:900;
+  display:grid;
+  gap:7px;
+}
+input,select,textarea{
+  width:100%;
+  min-height:46px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:10px 12px;
+  background:#fff;
+  color:var(--ink);
+  outline:none;
+}
+textarea{
+  resize:vertical;
+  min-height:76px;
+}
+.admin-list{
+  display:grid;
+  gap:10px;
+  margin-top:18px;
+}
+.admin-item{
+  display:grid;
+  grid-template-columns:58px 1fr auto;
+  gap:10px;
+  align-items:center;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:9px;
+}
+.admin-thumb{
+  width:58px;
+  height:58px;
+  border-radius:14px;
+  overflow:hidden;
+  background:#f1e8e1;
+}
+.admin-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.mini-btn{
+  min-height:38px;
+  border-radius:12px;
+  padding:0 12px;
+  font-weight:900;
+}
+.danger{
+  background:#fff0f0;
+  color:#de3e57;
+  border:1px solid #ffd1d9;
+}
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:24px;
+  z-index:200;
+  transform:translateX(-50%) translateY(20px);
+  opacity:0;
+  transition:.22s;
+  background:#241b20;
+  color:#fff;
+  border-radius:999px;
+  padding:12px 16px;
+  font-weight:850;
+}
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
 }
 
-/* 카드 여백 */
-.card{
-background:#fff;
-padding:16px;
-border-radius:16px;
-margin-top:16px;
-box-shadow:0 6px 18px rgba(0,0,0,0.05);
+@media(max-width:860px){
+  .header-inner{
+    align-items:flex-start;
+    flex-direction:column;
+    padding:14px 18px 16px;
+  }
+  .brand{
+    width:100%;
+  }
+  .logo{
+    width:44px;
+    height:44px;
+    border-radius:16px;
+    font-size:23px;
+  }
+  .brand h1{
+    font-size:18px;
+  }
+  .brand p{
+    font-size:12px;
+  }
+  .nav{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+  }
+  .nav a,.nav button{
+    min-width:0;
+    padding:12px 8px;
+    font-size:14px;
+  }
+  .app{
+    padding:20px 16px 80px;
+  }
+  .hero,.grid{
+    grid-template-columns:1fr;
+  }
+  .hero{
+    padding-top:18px;
+    gap:18px;
+  }
+  .hero h2{
+    font-size:46px;
+  }
+  .hero p{
+    font-size:15px;
+  }
+  .ticket-card{
+    min-height:390px;
+    border-radius:28px;
+    padding:18px;
+  }
+  .ticket-body{
+    min-height:310px;
+  }
+  .mystery{
+    width:152px;
+    height:152px;
+    border-radius:34px;
+    font-size:78px;
+  }
+  .ticket-body h3{
+    font-size:36px;
+  }
+  .panel{
+    padding:18px;
+    border-radius:26px;
+  }
+  .machine{
+    width:min(300px,100%);
+    border-radius:42px;
+  }
+  .cap{
+    width:50px;
+    height:50px;
+  }
+  .draw-btn{
+    width:148px;
+    height:148px;
+    font-size:25px;
+  }
+  .result-preview{
+    min-height:310px;
+  }
+  .prize-grid{
+    grid-template-columns:1fr;
+  }
+  .history-item{
+    grid-template-columns:58px 1fr;
+    align-items:start;
+  }
+  .history-thumb{
+    width:58px;
+    height:58px;
+  }
+  .history-item .time{
+    grid-column:2;
+  }
+  .section{
+    margin-top:34px;
+  }
+  .section-title h2{
+    font-size:27px;
+  }
+}
+
+@media(max-width:430px){
+  .app{
+    padding-left:14px;
+    padding-right:14px;
+  }
+  .header-inner{
+    padding-left:14px;
+    padding-right:14px;
+  }
+  .hero h2{
+    font-size:42px;
+  }
+  .hero-actions .btn{
+    width:100%;
+  }
 }
 </style>
 </head>
 
 <body>
-
 <div class="header" id="header">
-  <div class="logo">
-    <div class="logo-box">K</div>
-    <div>
-      <h2 style="margin:0">LUCKY KUJI</h2>
-      <div style="font-size:13px;color:#777">랜덤 굿즈 온라인 쿠지</div>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo">K</div>
+      <div>
+        <h1>LUCKY KUJI</h1>
+        <p>랜덤 굿즈 온라인 쿠지</p>
+      </div>
+    </div>
+    <div class="nav">
+      <a href="#drawSection">뽑기</a>
+      <a href="#prizeSection">상품</a>
+      <button type="button" onclick="openAdminLogin()">관리자</button>
     </div>
   </div>
+</div>
 
-  <div class="menu">
-    <button onclick="scrollToSection('draw')">뽑기</button>
-    <button onclick="scrollToSection('list')">상품</button>
-    <button onclick="login()">관리자</button>
+<div class="app">
+  <section class="hero">
+    <div>
+      <span class="badge">LIMITED KUJI</span>
+      <h2>오늘의 운으로<br>숨겨진 굿즈를 뽑아보세요</h2>
+      <p>상품 이미지를 직접 등록하고, 폰에 저장된 상태로 관리할 수 있는 온라인 쿠지 페이지입니다. 뽑기는 누구나 가능하고, 상품 관리는 관리자 비밀번호가 필요합니다.</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#drawSection">바로 뽑기</a>
+        <a class="btn ghost" href="#prizeSection">상품 보기</a>
+      </div>
+    </div>
+
+    <div class="ticket-card">
+      <div class="ticket-top">
+        <span>KUJI TICKET</span>
+        <strong>#LUCKY-DROP</strong>
+      </div>
+      <div class="ticket-body">
+        <div>
+          <div class="mystery">?</div>
+          <p>1회 뽑기</p>
+          <h3>DRAW</h3>
+        </div>
+      </div>
+      <div class="ticket-bottom">
+        <span>A / B / C / D / E</span>
+        <span>NO BLANK</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="drawSection" class="section">
+    <div class="section-head">
+      <div class="section-title">
+        <span>01</span>
+        <h2>쿠지 뽑기</h2>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <div class="machine-wrap">
+          <div class="machine" id="machine">
+            <div class="capsules">
+              <div class="cap">A</div>
+              <div class="cap">B</div>
+              <div class="cap">C</div>
+              <div class="cap">D</div>
+              <div class="cap">★</div>
+              <div class="cap">?</div>
+              <div class="cap">♡</div>
+              <div class="cap">E</div>
+            </div>
+          </div>
+          <button class="draw-btn" id="drawBtn" type="button" onclick="drawKuji()">DRAW</button>
+          <div class="stock">등록된 상품 <strong id="totalCount">0</strong>개</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div id="resultPreview" class="result-preview">
+          아직 뽑기 전입니다.<br>DRAW 버튼을 눌러보세요.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="prizeSection" class="section">
+    <div class="section-head">
+      <div class="section-title">
+        <span>02</span>
+        <h2>상품 라인업</h2>
+      </div>
+    </div>
+    <div id="prizeGrid" class="prize-grid"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title">
+        <span>03</span>
+        <h2>최근 뽑기 기록</h2>
+      </div>
+      <button class="btn ghost" type="button" onclick="clearHistory()">기록 초기화</button>
+    </div>
+    <div id="historyList" class="history-list"></div>
+  </section>
+</div>
+
+<div class="modal" id="winModal" onclick="modalBgClose(event)">
+  <div class="win-modal-card">
+    <div class="win-img" id="winImg"></div>
+    <div class="win-rank" id="winRank"></div>
+    <h2 id="winName"></h2>
+    <p id="winDesc"></p>
+    <button class="btn dark" style="width:100%" type="button" onclick="closeWin()">닫기</button>
   </div>
 </div>
 
-<div class="container">
-
-<!-- 뽑기 -->
-<div id="draw">
-<button class="draw" onclick="draw()">DRAW</button>
-</div>
-
-<div class="result" id="result"></div>
-
-<!-- 상품 리스트 -->
-<div id="list" class="card"></div>
-
-<!-- 관리자 -->
-<div class="admin" id="admin">
-  <div class="card">
-    <h3>상품 추가</h3>
-    <input id="name" placeholder="상품 이름">
-    <input id="rank" placeholder="등급">
-    <input type="file" id="img">
-    <button onclick="add()">추가</button>
+<div class="modal" id="loginModal" onclick="loginBgClose(event)">
+  <div class="win-modal-card" style="max-width:390px">
+    <h2 style="margin-top:8px">관리자 로그인</h2>
+    <p>상품 관리는 비밀번호가 필요합니다.</p>
+    <input id="adminPw" type="password" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')checkAdminPw()">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+      <button class="btn ghost" type="button" onclick="closeLogin()">취소</button>
+      <button class="btn primary" type="button" onclick="checkAdminPw()">입장</button>
+    </div>
   </div>
 </div>
 
-</div>
+<aside class="admin-drawer" id="adminDrawer">
+  <div class="admin-top">
+    <h2>상품 관리</h2>
+    <button class="mini-btn ghost" type="button" onclick="closeAdmin()">닫기</button>
+  </div>
+
+  <div class="form">
+    <input type="hidden" id="editIndex">
+
+    <label>상품 이미지
+      <input id="itemImg" type="file" accept="image/*">
+    </label>
+
+    <label>등급
+      <select id="itemRank">
+        <option>A상</option>
+        <option>B상</option>
+        <option>C상</option>
+        <option>D상</option>
+        <option>E상</option>
+        <option>LAST상</option>
+      </select>
+    </label>
+
+    <label>상품명
+      <input id="itemName" placeholder="예: 한정 아크릴 스탠드">
+    </label>
+
+    <label>상품 설명
+      <textarea id="itemDesc" placeholder="결과 팝업에 표시될 설명"></textarea>
+    </label>
+
+    <button class="btn primary" type="button" onclick="savePrize()">상품 저장</button>
+    <button class="btn ghost" type="button" onclick="resetForm()">입력 초기화</button>
+  </div>
+
+  <div class="admin-list" id="adminList"></div>
+</aside>
+
+<div class="toast" id="toast"></div>
 
 <script>
-let items = JSON.parse(localStorage.getItem("items")||"[]")
+const STORAGE_KEY = "pretty_kuji_items_v3";
+const HISTORY_KEY = "pretty_kuji_history_v3";
 
-function save(){
-localStorage.setItem("items",JSON.stringify(items))
+let prizes = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+
+function $(id){
+  return document.getElementById(id);
+}
+
+function saveAll(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(prizes));
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+function esc(str){
+  return String(str || "").replace(/[&<>"']/g, function(m){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m];
+  });
+}
+
+function toast(msg){
+  $("toast").textContent = msg;
+  $("toast").classList.add("show");
+  setTimeout(function(){
+    $("toast").classList.remove("show");
+  },1600);
+}
+
+function imgHTML(src){
+  return src ? '<img src="' + src + '" alt="">' : '<span>NO IMAGE</span>';
 }
 
 function render(){
-let html=""
-items.forEach(i=>{
-html+=`<div>${i.rank} - ${i.name}</div>`
-})
-document.getElementById("list").innerHTML=html
+  $("totalCount").textContent = prizes.length;
+
+  $("prizeGrid").innerHTML = prizes.length ? prizes.map(function(p,i){
+    return `
+      <article class="prize-card">
+        <div class="prize-img">${imgHTML(p.img)}</div>
+        <span class="rank-pill">${esc(p.rank)}</span>
+        <h3>${esc(p.name)}</h3>
+        <p>${esc(p.desc)}</p>
+        <div class="prize-meta">
+          <span>상품 #${i+1}</span>
+          <span>등록됨</span>
+        </div>
+      </article>
+    `;
+  }).join("") : `<div class="empty" style="grid-column:1/-1">아직 등록된 상품이 없습니다. 관리자 메뉴에서 상품을 추가하세요.</div>`;
+
+  $("historyList").innerHTML = history.length ? history.map(function(h){
+    return `
+      <div class="history-item">
+        <strong style="color:#ff4c9d">${esc(h.rank)}</strong>
+        <div class="history-thumb">${imgHTML(h.img)}</div>
+        <div>
+          <strong>${esc(h.name)}</strong>
+          <div style="color:#81737b;font-size:13px">${esc(h.desc)}</div>
+        </div>
+        <div class="time" style="color:#81737b;font-size:12px">${esc(h.time)}</div>
+      </div>
+    `;
+  }).join("") : `<div class="empty">아직 뽑기 기록이 없습니다.</div>`;
+
+  renderAdminList();
 }
 
-function add(){
-let name=nameInput.value
-let rank=rankInput.value
-let file=img.files[0]
-
-let reader=new FileReader()
-reader.onload=function(){
-items.push({name,rank,img:reader.result})
-save()
-render()
-}
-reader.readAsDataURL(file)
-}
-
-function login(){
-let pw=prompt("비밀번호")
-if(pw==="1230"){
-admin.style.display="block"
-}
+function renderAdminList(){
+  $("adminList").innerHTML = prizes.length ? prizes.map(function(p,i){
+    return `
+      <div class="admin-item">
+        <div class="admin-thumb">${imgHTML(p.img)}</div>
+        <div>
+          <strong>${esc(p.rank)} · ${esc(p.name)}</strong>
+          <div style="color:#81737b;font-size:12px">${esc(p.desc)}</div>
+        </div>
+        <div style="display:grid;gap:6px">
+          <button class="mini-btn ghost" type="button" onclick="editPrize(${i})">수정</button>
+          <button class="mini-btn danger" type="button" onclick="deletePrize(${i})">삭제</button>
+        </div>
+      </div>
+    `;
+  }).join("") : `<div class="empty">관리자 메뉴에서 첫 상품을 추가하세요.</div>`;
 }
 
-function draw(){
-if(items.length===0)return alert("상품 없음")
+function drawKuji(){
+  if(!prizes.length){
+    toast("등록된 상품이 없습니다.");
+    openAdminLogin();
+    return;
+  }
 
-let pick=items[Math.floor(Math.random()*items.length)]
+  const btn = $("drawBtn");
+  const machine = $("machine");
 
-result.innerHTML=`
-<h2>${pick.rank}</h2>
-<h3>${pick.name}</h3>
-<img src="${pick.img}">
-`
+  btn.disabled = true;
+  btn.textContent = "...";
+
+  machine.classList.remove("spin");
+  void machine.offsetWidth;
+  machine.classList.add("spin");
+
+  setTimeout(function(){
+    const pick = prizes[Math.floor(Math.random() * prizes.length)];
+    const record = {
+      rank: pick.rank,
+      name: pick.name,
+      desc: pick.desc,
+      img: pick.img,
+      time: new Date().toLocaleString("ko-KR")
+    };
+
+    history.unshift(record);
+    history = history.slice(0,20);
+    saveAll();
+
+    $("resultPreview").innerHTML = `
+      <div style="width:100%">
+        <div class="prize-img" style="max-width:240px;margin:0 auto 16px">${imgHTML(pick.img)}</div>
+        <span class="rank-pill">${esc(pick.rank)}</span>
+        <h3 style="font-size:28px;margin:12px 0 8px">${esc(pick.name)}</h3>
+        <p style="color:#81737b;line-height:1.55">${esc(pick.desc)}</p>
+      </div>
+    `;
+
+    $("winImg").innerHTML = imgHTML(pick.img);
+    $("winRank").textContent = pick.rank + " 당첨!";
+    $("winName").textContent = pick.name;
+    $("winDesc").textContent = pick.desc;
+
+    $("winModal").classList.add("show");
+
+    btn.disabled = false;
+    btn.textContent = "DRAW";
+
+    render();
+  },850);
 }
 
-function scrollToSection(id){
-document.getElementById(id).scrollIntoView({behavior:"smooth"})
+function closeWin(){
+  $("winModal").classList.remove("show");
 }
 
-/* 🔥 스크롤 시 헤더 숨김 */
-let lastScroll=0
-window.addEventListener("scroll",()=>{
-let current=window.scrollY
-if(current>lastScroll && current>80){
-header.classList.add("hide")
-}else{
-header.classList.remove("hide")
+function modalBgClose(e){
+  if(e.target.id === "winModal") closeWin();
 }
-lastScroll=current
-})
 
-render()
+function openAdminLogin(){
+  $("loginModal").classList.add("show");
+  setTimeout(function(){
+    $("adminPw").focus();
+  },100);
+}
+
+function closeLogin(){
+  $("loginModal").classList.remove("show");
+  $("adminPw").value = "";
+}
+
+function loginBgClose(e){
+  if(e.target.id === "loginModal") closeLogin();
+}
+
+function checkAdminPw(){
+  if($("adminPw").value === "1230"){
+    closeLogin();
+    $("adminDrawer").classList.add("open");
+    toast("관리자 메뉴가 열렸습니다.");
+  }else{
+    toast("비밀번호가 틀렸습니다.");
+  }
+}
+
+function closeAdmin(){
+  $("adminDrawer").classList.remove("open");
+}
+
+function fileToDataURL(file){
+  return new Promise(function(resolve,reject){
+    if(!file){
+      resolve("");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(){
+      resolve(reader.result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function savePrize(){
+  const editIndex = $("editIndex").value;
+  const rank = $("itemRank").value;
+  const name = $("itemName").value.trim();
+  const desc = $("itemDesc").value.trim();
+  const file = $("itemImg").files[0];
+
+  if(!name){
+    toast("상품명을 입력하세요.");
+    return;
+  }
+
+  let img = "";
+
+  if(file){
+    img = await fileToDataURL(file);
+  }else if(editIndex !== ""){
+    img = prizes[Number(editIndex)].img || "";
+  }
+
+  const item = {
+    rank: rank,
+    name: name,
+    desc: desc,
+    img: img
+  };
+
+  if(editIndex !== ""){
+    prizes[Number(editIndex)] = item;
+    toast("상품을 수정했습니다.");
+  }else{
+    prizes.push(item);
+    toast("상품을 추가했습니다.");
+  }
+
+  resetForm();
+  saveAll();
+  render();
+}
+
+function editPrize(i){
+  const p = prizes[i];
+
+  $("editIndex").value = i;
+  $("itemRank").value = p.rank;
+  $("itemName").value = p.name;
+  $("itemDesc").value = p.desc || "";
+  $("itemImg").value = "";
+
+  toast("수정할 내용을 불러왔습니다.");
+}
+
+function deletePrize(i){
+  prizes.splice(i,1);
+  saveAll();
+  render();
+  toast("상품을 삭제했습니다.");
+}
+
+function resetForm(){
+  $("editIndex").value = "";
+  $("itemRank").value = "A상";
+  $("itemName").value = "";
+  $("itemDesc").value = "";
+  $("itemImg").value = "";
+}
+
+function clearHistory(){
+  history = [];
+  saveAll();
+  render();
+  toast("기록을 초기화했습니다.");
+}
+
+let lastScroll = 0;
+window.addEventListener("scroll", function(){
+  const current = window.scrollY;
+  const header = $("header");
+
+  if(current > lastScroll && current > 130){
+    header.classList.add("hide");
+  }else{
+    header.classList.remove("hide");
+  }
+
+  lastScroll = current;
+});
+
+render();
 </script>
-
 </body>
 </html>

@@ -4,428 +4,253 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LUCKY KUJI</title>
-
 <style>
 *{box-sizing:border-box}
 :root{
-  --bg:#f7f1ec;
-  --ink:#1f171d;
-  --muted:#8b7b84;
-  --card:#fffaf6;
-  --line:#eadbd3;
-  --pink:#ff6fb5;
-  --hot:#ff4c9d;
-  --violet:#7c5cff;
-  --yellow:#ffd76b;
-  --mint:#8af0d1;
-  --shadow:0 22px 60px rgba(42,25,33,.13);
+  --ink:#221625;--muted:#7f7288;--pink:#ff4fa3;--hot:#ff2f93;
+  --violet:#7657ff;--blue:#42c8ff;--yellow:#ffd45f;--line:#eee4f0;
 }
 html{scroll-behavior:smooth}
 body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
-  color:var(--ink);
-  background:
-    radial-gradient(circle at 0% 0%,rgba(255,111,181,.22),transparent 34%),
-    radial-gradient(circle at 100% 0%,rgba(124,92,255,.16),transparent 38%),
-    linear-gradient(180deg,#fff7f1 0%,#f7f1ec 62%,#efe6df 100%);
-  min-height:100vh;
+  margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  color:var(--ink);background:#fff;
 }
 button,input,select,textarea{font:inherit}
 button{border:0;cursor:pointer}
 button:active{transform:scale(.98)}
-
 .header{
-  position:sticky;
-  top:0;
-  z-index:50;
-  background:rgba(255,247,241,.82);
-  backdrop-filter:blur(18px);
-  border-bottom:1px solid rgba(234,219,211,.85);
-  transition:.28s;
+  position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);
+  backdrop-filter:blur(18px);border-bottom:1px solid #f1e7f1;transition:.25s;
 }
 .header.hide{transform:translateY(-105%)}
-.header-inner{
-  max-width:1080px;
-  margin:auto;
-  padding:14px 18px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
+.nav{
+  max-width:980px;margin:auto;padding:10px 16px;display:grid;grid-template-columns:repeat(3,1fr);
+  gap:8px;
 }
-.brand{display:flex;align-items:center;gap:12px}
-.logo{
-  width:48px;height:48px;border-radius:18px;
-  display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--yellow),var(--pink));
-  color:#24111b;font-size:25px;font-weight:950;
-  box-shadow:0 14px 28px rgba(255,76,157,.24);
-}
-.brand h1{margin:0;font-size:19px;letter-spacing:.04em}
-.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
-.nav{display:flex;gap:8px}
 .nav a,.nav button{
-  min-width:82px;text-align:center;padding:11px 14px;border-radius:999px;
-  background:#fff;border:1px solid var(--line);color:var(--ink);
-  text-decoration:none;font-size:13px;font-weight:900;
-  box-shadow:0 8px 18px rgba(42,25,33,.06);
+  height:48px;border-radius:999px;background:#fff;color:#6d6475;text-decoration:none;
+  display:flex;align-items:center;justify-content:center;font-weight:950;border:1px solid #eee4f0;
+  box-shadow:0 8px 22px rgba(40,20,60,.07);
 }
-
-.app{max-width:1080px;margin:auto;padding:24px 18px 90px}
+.nav a:first-child{color:var(--hot)}
+.app{max-width:980px;margin:auto;padding-bottom:80px}
 .hero{
-  display:grid;grid-template-columns:1.04fr .96fr;gap:24px;
-  align-items:center;padding:28px 0 22px;
+  position:relative;overflow:hidden;padding:44px 22px 26px;min-height:560px;
+  background:
+    radial-gradient(circle at 72% 35%,rgba(255,255,255,.45),transparent 26%),
+    radial-gradient(circle at 25% 18%,rgba(255,88,180,.34),transparent 26%),
+    linear-gradient(135deg,#6e5bff 0%,#d86cff 45%,#ff8bc3 100%);
+  color:#fff;
 }
+.hero:before{
+  content:"";position:absolute;inset:0;background:
+  radial-gradient(circle at 15% 78%,rgba(255,255,255,.22),transparent 18%),
+  radial-gradient(circle at 88% 12%,rgba(82,216,255,.35),transparent 18%);
+}
+.hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}
 .badge{
-  display:inline-flex;width:max-content;align-items:center;gap:6px;
-  padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);
-  color:var(--hot);font-size:12px;font-weight:950;letter-spacing:.08em;
+  display:inline-flex;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.22);
+  border:1px solid rgba(255,255,255,.45);font-weight:950;font-size:13px;backdrop-filter:blur(10px);
 }
-.hero h2{
-  margin:16px 0 12px;font-size:clamp(44px,8vw,88px);
-  line-height:.92;letter-spacing:-.075em;
+.hero h1{
+  margin:18px 0 12px;font-size:clamp(42px,8vw,72px);line-height:.96;letter-spacing:-.055em;
+  text-shadow:0 5px 0 rgba(50,25,90,.18);
 }
-.hero p{margin:0;max-width:600px;color:var(--muted);font-size:16px;line-height:1.75}
-.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
-.btn{
-  min-height:48px;display:inline-flex;align-items:center;justify-content:center;
-  padding:0 18px;border-radius:16px;font-weight:950;text-decoration:none;
+.hero p{margin:0;font-size:17px;line-height:1.55;color:rgba(255,255,255,.9);font-weight:750}
+.stat{
+  margin-top:22px;width:max-content;min-width:210px;padding:16px 18px;border-radius:26px;
+  background:rgba(255,255,255,.86);color:var(--ink);display:flex;gap:12px;align-items:center;
+  box-shadow:0 18px 46px rgba(50,20,80,.18);
 }
-.primary{
-  background:linear-gradient(135deg,var(--yellow),var(--pink));
-  color:#2b1320;box-shadow:0 14px 30px rgba(255,76,157,.22);
+.ball{
+  width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#fff,#ff5aa8 48%,#51d7ff 50%,#fff);
+  box-shadow:0 8px 20px rgba(0,0,0,.12);
 }
-.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
-.dark{background:#241b20;color:#fff}
-
-.ticket-card{
-  position:relative;min-height:470px;padding:22px;border-radius:34px;
-  background:linear-gradient(145deg,#fff,#fff1e7),
-  radial-gradient(circle at 80% 80%,rgba(255,111,181,.22),transparent 38%);
-  border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;
+.stat span{display:block;color:var(--muted);font-size:13px;font-weight:800}
+.stat strong{font-size:26px}
+.gacha{
+  width:min(360px,100%);margin:auto;position:relative;
 }
-.ticket-top,.ticket-bottom{
-  display:flex;justify-content:space-between;gap:14px;color:var(--muted);
-  font-size:12px;font-weight:900;letter-spacing:.08em;
+.globe{
+  aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.32);
+  border:10px solid rgba(255,255,255,.45);box-shadow:inset 0 0 42px rgba(255,255,255,.6),0 22px 50px rgba(50,20,80,.24);
+  display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:12px;padding:40px;
 }
-.ticket-body{min-height:390px;display:grid;place-items:center;text-align:center}
-.mystery{
-  width:182px;height:182px;border-radius:42px;display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--yellow),var(--pink),var(--violet));
-  color:#24111b;font-size:94px;font-weight:950;transform:rotate(-6deg);
-  box-shadow:0 24px 58px rgba(124,92,255,.22);
+.g-ball{
+  width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#ffeff9,#ff4fa3);
+  box-shadow:inset -8px -10px 16px rgba(120,20,90,.15),0 8px 18px rgba(0,0,0,.16);
 }
-.ticket-body p{margin:22px 0 4px;color:var(--muted);font-weight:850}
-.ticket-body h3{margin:0;font-size:44px;letter-spacing:-.05em}
-
-.section{margin-top:42px}
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:14px;margin-bottom:16px}
-.section-title{display:flex;align-items:end;gap:10px}
-.section-title span{color:var(--hot);font-weight:950}
-.section-title h2{margin:0;font-size:30px;letter-spacing:-.04em}
-
-.grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:18px}
-.panel{
-  background:rgba(255,250,246,.82);border:1px solid var(--line);
-  border-radius:30px;padding:22px;box-shadow:0 14px 38px rgba(42,25,33,.07);
+.g-ball:nth-child(2n){background:linear-gradient(135deg,#e7f8ff,#42c8ff)}
+.g-ball:nth-child(3n){background:linear-gradient(135deg,#fff7d6,#ffd45f)}
+.g-base{
+  margin:-20px auto 0;width:70%;height:150px;border-radius:30px 30px 22px 22px;
+  background:linear-gradient(135deg,#fff,#ffbadc);border:8px solid rgba(255,255,255,.55);
+  box-shadow:0 22px 46px rgba(50,20,80,.18);position:relative;
 }
-.machine-wrap{display:grid;place-items:center;gap:16px}
-.machine{
-  width:min(330px,100%);aspect-ratio:1;border-radius:48px;
-  background:linear-gradient(145deg,#fff,#f7ecff);border:1px solid var(--line);
-  box-shadow:inset 0 0 0 12px rgba(255,255,255,.55),0 22px 46px rgba(124,92,255,.12);
-  display:grid;place-items:center;overflow:hidden;
+.knob{
+  position:absolute;left:50%;top:30px;transform:translateX(-50%);
+  width:82px;height:82px;border-radius:50%;background:linear-gradient(135deg,#ffeaa1,#ff9a2e);
+  border:8px solid rgba(255,255,255,.55);box-shadow:0 10px 22px rgba(0,0,0,.16);
 }
-.capsules{width:76%;height:76%;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:12px}
-.cap{
-  width:56px;height:56px;border-radius:999px;display:grid;place-items:center;
-  font-weight:950;color:#2b1320;background:linear-gradient(135deg,#fff,var(--yellow));
-  box-shadow:0 8px 16px rgba(42,25,33,.12);
+.hole{
+  position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
+  width:78px;height:44px;border-radius:999px 999px 18px 18px;background:#1d1021;
 }
-.machine.spin .cap{animation:bounce .62s ease}
-.machine.spin .cap:nth-child(2n){animation-delay:.05s}
-.machine.spin .cap:nth-child(3n){animation-delay:.1s}
-@keyframes bounce{
-  0%,100%{transform:translate(0,0) rotate(0)}
-  25%{transform:translate(-16px,8px) rotate(-18deg)}
-  55%{transform:translate(14px,-12px) rotate(22deg)}
-  80%{transform:translate(-8px,5px) rotate(-10deg)}
+.draw-card{
+  position:relative;z-index:5;margin:-12px 18px 0;padding:22px;border-radius:34px;background:#fff;
+  box-shadow:0 22px 60px rgba(60,25,70,.15);text-align:center;
 }
+.draw-card h2{margin:0 0 14px;font-size:22px}
 .draw-btn{
-  width:164px;height:164px;border-radius:50%;
-  background:linear-gradient(135deg,var(--yellow),var(--hot));
-  color:#2b1320;font-size:27px;font-weight:950;letter-spacing:.04em;
-  box-shadow:0 22px 42px rgba(255,76,157,.28);
+  width:min(360px,100%);height:78px;border-radius:999px;
+  color:#fff;background:linear-gradient(135deg,#ff7ac6,#ff2f93);
+  font-size:32px;font-weight:950;letter-spacing:.02em;box-shadow:0 16px 34px rgba(255,47,147,.28);
 }
-.draw-btn[disabled]{opacity:.65}
-.stock{color:var(--muted);font-weight:850;text-align:center}
-.result-preview{
-  min-height:418px;display:grid;place-items:center;text-align:center;
-  border:1px dashed #decfc5;border-radius:24px;color:var(--muted);
-  padding:22px;background:rgba(255,255,255,.48);
+.draw-sub{margin-top:8px;color:var(--muted);font-weight:800}
+.section{padding:28px 18px}
+.section h2{font-size:24px;margin:0 0 16px}
+.rank-counts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rank-box{
+  background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;text-align:center;
+  box-shadow:0 10px 28px rgba(40,20,60,.07);
 }
-
+.rank-icon{
+  width:46px;height:46px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;font-weight:950;color:#fff;
+  background:linear-gradient(135deg,#8a6cff,#cf7cff);
+}
+.rank-box strong{display:block;font-size:18px}.rank-box span{color:var(--muted);font-weight:800}
 .prize-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.prize-card{
-  background:#fff;border:1px solid var(--line);border-radius:24px;
-  padding:14px;box-shadow:0 10px 28px rgba(42,25,33,.06);overflow:hidden;
+.card{
+  background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px;
+  box-shadow:0 10px 28px rgba(40,20,60,.07);
 }
-.prize-img{
-  width:100%;aspect-ratio:1/1;border-radius:18px;
-  background:linear-gradient(135deg,#f0e6df,#fff);
-  display:grid;place-items:center;overflow:hidden;color:#b8a8a0;font-weight:900;
-}
-.prize-img img{width:100%;height:100%;object-fit:cover;display:block}
-.prize-card h3{margin:12px 0 6px;font-size:17px;line-height:1.25}
-.prize-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
-.prize-meta{
-  display:flex;justify-content:space-between;gap:8px;margin-top:12px;
-  color:var(--muted);font-size:12px;font-weight:850;
-}
-.rank-pill{
-  display:inline-flex;width:max-content;padding:6px 10px;border-radius:999px;
-  background:var(--mint);color:#11251d;font-size:12px;font-weight:950;margin-top:12px;
-}
-
-.history-list{display:grid;gap:10px}
-.history-item{
-  display:grid;grid-template-columns:72px 64px 1fr auto;gap:12px;align-items:center;
-  background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px;
-}
-.history-thumb{width:64px;height:64px;border-radius:14px;background:#f1e8e1;overflow:hidden}
-.history-thumb img{width:100%;height:100%;object-fit:cover}
-.empty{
-  padding:22px;border:1px dashed #decfc5;border-radius:20px;color:var(--muted);
-  text-align:center;background:rgba(255,255,255,.48);
-}
-
-.modal{
-  position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
-  padding:18px;background:rgba(28,18,24,.55);backdrop-filter:blur(12px);
-}
+.imgbox{aspect-ratio:1;border-radius:18px;overflow:hidden;background:#f5eef6;display:grid;place-items:center;color:#aaa;font-weight:900}
+.imgbox img{width:100%;height:100%;object-fit:cover}
+.pill{display:inline-flex;margin-top:10px;padding:6px 10px;border-radius:999px;background:#ffe5f3;color:#d9197d;font-weight:950;font-size:12px}
+.card h3{margin:10px 0 5px;font-size:16px}.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.card small{display:block;margin-top:8px;color:#aaa;font-weight:800}
+.history{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.history-item{display:grid;grid-template-columns:58px 1fr;gap:10px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:9px}
+.thumb{width:58px;height:58px;border-radius:14px;overflow:hidden;background:#f5eef6}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.empty{padding:22px;border-radius:22px;border:1px dashed #e7d8e9;text-align:center;color:var(--muted);background:#fff}
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(18,10,25,.55);backdrop-filter:blur(12px)}
 .modal.show{display:flex}
-.win-modal-card{
-  width:min(520px,100%);background:#fffaf4;border:1px solid var(--line);
-  border-radius:34px;padding:18px;box-shadow:0 34px 100px rgba(0,0,0,.28);
-  animation:pop .34s cubic-bezier(.2,1.2,.3,1);
-}
-@keyframes pop{
-  from{transform:scale(.82) translateY(18px);opacity:0}
-  to{transform:scale(1) translateY(0);opacity:1}
-}
-.win-img{
-  width:100%;aspect-ratio:1/1;border-radius:26px;background:#efe5dd;
-  overflow:hidden;display:grid;place-items:center;color:#a39188;font-weight:900;
-}
+.win{width:min(480px,100%);border-radius:34px;background:#fff;padding:18px;box-shadow:0 35px 100px rgba(0,0,0,.28);animation:pop .35s cubic-bezier(.2,1.25,.2,1)}
+@keyframes pop{from{transform:scale(.82);opacity:0}to{transform:scale(1);opacity:1}}
+.win-img{aspect-ratio:1;border-radius:28px;overflow:hidden;background:#f5eef6;display:grid;place-items:center}
 .win-img img{width:100%;height:100%;object-fit:cover}
-.win-rank{
-  margin:16px auto 10px;width:max-content;padding:9px 16px;border-radius:999px;
-  background:linear-gradient(135deg,var(--yellow),var(--pink));color:#2b1320;font-weight:950;
+.win-rank{width:max-content;margin:15px auto 8px;padding:8px 15px;border-radius:999px;background:linear-gradient(135deg,#ffd45f,#ff4fa3);font-weight:950}
+.win h2{text-align:center;margin:0;font-size:30px}.win p{text-align:center;color:var(--muted);line-height:1.5}
+.btn{min-height:48px;border-radius:16px;font-weight:950;padding:0 16px}.dark{background:#221625;color:#fff;width:100%}
+.drawer{
+  position:fixed;inset:0 0 0 auto;z-index:80;width:min(500px,100%);background:#fff;
+  transform:translateX(105%);transition:.25s;overflow:auto;padding:20px;box-shadow:-30px 0 70px rgba(20,10,30,.18)
 }
-.win-modal-card h2{margin:0;font-size:32px;letter-spacing:-.04em;text-align:center}
-.win-modal-card p{margin:8px 0 18px;color:var(--muted);text-align:center;line-height:1.55}
-
-.admin-drawer{
-  position:fixed;inset:0 0 0 auto;z-index:80;width:min(480px,100%);
-  background:#fffaf4;border-left:1px solid var(--line);
-  box-shadow:-24px 0 70px rgba(42,25,33,.18);
-  transform:translateX(105%);transition:.25s transform;overflow:auto;padding:20px;
-}
-.admin-drawer.open{transform:translateX(0)}
-.admin-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
-.admin-top h2{margin:0;font-size:26px}
-.form{display:grid;gap:12px}
-label{text-align:left;color:var(--muted);font-size:13px;font-weight:900;display:grid;gap:7px}
-input,select,textarea{
-  width:100%;min-height:46px;border:1px solid var(--line);border-radius:15px;
-  padding:10px 12px;background:#fff;color:var(--ink);outline:none;
-}
-textarea{resize:vertical;min-height:76px}
+.drawer.open{transform:translateX(0)}
+.drawer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.drawer h2{margin:0}.form{display:grid;gap:12px}
+label{display:grid;gap:7px;color:var(--muted);font-size:13px;font-weight:900}
+input,select,textarea{width:100%;min-height:46px;border:1px solid var(--line);border-radius:15px;padding:10px;background:#fff;color:var(--ink)}
+textarea{min-height:70px;resize:vertical}
+.form .save{height:50px;border-radius:16px;background:linear-gradient(135deg,#ffd45f,#ff4fa3);font-weight:950}
+.form .ghost{height:46px;border-radius:16px;background:#fff;border:1px solid var(--line);font-weight:950}
 .admin-list{display:grid;gap:10px;margin-top:18px}
-.admin-item{
-  display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;
-  background:#fff;border:1px solid var(--line);border-radius:18px;padding:9px;
-}
-.admin-thumb{width:58px;height:58px;border-radius:14px;overflow:hidden;background:#f1e8e1}
-.admin-thumb img{width:100%;height:100%;object-fit:cover}
-.mini-btn{min-height:38px;border-radius:12px;padding:0 12px;font-weight:900}
-.danger{background:#fff0f0;color:#de3e57;border:1px solid #ffd1d9}
-.toast{
-  position:fixed;left:50%;bottom:24px;z-index:200;
-  transform:translateX(-50%) translateY(20px);opacity:0;transition:.22s;
-  background:#241b20;color:#fff;border-radius:999px;padding:12px 16px;font-weight:850;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-@media(max-width:860px){
-  .header-inner{align-items:flex-start;flex-direction:column;padding:14px 18px 16px}
-  .brand{width:100%}
-  .logo{width:44px;height:44px;border-radius:16px;font-size:23px}
-  .brand h1{font-size:18px}
-  .brand p{font-size:12px}
-  .nav{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .nav a,.nav button{min-width:0;padding:12px 8px;font-size:14px}
-  .app{padding:20px 16px 80px}
-  .hero,.grid{grid-template-columns:1fr}
-  .hero{padding-top:18px;gap:18px}
-  .hero h2{font-size:46px}
-  .hero p{font-size:15px}
-  .ticket-card{min-height:390px;border-radius:28px;padding:18px}
-  .ticket-body{min-height:310px}
-  .mystery{width:152px;height:152px;border-radius:34px;font-size:78px}
-  .ticket-body h3{font-size:36px}
-  .panel{padding:18px;border-radius:26px}
-  .machine{width:min(300px,100%);border-radius:42px}
-  .cap{width:50px;height:50px}
-  .draw-btn{width:148px;height:148px;font-size:25px}
-  .result-preview{min-height:310px}
-  .prize-grid{grid-template-columns:1fr}
-  .history-item{grid-template-columns:58px 1fr;align-items:start}
-  .history-thumb{width:58px;height:58px}
-  .history-item .time{grid-column:2}
-  .section{margin-top:34px}
-  .section-title h2{font-size:27px}
+.admin-item{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:18px;padding:9px}
+.mini{height:34px;border-radius:11px;padding:0 10px;font-weight:900;background:#f7f0f8}.danger{color:#de3e57;background:#fff0f4}
+.toast{position:fixed;left:50%;bottom:24px;z-index:200;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#221625;color:#fff;border-radius:999px;padding:12px 16px;font-weight:900}
+.toast.show{opacity:1;transform:translateX(-50%)}
+@media(max-width:760px){
+  .hero{padding:30px 18px 20px;min-height:auto}.hero-inner{grid-template-columns:1fr}.hero h1{font-size:40px;letter-spacing:-.045em}
+  .hero p{font-size:15px}.gacha{width:min(320px,100%)}.globe{padding:34px}.g-ball{width:52px;height:52px}
+  .rank-counts{grid-template-columns:repeat(3,1fr)}.prize-grid{grid-template-columns:1fr 1fr}.history{grid-template-columns:1fr}
 }
 @media(max-width:430px){
-  .app{padding-left:14px;padding-right:14px}
-  .header-inner{padding-left:14px;padding-right:14px}
-  .hero h2{font-size:42px}
-  .hero-actions .btn{width:100%}
+  .nav{padding:9px 10px}.nav a,.nav button{height:44px;font-size:13px}
+  .hero h1{font-size:37px}.draw-card{margin-left:12px;margin-right:12px}.draw-btn{height:70px;font-size:28px}
+  .rank-counts{grid-template-columns:repeat(2,1fr)}.prize-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
-
 <body>
-<div class="header" id="header">
-  <div class="header-inner">
-    <div class="brand">
-      <div class="logo">K</div>
-      <div>
-        <h1>LUCKY KUJI</h1>
-        <p>랜덤 굿즈 온라인 쿠지</p>
-      </div>
-    </div>
-    <div class="nav">
-      <a href="#drawSection">뽑기</a>
-      <a href="#prizeSection">상품</a>
-      <button type="button" onclick="openAdminDirect()">관리자</button>
-    </div>
-  </div>
-</div>
+<header class="header" id="header">
+  <nav class="nav">
+    <a href="#draw">뽑기</a>
+    <a href="#prizes">상품</a>
+    <button type="button" onclick="openAdmin()">관리자</button>
+  </nav>
+</header>
 
-<div class="app">
+<main class="app">
   <section class="hero">
-    <div>
-      <span class="badge">LIMITED KUJI</span>
-      <h2>오늘의 운으로<br>숨겨진 굿즈를 뽑아보세요</h2>
-      <p>상품 이미지를 직접 등록하고, 폰에 저장된 상태로 관리할 수 있는 온라인 쿠지 페이지입니다. 뽑기는 누구나 가능하고, 상품 관리는 관리자 메뉴에서 할 수 있습니다.</p>
-      <div class="hero-actions">
-        <a class="btn primary" href="#drawSection">바로 뽑기</a>
-        <a class="btn ghost" href="#prizeSection">상품 보기</a>
+    <div class="hero-inner">
+      <div>
+        <span class="badge">1회 뽑기 ✦</span>
+        <h1>오늘의 운!<br>굿즈를 뽑아보세요</h1>
+        <p>과연 어떤 굿즈가 나올까?</p>
+        <div class="stat"><div class="ball"></div><div><span>등록된 상품</span><strong id="heroTotal">0개</strong></div></div>
       </div>
-    </div>
-
-    <div class="ticket-card">
-      <div class="ticket-top"><span>KUJI TICKET</span><strong>#LUCKY-DROP</strong></div>
-      <div class="ticket-body">
-        <div>
-          <div class="mystery">?</div>
-          <p>1회 뽑기</p>
-          <h3>DRAW</h3>
+      <div class="gacha">
+        <div class="globe">
+          <div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div>
+          <div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div>
         </div>
-      </div>
-      <div class="ticket-bottom"><span>A / B / C / D / E</span><span>NO BLANK</span></div>
-    </div>
-  </section>
-
-  <section id="drawSection" class="section">
-    <div class="section-head">
-      <div class="section-title"><span>01</span><h2>쿠지 뽑기</h2></div>
-    </div>
-
-    <div class="grid">
-      <div class="panel">
-        <div class="machine-wrap">
-          <div class="machine" id="machine">
-            <div class="capsules">
-              <div class="cap">A</div><div class="cap">B</div><div class="cap">C</div><div class="cap">D</div>
-              <div class="cap">★</div><div class="cap">?</div><div class="cap">♡</div><div class="cap">E</div>
-            </div>
-          </div>
-          <button class="draw-btn" id="drawBtn" type="button" onclick="drawKuji()">DRAW</button>
-          <div class="stock">등록된 상품 <strong id="totalCount">0</strong>개</div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div id="resultPreview" class="result-preview">
-          아직 뽑기 전입니다.<br>DRAW 버튼을 눌러보세요.
-        </div>
+        <div class="g-base"><div class="knob"></div><div class="hole"></div></div>
       </div>
     </div>
   </section>
 
-  <section id="prizeSection" class="section">
-    <div class="section-head">
-      <div class="section-title"><span>02</span><h2>상품 라인업</h2></div>
-    </div>
-    <div id="prizeGrid" class="prize-grid"></div>
+  <section class="draw-card" id="draw">
+    <h2>지금 바로 뽑기!</h2>
+    <button class="draw-btn" id="drawBtn" onclick="drawKuji()">🪙 DRAW</button>
+    <div class="draw-sub">총 <b id="totalCount">0</b>개 중 랜덤</div>
   </section>
 
   <section class="section">
-    <div class="section-head">
-      <div class="section-title"><span>03</span><h2>최근 뽑기 기록</h2></div>
-      <button class="btn ghost" type="button" onclick="clearHistory()">기록 초기화</button>
-    </div>
-    <div id="historyList" class="history-list"></div>
+    <h2>등급별 보유 수량</h2>
+    <div class="rank-counts" id="rankCounts"></div>
   </section>
-</div>
 
-<div class="modal" id="winModal" onclick="modalBgClose(event)">
-  <div class="win-modal-card">
+  <section class="section" id="prizes">
+    <h2>상품 라인업</h2>
+    <div class="prize-grid" id="prizeGrid"></div>
+  </section>
+
+  <section class="section">
+    <h2>최근 당첨 내역</h2>
+    <div class="history" id="historyList"></div>
+  </section>
+</main>
+
+<div class="modal" id="winModal" onclick="if(event.target.id==='winModal')closeWin()">
+  <div class="win">
     <div class="win-img" id="winImg"></div>
     <div class="win-rank" id="winRank"></div>
     <h2 id="winName"></h2>
     <p id="winDesc"></p>
-    <button class="btn dark" style="width:100%" type="button" onclick="closeWin()">닫기</button>
+    <button class="btn dark" onclick="closeWin()">닫기</button>
   </div>
 </div>
 
-<aside class="admin-drawer" id="adminDrawer">
-  <div class="admin-top">
+<aside class="drawer" id="adminDrawer">
+  <div class="drawer-top">
     <h2>상품 관리</h2>
-    <button class="mini-btn ghost" type="button" onclick="closeAdmin()">닫기</button>
+    <button class="mini" onclick="closeAdmin()">닫기</button>
   </div>
 
   <div class="form">
     <input type="hidden" id="editIndex">
-
-    <label>상품 이미지
-      <input id="itemImg" type="file" accept="image/*">
-    </label>
-
+    <label>상품 이미지 <input id="itemImg" type="file" accept="image/*"></label>
     <label>등급
       <select id="itemRank">
-        <option>A상</option>
-        <option>B상</option>
-        <option>C상</option>
-        <option>D상</option>
-        <option>E상</option>
-        <option>LAST상</option>
+        <option>미스터리상</option><option>A상</option><option>B상</option><option>C상</option><option>D상</option><option>E상</option>
       </select>
     </label>
-
-    <label>상품명
-      <input id="itemName" placeholder="예: 한정 아크릴 스탠드">
-    </label>
-
-    <label>상품 설명
-      <textarea id="itemDesc" placeholder="결과 팝업에 표시될 설명"></textarea>
-    </label>
-
-    <button class="btn primary" type="button" onclick="savePrize()">상품 저장</button>
-    <button class="btn ghost" type="button" onclick="resetForm()">입력 초기화</button>
+    <label>상품명 <input id="itemName" placeholder="예: 토끼 인형 키링"></label>
+    <label>상품 설명 <textarea id="itemDesc" placeholder="짧게 설명"></textarea></label>
+    <label>수량 <input id="itemQty" type="number" min="1" value="1"></label>
+    <button class="save" onclick="savePrize()">상품 저장</button>
+    <button class="ghost" onclick="resetForm()">입력 초기화</button>
   </div>
 
   <div class="admin-list" id="adminList"></div>
@@ -434,283 +259,159 @@ textarea{resize:vertical;min-height:76px}
 <div class="toast" id="toast"></div>
 
 <script>
-const STORAGE_KEY = "pretty_kuji_items_v4";
-const HISTORY_KEY = "pretty_kuji_history_v4";
-
-let prizes = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+const STORAGE_KEY="gacha_kuji_items_v1";
+const HISTORY_KEY="gacha_kuji_history_v1";
+let prizes=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
+let history=JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]");
+const ranks=["미스터리상","A상","B상","C상","D상","E상"];
 
 function $(id){return document.getElementById(id)}
-
-function saveAll(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(prizes));
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-}
-
-function esc(str){
-  return String(str || "").replace(/[&<>"']/g, function(m){
-    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m];
-  });
-}
-
-function toast(msg){
-  $("toast").textContent = msg;
-  $("toast").classList.add("show");
-  setTimeout(function(){$("toast").classList.remove("show")},1600);
-}
-
-function imgHTML(src){
-  return src ? '<img src="' + src + '" alt="">' : '<span>NO IMAGE</span>';
-}
+function toast(msg){$("toast").textContent=msg;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1500)}
+function saveAll(){localStorage.setItem(STORAGE_KEY,JSON.stringify(prizes));localStorage.setItem(HISTORY_KEY,JSON.stringify(history))}
+function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function imgHTML(src){return src?`<img src="${src}" alt="">`:"<span>NO IMAGE</span>"}
+function totalQty(){return prizes.reduce((a,p)=>a+(Number(p.qty)||0),0)}
 
 function render(){
-  $("totalCount").textContent = prizes.length;
+  const total=totalQty();
+  $("heroTotal").textContent=total+"개";
+  $("totalCount").textContent=total;
 
-  $("prizeGrid").innerHTML = prizes.length ? prizes.map(function(p,i){
-    return `
-      <article class="prize-card">
-        <div class="prize-img">${imgHTML(p.img)}</div>
-        <span class="rank-pill">${esc(p.rank)}</span>
-        <h3>${esc(p.name)}</h3>
-        <p>${esc(p.desc)}</p>
-        <div class="prize-meta">
-          <span>상품 #${i+1}</span>
-          <span>등록됨</span>
-        </div>
-      </article>
-    `;
-  }).join("") : `<div class="empty" style="grid-column:1/-1">아직 등록된 상품이 없습니다. 관리자 메뉴에서 상품을 추가하세요.</div>`;
+  const counts={}; ranks.forEach(r=>counts[r]=0);
+  prizes.forEach(p=>counts[p.rank]=(counts[p.rank]||0)+(Number(p.qty)||0));
+  $("rankCounts").innerHTML=ranks.map(r=>`
+    <div class="rank-box">
+      <div class="rank-icon">${r==="미스터리상"?"?":r.replace("상","")}</div>
+      <strong>${esc(r)}</strong><span>${counts[r]||0}개</span>
+    </div>
+  `).join("");
 
-  $("historyList").innerHTML = history.length ? history.map(function(h){
-    return `
-      <div class="history-item">
-        <strong style="color:#ff4c9d">${esc(h.rank)}</strong>
-        <div class="history-thumb">${imgHTML(h.img)}</div>
-        <div>
-          <strong>${esc(h.name)}</strong>
-          <div style="color:#81737b;font-size:13px">${esc(h.desc)}</div>
-        </div>
-        <div class="time" style="color:#81737b;font-size:12px">${esc(h.time)}</div>
-      </div>
-    `;
-  }).join("") : `<div class="empty">아직 뽑기 기록이 없습니다.</div>`;
+  $("prizeGrid").innerHTML=prizes.length?prizes.map((p,i)=>`
+    <article class="card">
+      <div class="imgbox">${imgHTML(p.img)}</div>
+      <span class="pill">${esc(p.rank)}</span>
+      <h3>${esc(p.name)}</h3>
+      <p>${esc(p.desc)}</p>
+      <small>수량 ${Number(p.qty)||0}개</small>
+    </article>
+  `).join(""):`<div class="empty" style="grid-column:1/-1">아직 등록된 상품이 없습니다.</div>`;
 
-  renderAdminList();
+  $("historyList").innerHTML=history.length?history.map(h=>`
+    <div class="history-item">
+      <div class="thumb">${imgHTML(h.img)}</div>
+      <div><b>${esc(h.rank)} · ${esc(h.name)}</b><br><small>${esc(h.time)}</small></div>
+    </div>
+  `).join(""):`<div class="empty">아직 당첨 내역이 없습니다.</div>`;
+
+  renderAdmin();
 }
 
-function renderAdminList(){
-  $("adminList").innerHTML = prizes.length ? prizes.map(function(p,i){
-    return `
-      <div class="admin-item">
-        <div class="admin-thumb">${imgHTML(p.img)}</div>
-        <div>
-          <strong>${esc(p.rank)} · ${esc(p.name)}</strong>
-          <div style="color:#81737b;font-size:12px">${esc(p.desc)}</div>
-        </div>
-        <div style="display:grid;gap:6px">
-          <button class="mini-btn ghost" type="button" onclick="editPrize(${i})">수정</button>
-          <button class="mini-btn danger" type="button" onclick="deletePrize(${i})">삭제</button>
-        </div>
+function renderAdmin(){
+  $("adminList").innerHTML=prizes.length?prizes.map((p,i)=>`
+    <div class="admin-item">
+      <div class="thumb">${imgHTML(p.img)}</div>
+      <div><b>${esc(p.rank)} · ${esc(p.name)}</b><br><small>수량 ${Number(p.qty)||0}개</small></div>
+      <div style="display:grid;gap:6px">
+        <button class="mini" onclick="editPrize(${i})">수정</button>
+        <button class="mini danger" onclick="deletePrize(${i})">삭제</button>
       </div>
-    `;
-  }).join("") : `<div class="empty">관리자 메뉴에서 첫 상품을 추가하세요.</div>`;
+    </div>
+  `).join(""):`<div class="empty">상품을 추가하세요.</div>`;
+}
+
+function weightedPool(){
+  const pool=[];
+  prizes.forEach((p,i)=>{
+    const q=Math.max(0,Number(p.qty)||0);
+    for(let n=0;n<q;n++) pool.push(i);
+  });
+  return pool;
 }
 
 function drawKuji(){
-  if(!prizes.length){
-    toast("등록된 상품이 없습니다.");
-    openAdminDirect();
-    return;
-  }
+  const pool=weightedPool();
+  if(!pool.length){toast("등록된 상품이 없습니다.");openAdmin();return}
+  const btn=$("drawBtn");
+  btn.disabled=true;btn.textContent="...";
+  setTimeout(()=>{
+    const idx=pool[Math.floor(Math.random()*pool.length)];
+    const pick=prizes[idx];
+    pick.qty=Math.max(0,(Number(pick.qty)||0)-1);
 
-  const btn = $("drawBtn");
-  const machine = $("machine");
+    const record={rank:pick.rank,name:pick.name,desc:pick.desc,img:pick.img,time:new Date().toLocaleString("ko-KR")};
+    history.unshift(record);history=history.slice(0,20);
 
-  btn.disabled = true;
-  btn.textContent = "...";
-  machine.classList.remove("spin");
-  void machine.offsetWidth;
-  machine.classList.add("spin");
-
-  setTimeout(function(){
-    const pick = prizes[Math.floor(Math.random() * prizes.length)];
-    const record = {
-      rank: pick.rank,
-      name: pick.name,
-      desc: pick.desc,
-      img: pick.img,
-      time: new Date().toLocaleString("ko-KR")
-    };
-
-    history.unshift(record);
-    history = history.slice(0,20);
-    saveAll();
-
-    $("resultPreview").innerHTML = `
-      <div style="width:100%">
-        <div class="prize-img" style="max-width:240px;margin:0 auto 16px">${imgHTML(pick.img)}</div>
-        <span class="rank-pill">${esc(pick.rank)}</span>
-        <h3 style="font-size:28px;margin:12px 0 8px">${esc(pick.name)}</h3>
-        <p style="color:#81737b;line-height:1.55">${esc(pick.desc)}</p>
-      </div>
-    `;
-
-    $("winImg").innerHTML = imgHTML(pick.img);
-    $("winRank").textContent = pick.rank + " 당첨!";
-    $("winName").textContent = pick.name;
-    $("winDesc").textContent = pick.desc;
+    $("winImg").innerHTML=imgHTML(pick.img);
+    $("winRank").textContent=pick.rank+" 당첨!";
+    $("winName").textContent=pick.name;
+    $("winDesc").textContent=pick.desc;
     $("winModal").classList.add("show");
 
-    btn.disabled = false;
-    btn.textContent = "DRAW";
-    render();
-  },850);
+    btn.disabled=false;btn.textContent="🪙 DRAW";
+    saveAll();render();
+  },750)
 }
-
-function closeWin(){
-  $("winModal").classList.remove("show");
-}
-
-function modalBgClose(e){
-  if(e.target.id === "winModal") closeWin();
-}
-
-function openAdminDirect(){
-  $("adminDrawer").classList.add("open");
-  toast("관리자 메뉴가 열렸습니다.");
-}
-
-function closeAdmin(){
-  $("adminDrawer").classList.remove("open");
-}
+function closeWin(){$("winModal").classList.remove("show")}
+function openAdmin(){$("adminDrawer").classList.add("open");toast("관리자 메뉴가 열렸습니다.")}
+function closeAdmin(){$("adminDrawer").classList.remove("open")}
 
 function fileToDataURL(file){
-  return new Promise(function(resolve,reject){
-    if(!file){
-      resolve("");
-      return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = function(e){
-      const img = new Image();
-
-      img.onload = function(){
-        const canvas = document.createElement("canvas");
-        const maxSize = 900;
-
-        let width = img.width;
-        let height = img.height;
-
-        if(width > height && width > maxSize){
-          height = Math.round(height * maxSize / width);
-          width = maxSize;
-        }else if(height > maxSize){
-          width = Math.round(width * maxSize / height);
-          height = maxSize;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img,0,0,width,height);
-
-        const compressed = canvas.toDataURL("image/jpeg",0.7);
-        resolve(compressed);
+  return new Promise((resolve,reject)=>{
+    if(!file){resolve("");return}
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement("canvas");
+        const maxSize=850;
+        let w=img.width,h=img.height;
+        if(w>h&&w>maxSize){h=Math.round(h*maxSize/w);w=maxSize}
+        else if(h>maxSize){w=Math.round(w*maxSize/h);h=maxSize}
+        canvas.width=w;canvas.height=h;
+        canvas.getContext("2d").drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL("image/jpeg",0.68));
       };
-
-      img.onerror = reject;
-      img.src = e.target.result;
+      img.onerror=reject;img.src=e.target.result;
     };
-
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+    reader.onerror=reject;reader.readAsDataURL(file);
+  })
 }
 
 async function savePrize(){
-  const editIndex = $("editIndex").value;
-  const rank = $("itemRank").value;
-  const name = $("itemName").value.trim();
-  const desc = $("itemDesc").value.trim();
-  const file = $("itemImg").files[0];
-
-  if(!name){
-    toast("상품명을 입력하세요.");
-    return;
-  }
-
-  let img = "";
-
-  if(file){
-    img = await fileToDataURL(file);
-  }else if(editIndex !== ""){
-    img = prizes[Number(editIndex)].img || "";
-  }
-
-  const item = {rank:rank,name:name,desc:desc,img:img};
-
-  if(editIndex !== ""){
-    prizes[Number(editIndex)] = item;
-    toast("상품을 수정했습니다.");
-  }else{
-    prizes.push(item);
-    toast("상품을 추가했습니다.");
-  }
-
-  resetForm();
-  saveAll();
-  render();
+  const editIndex=$("editIndex").value;
+  const rank=$("itemRank").value;
+  const name=$("itemName").value.trim();
+  const desc=$("itemDesc").value.trim();
+  const qty=Math.max(1,Number($("itemQty").value)||1);
+  const file=$("itemImg").files[0];
+  if(!name){toast("상품명을 입력하세요.");return}
+  let img="";
+  if(file) img=await fileToDataURL(file);
+  else if(editIndex!=="") img=prizes[Number(editIndex)].img||"";
+  const item={rank,name,desc,qty,img};
+  if(editIndex!==""){prizes[Number(editIndex)]=item;toast("상품을 수정했습니다.")}
+  else{prizes.push(item);toast("상품을 추가했습니다.")}
+  resetForm();saveAll();render();
 }
-
 function editPrize(i){
-  const p = prizes[i];
-  $("editIndex").value = i;
-  $("itemRank").value = p.rank;
-  $("itemName").value = p.name;
-  $("itemDesc").value = p.desc || "";
-  $("itemImg").value = "";
-  toast("수정할 내용을 불러왔습니다.");
+  const p=prizes[i];
+  $("editIndex").value=i;$("itemRank").value=p.rank;$("itemName").value=p.name;
+  $("itemDesc").value=p.desc||"";$("itemQty").value=p.qty||1;$("itemImg").value="";
+  toast("수정할 상품을 불러왔습니다.");
 }
-
-function deletePrize(i){
-  prizes.splice(i,1);
-  saveAll();
-  render();
-  toast("상품을 삭제했습니다.");
-}
-
+function deletePrize(i){prizes.splice(i,1);saveAll();render();toast("삭제했습니다.")}
 function resetForm(){
-  $("editIndex").value = "";
-  $("itemRank").value = "A상";
-  $("itemName").value = "";
-  $("itemDesc").value = "";
-  $("itemImg").value = "";
+  $("editIndex").value="";$("itemRank").value="미스터리상";$("itemName").value="";
+  $("itemDesc").value="";$("itemQty").value=1;$("itemImg").value="";
 }
 
-function clearHistory(){
-  history = [];
-  saveAll();
-  render();
-  toast("기록을 초기화했습니다.");
-}
-
-let lastScroll = 0;
-window.addEventListener("scroll", function(){
-  const current = window.scrollY;
-  const header = $("header");
-
-  if(current > lastScroll && current > 130){
-    header.classList.add("hide");
-  }else{
-    header.classList.remove("hide");
-  }
-
-  lastScroll = current;
+let last=0;
+window.addEventListener("scroll",()=>{
+  const cur=window.scrollY;
+  if(cur>last&&cur>90)$("header").classList.add("hide");
+  else $("header").classList.remove("hide");
+  last=cur;
 });
-
 render();
 </script>
 </body>

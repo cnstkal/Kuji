@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUCKY KUJI</title>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#221625;--muted:#7f7288;--hot:#ff2f93;--blue:#42c8ff;--yellow:#ffd45f;--line:#eee4f0}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--ink);background:#fff}
+button,input,select,textarea{font:inherit}
+button{border:0;cursor:pointer}
+button:active{transform:scale(.98)}
+.header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.88);backdrop-filter:blur(18px);border-bottom:1px solid #f1e7f1;transition:.25s}
+.header.hide{transform:translateY(-105%)}
+.nav{max-width:980px;margin:auto;padding:10px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.nav a,.nav button{height:48px;border-radius:999px;background:#fff;color:#6d6475;text-decoration:none;display:flex;align-items:center;justify-content:center;font-weight:950;border:1px solid var(--line);box-shadow:0 8px 22px rgba(40,20,60,.07)}
+.nav a:first-child{color:var(--hot)}
+.app{max-width:980px;margin:auto;padding-bottom:80px}
+.hero{position:relative;overflow:hidden;padding:44px 22px 26px;min-height:560px;background:radial-gradient(circle at 72% 35%,rgba(255,255,255,.45),transparent 26%),radial-gradient(circle at 25% 18%,rgba(255,88,180,.34),transparent 26%),linear-gradient(135deg,#6e5bff 0%,#d86cff 45%,#ff8bc3 100%);color:#fff}
+.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 78%,rgba(255,255,255,.22),transparent 18%),radial-gradient(circle at 88% 12%,rgba(82,216,255,.35),transparent 18%)}
+.hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}
+.badge{display:inline-flex;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.45);font-weight:950;font-size:13px;backdrop-filter:blur(10px)}
+.hero h1{margin:18px 0 12px;font-size:clamp(42px,8vw,72px);line-height:.96;letter-spacing:-.055em;text-shadow:0 5px 0 rgba(50,25,90,.18)}
+.hero p{margin:0;font-size:17px;line-height:1.55;color:rgba(255,255,255,.9);font-weight:750}
+.stat{margin-top:22px;width:max-content;min-width:210px;padding:16px 18px;border-radius:26px;background:rgba(255,255,255,.86);color:var(--ink);display:flex;gap:12px;align-items:center;box-shadow:0 18px 46px rgba(50,20,80,.18)}
+.ball{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#fff,#ff5aa8 48%,#51d7ff 50%,#fff);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.stat span{display:block;color:var(--muted);font-size:13px;font-weight:800}.stat strong{font-size:26px}
+.gacha{width:min(360px,100%);margin:auto;position:relative}
+.globe{aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.32);border:10px solid rgba(255,255,255,.45);box-shadow:inset 0 0 42px rgba(255,255,255,.6),0 22px 50px rgba(50,20,80,.24);display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:12px;padding:40px}
+.g-ball{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#ffeff9,#ff4fa3);box-shadow:inset -8px -10px 16px rgba(120,20,90,.15),0 8px 18px rgba(0,0,0,.16)}
+.g-ball:nth-child(2n){background:linear-gradient(135deg,#e7f8ff,#42c8ff)}.g-ball:nth-child(3n){background:linear-gradient(135deg,#fff7d6,#ffd45f)}
+.g-base{margin:-20px auto 0;width:70%;height:150px;border-radius:30px 30px 22px 22px;background:linear-gradient(135deg,#fff,#ffbadc);border:8px solid rgba(255,255,255,.55);box-shadow:0 22px 46px rgba(50,20,80,.18);position:relative}
+.knob{position:absolute;left:50%;top:30px;transform:translateX(-50%);width:82px;height:82px;border-radius:50%;background:linear-gradient(135deg,#ffeaa1,#ff9a2e);border:8px solid rgba(255,255,255,.55);box-shadow:0 10px 22px rgba(0,0,0,.16)}
+.hole{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:78px;height:44px;border-radius:999px 999px 18px 18px;background:#1d1021}
+.draw-card{position:relative;z-index:5;margin:-12px 18px 0;padding:22px;border-radius:34px;background:#fff;box-shadow:0 22px 60px rgba(60,25,70,.15);text-align:center}
+.draw-card h2{margin:0 0 14px;font-size:22px}
+.draw-btn{width:min(360px,100%);height:78px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#ff7ac6,#ff2f93);font-size:32px;font-weight:950;letter-spacing:.02em;box-shadow:0 16px 34px rgba(255,47,147,.28)}
+.draw-sub{margin-top:8px;color:var(--muted);font-weight:800}.bonus-line{margin-top:8px;color:var(--hot);font-weight:950}
+.section{padding:28px 18px}.section h2{font-size:24px;margin:0 0 16px}
+.rank-counts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.rank-box{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;text-align:center;box-shadow:0 10px 28px rgba(40,20,60,.07)}
+.rank-icon{width:46px;height:46px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;font-weight:950;color:#fff;background:linear-gradient(135deg,#8a6cff,#cf7cff)}
+.rank-box.digital .rank-icon{background:linear-gradient(135deg,#42c8ff,#7657ff)}
+.rank-box strong{display:block;font-size:18px}.rank-box span{color:var(--muted);font-weight:800}
+.prize-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:9px;box-shadow:0 10px 28px rgba(40,20,60,.07)}
+.imgbox{aspect-ratio:1;border-radius:13px;overflow:hidden;background:#f5eef6;display:grid;place-items:center;color:#aaa;font-weight:900;font-size:10px}
+.imgbox img{width:100%;height:100%;object-fit:cover}
+.pill{display:inline-flex;margin-top:7px;padding:4px 7px;border-radius:999px;background:#ffe5f3;color:#d9197d;font-weight:950;font-size:10px}
+.pill.digital{background:#e8f5ff;color:#2369ff}
+.card h3{margin:7px 0 3px;font-size:13px;line-height:1.2}.card p{margin:0;color:var(--muted);font-size:10px;line-height:1.3}.card small{display:block;margin-top:5px;color:#aaa;font-weight:800;font-size:10px}
+.history{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.history-item{display:grid;grid-template-columns:58px 1fr;gap:10px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:9px}
+.thumb{width:58px;height:58px;border-radius:14px;overflow:hidden;background:#f5eef6}.thumb img{width:100%;height:100%;object-fit:cover}
+.empty{padding:18px;border-radius:20px;border:1px dashed #e7d8e9;text-align:center;color:var(--muted);background:#fff}
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(18,10,25,.55);backdrop-filter:blur(12px)}.modal.show{display:flex}
+.win{width:min(480px,100%);border-radius:34px;background:#fff;padding:18px;box-shadow:0 35px 100px rgba(0,0,0,.28);animation:pop .35s cubic-bezier(.2,1.25,.2,1)}
+@keyframes pop{from{transform:scale(.82);opacity:0}to{transform:scale(1);opacity:1}}
+.win-img{aspect-ratio:1;border-radius:28px;overflow:hidden;background:#f5eef6;display:grid;place-items:center}.win-img img{width:100%;height:100%;object-fit:cover}
+.win-rank{width:max-content;margin:15px auto 8px;padding:8px 15px;border-radius:999px;background:linear-gradient(135deg,#ffd45f,#ff4fa3);font-weight:950}.win h2{text-align:center;margin:0;font-size:30px}.win p{text-align:center;color:var(--muted);line-height:1.5}
+.btn{min-height:48px;border-radius:16px;font-weight:950;padding:0 16px}.dark{background:#221625;color:#fff;width:100%}
+.drawer{position:fixed;inset:0 0 0 auto;z-index:80;width:min(500px,100%);background:#fff;transform:translateX(105%);transition:.25s;overflow:auto;padding:20px;box-shadow:-30px 0 70px rgba(20,10,30,.18)}
+.drawer.open{transform:translateX(0)}.drawer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.drawer h2{margin:0}.form{display:grid;gap:12px}
+label{display:grid;gap:7px;color:var(--muted);font-size:13px;font-weight:900}
+input,select,textarea{width:100%;min-height:46px;border:1px solid var(--line);border-radius:15px;padding:10px;background:#fff;color:var(--ink)}textarea{min-height:70px;resize:vertical}
+.form .save{height:50px;border-radius:16px;background:linear-gradient(135deg,#ffd45f,#ff4fa3);font-weight:950}.form .ghost{height:46px;border-radius:16px;background:#fff;border:1px solid var(--line);font-weight:950}
+.admin-list{display:grid;gap:10px;margin-top:18px}.admin-item{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:18px;padding:9px}
+.mini{height:34px;border-radius:11px;padding:0 10px;font-weight:900;background:#f7f0f8}.danger{color:#de3e57;background:#fff0f4}
+.toast{position:fixed;left:50%;bottom:24px;z-index:200;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#221625;color:#fff;border-radius:999px;padding:12px 16px;font-weight:900;max-width:90%;text-align:center}.toast.show{opacity:1;transform:translateX(-50%)}
+@media(max-width:760px){.hero{padding:30px 18px 20px;min-height:auto}.hero-inner{grid-template-columns:1fr}.hero h1{font-size:40px;letter-spacing:-.045em}.hero p{font-size:15px}.gacha{width:min(320px,100%)}.globe{padding:34px}.g-ball{width:52px;height:52px}.rank-counts{grid-template-columns:repeat(3,1fr)}.prize-grid{grid-template-columns:repeat(3,1fr)}.history{grid-template-columns:1fr}}
+@media(max-width:430px){.nav{padding:9px 10px}.nav a,.nav button{height:44px;font-size:13px}.hero h1{font-size:37px}.draw-card{margin-left:12px;margin-right:12px}.draw-btn{height:70px;font-size:28px}.rank-counts{grid-template-columns:repeat(2,1fr)}.prize-grid{grid-template-columns:repeat(3,1fr);gap:7px}}
+</style>
+</head>
+<body>
+<header class="header" id="header"><nav class="nav"><a href="#draw">뽑기</a><a href="#prizes">상품</a><button type="button" onclick="openAdmin()">관리자</button></nav></header>
+
+<main class="app">
+<section class="hero"><div class="hero-inner"><div><span class="badge">1회 뽑기 ✦</span><h1>오늘의 운!<br>굿즈를 뽑아보세요</h1><p>과연 어떤 굿즈가 나올까?</p><div class="stat"><div class="ball"></div><div><span>등록된 상품</span><strong id="heroTotal">0개</strong></div></div></div><div class="gacha"><div class="globe"><div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div></div><div class="g-base"><div class="knob"></div><div class="hole"></div></div></div></div></section>
+<section class="draw-card" id="draw"><h2>지금 바로 뽑기!</h2><button class="draw-btn" id="drawBtn" onclick="drawKuji()">🪙 DRAW</button><div class="draw-sub">총 <b id="totalCount">0</b>개 중 랜덤</div><div class="bonus-line" id="bonusLine"></div></section>
+<section class="section"><h2>등급별 보유 수량</h2><div class="rank-counts" id="rankCounts"></div></section>
+<section class="section" id="prizes"><h2>상품 라인업</h2><div class="prize-grid" id="prizeGrid"></div></section>
+<section class="section"><h2>최근 당첨 내역</h2><div class="history" id="historyList"></div></section>
+</main>
+
+<div class="modal" id="winModal" onclick="if(event.target.id==='winModal')closeWin()"><div class="win"><div class="win-img" id="winImg"></div><div class="win-rank" id="winRank"></div><h2 id="winName"></h2><p id="winDesc"></p><button class="btn dark" onclick="closeWin()">닫기</button></div></div>
+
+<aside class="drawer" id="adminDrawer">
+<div class="drawer-top"><h2>상품 관리</h2><button class="mini" onclick="closeAdmin()">닫기</button></div>
+<div class="form">
+<input type="hidden" id="editIndex">
+<label>상품 이미지 <input id="itemImg" type="file" accept="image/*"></label>
+<label>등급 <select id="itemRank"><option>A상</option><option>B상</option><option>C상</option><option>D상</option><option>E상</option><option>미스터리상</option><option>디지털상</option></select></label>
+<label>상품명 <input id="itemName" placeholder="예: 토끼 인형 키링"></label>
+<label>상품 설명 <textarea id="itemDesc" placeholder="짧게 설명"></textarea></label>
+<label>수량 <input id="itemQty" type="number" min="1" value="1"></label>
+<label>확률 가중치 <input id="itemWeight" type="number" min="1" value="10"></label>
+<button class="save" onclick="savePrize()">상품 저장</button>
+<button class="ghost" onclick="resetForm()">입력 초기화</button>
+<button class="ghost danger" onclick="resetAllData()">전체 초기화</button>
+</div>
+<div class="admin-list" id="adminList"></div>
+</aside>
+<div class="toast" id="toast"></div>
+
+<script>
+const DB_NAME="kuji_all_data_v12";
+const STORE_META="meta";
+const STORE_IMAGES="images";
+const MAX_ITEMS=120;
+
+let prizes=[];
+let history=[];
+let bonusChances=0;
+let imageCache={};
+
+const ranks=["A상","B상","C상","D상","E상","미스터리상","디지털상"];
+const rankOrder={"A상":1,"B상":2,"C상":3,"D상":4,"E상":5,"미스터리상":6,"디지털상":7};
+
+function $(id){return document.getElementById(id)}
+function toast(msg){$("toast").textContent=msg;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2200)}
+function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function imgHTML(src){return src?`<img src="${src}" alt="">`:"<span>NO IMAGE</span>"}
+function makeId(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function totalQty(){return prizes.reduce((a,p)=>a+(Number(p.qty)||0),0)}
+function normalize(){prizes.forEach(p=>{p.qty=Math.max(0,Number(p.qty)||0);p.weight=Math.max(1,Number(p.weight)||10);if(!p.rank)p.rank="A상";if(!p.id)p.id=makeId();if(!p.imgId)p.imgId=""})}
+function sortPrizes(){normalize();prizes.sort((a,b)=>(rankOrder[a.rank]||99)-(rankOrder[b.rank]||99)||String(a.name).localeCompare(String(b.name)))}
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    if(!window.indexedDB){reject(new Error("IndexedDB 미지원"));return}
+    const req=indexedDB.open(DB_NAME,1);
+    req.onupgradeneeded=()=>{
+      const db=req.result;
+      if(!db.objectStoreNames.contains(STORE_META))db.createObjectStore(STORE_META);
+      if(!db.objectStoreNames.contains(STORE_IMAGES))db.createObjectStore(STORE_IMAGES);
+    };
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function dbPut(store,key,value){
+  const db=await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,"readwrite");
+    tx.objectStore(store).put(value,key);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+async function dbGet(store,key){
+  const db=await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,"readonly");
+    const req=tx.objectStore(store).get(key);
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function dbDelete(store,key){
+  const db=await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,"readwrite");
+    tx.objectStore(store).delete(key);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+async function dbClear(store){
+  const db=await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,"readwrite");
+    tx.objectStore(store).clear();
+    tx.oncomplete=()=>resolve();
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+
+async function loadData(){
+  try{
+    prizes=await dbGet(STORE_META,"prizes") || [];
+    history=await dbGet(STORE_META,"history") || [];
+    bonusChances=Number(await dbGet(STORE_META,"bonus") || 0);
+    sortPrizes();
+  }catch(e){
+    prizes=[];history=[];bonusChances=0;
+    toast("저장소 로딩 실패. 전체 초기화를 눌러주세요.");
+  }
+}
+async function saveData(){
+  sortPrizes();
+  try{
+    await dbPut(STORE_META,"prizes",prizes);
+    await dbPut(STORE_META,"history",history);
+    await dbPut(STORE_META,"bonus",bonusChances);
+    return true;
+  }catch(e){
+    toast("저장 실패. 전체 초기화 후 다시 시도하세요.");
+    return false;
+  }
+}
+async function setImage(id,blob){await dbPut(STORE_IMAGES,id,blob)}
+async function getImage(id){
+  if(!id)return "";
+  if(imageCache[id])return imageCache[id];
+  try{
+    const blob=await dbGet(STORE_IMAGES,id);
+    const url=blob?URL.createObjectURL(blob):"";
+    if(url)imageCache[id]=url;
+    return url;
+  }catch(e){return ""}
+}
+async function deleteImage(id){if(id)await dbDelete(STORE_IMAGES,id)}
+
+async function render(){
+  sortPrizes();
+  $("heroTotal").textContent=prizes.length+"종 / "+totalQty()+"개";
+  $("totalCount").textContent=totalQty();
+  $("bonusLine").textContent=bonusChances>0?`디지털상 보너스 기회 ${bonusChances}회 보유 중`:"";
+
+  const counts={};ranks.forEach(r=>counts[r]=0);
+  prizes.forEach(p=>counts[p.rank]=(counts[p.rank]||0)+(Number(p.qty)||0));
+  $("rankCounts").innerHTML=ranks.map(r=>`<div class="rank-box ${r==="디지털상"?"digital":""}"><div class="rank-icon">${r==="미스터리상"?"?":r==="디지털상"?"D":r.replace("상","")}</div><strong>${esc(r)}</strong><span>${counts[r]||0}개</span></div>`).join("");
+
+  let prizeHTML="";
+  for(const p of prizes){
+    const img=await getImage(p.imgId);
+    prizeHTML+=`<article class="card"><div class="imgbox">${imgHTML(img)}</div><span class="pill ${p.rank==="디지털상"?"digital":""}">${esc(p.rank)}</span><h3>${esc(p.name)}</h3><p>${esc(p.desc)}</p><small>수량 ${Number(p.qty)||0}개 · 확률 ${Number(p.weight)||1}</small></article>`;
+  }
+  $("prizeGrid").innerHTML=prizes.length?prizeHTML:`<div class="empty" style="grid-column:1/-1">아직 등록된 상품이 없습니다.</div>`;
+
+  let historyHTML="";
+  for(const h of history){
+    const img=await getImage(h.imgId);
+    historyHTML+=`<div class="history-item"><div class="thumb">${imgHTML(img)}</div><div><b>${esc(h.rank)} · ${esc(h.name)}</b><br><small>${esc(h.time)}</small></div></div>`;
+  }
+  $("historyList").innerHTML=history.length?historyHTML:`<div class="empty">아직 당첨 내역이 없습니다.</div>`;
+  await renderAdmin();
+}
+async function renderAdmin(){
+  let html=`<div class="empty">등록 품목 ${prizes.length}/${MAX_ITEMS}종</div>`;
+  for(let i=0;i<prizes.length;i++){
+    const p=prizes[i],img=await getImage(p.imgId);
+    html+=`<div class="admin-item"><div class="thumb">${imgHTML(img)}</div><div><b>${esc(p.rank)} · ${esc(p.name)}</b><br><small>수량 ${Number(p.qty)||0}개 · 확률 ${Number(p.weight)||1}</small></div><div style="display:grid;gap:6px"><button class="mini" onclick="editPrize(${i})">수정</button><button class="mini danger" onclick="deletePrize(${i})">삭제</button></div></div>`;
+  }
+  $("adminList").innerHTML=html;
+}
+function weightedPool(){
+  const pool=[];
+  prizes.forEach((p,i)=>{
+    const q=Math.max(0,Number(p.qty)||0),w=Math.max(1,Number(p.weight)||1);
+    for(let n=0;n<q*w;n++)pool.push(i);
+  });
+  return pool;
+}
+async function drawKuji(){
+  const pool=weightedPool();
+  if(!pool.length){toast("등록된 상품이 없습니다.");openAdmin();return}
+  const btn=$("drawBtn");
+  btn.disabled=true;btn.textContent="...";
+  setTimeout(async()=>{
+    const idx=pool[Math.floor(Math.random()*pool.length)],pick=prizes[idx];
+    pick.qty=Math.max(0,(Number(pick.qty)||0)-1);
+    if(pick.rank==="디지털상")bonusChances+=1;else if(bonusChances>0)bonusChances-=1;
+    history.unshift({rank:pick.rank,name:pick.name,desc:pick.desc,imgId:pick.imgId,time:new Date().toLocaleString("ko-KR")});
+    history=history.slice(0,30);
+    const img=await getImage(pick.imgId);
+    $("winImg").innerHTML=imgHTML(img);
+    $("winRank").textContent=pick.rank+" 당첨!";
+    $("winName").textContent=pick.name;
+    $("winDesc").textContent=pick.rank==="디지털상"?(pick.desc||"디지털 상품이 지급됩니다.")+" 보너스 뽑기 기회 1회가 추가되었습니다.":pick.desc;
+    $("winModal").classList.add("show");
+    btn.disabled=false;btn.textContent=bonusChances>0?"🎁 BONUS DRAW":"🪙 DRAW";
+    await saveData();await render();
+  },650)
+}
+function closeWin(){$("winModal").classList.remove("show")}
+function openAdmin(){$("adminDrawer").classList.add("open");toast("관리자 메뉴가 열렸습니다.")}
+function closeAdmin(){$("adminDrawer").classList.remove("open")}
+
+function fileToBlob(file){
+  return new Promise((resolve,reject)=>{
+    if(!file){resolve(null);return}
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement("canvas");
+        const maxSize=280;
+        let w=img.width,h=img.height;
+        if(w>h&&w>maxSize){h=Math.round(h*maxSize/w);w=maxSize}
+        else if(h>maxSize){w=Math.round(w*maxSize/h);h=maxSize}
+        canvas.width=w;canvas.height=h;
+        canvas.getContext("2d").drawImage(img,0,0,w,h);
+        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("이미지 압축 실패")),"image/jpeg",0.16);
+      };
+      img.onerror=()=>reject(new Error("이미지 읽기 실패"));
+      img.src=e.target.result;
+    };
+    reader.onerror=()=>reject(new Error("파일 읽기 실패"));
+    reader.readAsDataURL(file);
+  })
+}
+async function savePrize(){
+  const editIndex=$("editIndex").value,isEdit=editIndex!=="";
+  const rank=$("itemRank").value,name=$("itemName").value.trim(),desc=$("itemDesc").value.trim();
+  const qty=Math.max(1,Number($("itemQty").value)||1),weight=Math.max(1,Number($("itemWeight").value)||1),file=$("itemImg").files[0];
+
+  if(!name){toast("상품명을 입력하세요.");return}
+  if(!isEdit&&prizes.length>=MAX_ITEMS){toast(`최대 ${MAX_ITEMS}종까지 등록 가능합니다.`);return}
+
+  let imgId=isEdit?(prizes[Number(editIndex)].imgId||makeId()):makeId();
+
+  if(file){
+    try{
+      const blob=await fileToBlob(file);
+      await setImage(imgId,blob);
+    }catch(e){
+      toast("이미지 저장 실패. 이미지 없이 상품 등록합니다.");
+      if(!isEdit)imgId="";
+    }
+  }
+
+  const item={id:isEdit?(prizes[Number(editIndex)].id||makeId()):makeId(),rank,name,desc,qty,weight,imgId};
+
+  if(isEdit){prizes[Number(editIndex)]=item;toast("상품을 수정했습니다.")}
+  else{prizes.push(item);toast("상품을 추가했습니다.")}
+
+  resetForm();
+  const ok=await saveData();
+  if(ok)await render();
+}
+function editPrize(i){
+  const p=prizes[i];
+  $("editIndex").value=i;$("itemRank").value=p.rank;$("itemName").value=p.name;$("itemDesc").value=p.desc||"";$("itemQty").value=p.qty||1;$("itemWeight").value=p.weight||10;$("itemImg").value="";
+  toast("수정할 상품을 불러왔습니다.");
+}
+async function deletePrize(i){
+  const p=prizes[i];
+  await deleteImage(p.imgId);
+  prizes.splice(i,1);
+  await saveData();
+  await render();
+  toast("삭제했습니다.");
+}
+function resetForm(){
+  $("editIndex").value="";$("itemRank").value="A상";$("itemName").value="";$("itemDesc").value="";$("itemQty").value=1;$("itemWeight").value=10;$("itemImg").value="";
+}
+async function resetAllData(){
+  if(!confirm("전체 상품/이미지/기록을 삭제할까요?"))return;
+  prizes=[];history=[];bonusChances=0;imageCache={};
+  try{await dbClear(STORE_META);await dbClear(STORE_IMAGES)}catch(e){}
+  await render();
+  toast("초기화 완료");
+}
+
+let last=0;
+window.addEventListener("scroll",()=>{const cur=window.scrollY;if(cur>last&&cur>90)$("header").classList.add("hide");else $("header").classList.remove("hide");last=cur});
+loadData().then(render);
+</script>
+</body>
+</html>

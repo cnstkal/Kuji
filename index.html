@@ -80,7 +80,7 @@ input,select,textarea{width:100%;min-height:46px;border:1px solid var(--line);bo
 <div class="form"><input type="hidden" id="editIndex"><label>상품 이미지 <input id="itemImg" type="file" accept="image/*"></label><label>등급 <select id="itemRank"><option>A상</option><option>B상</option><option>C상</option><option>D상</option><option>E상</option><option>미스터리상</option><option>디지털상</option></select></label><label>상품명 <input id="itemName" placeholder="예: 토끼 인형 키링"></label><label>상품 설명 <textarea id="itemDesc" placeholder="짧게 설명"></textarea></label><label>수량 <input id="itemQty" type="number" min="1" value="1"></label><label>확률 가중치 <input id="itemWeight" type="number" min="1" value="10"></label><button class="save" onclick="savePrize()">상품 저장</button><button class="ghost" onclick="resetForm()">입력 초기화</button></div>
 <div class="admin-list" id="adminList"></div></aside><div class="toast" id="toast"></div>
 <script>
-const STORAGE_KEY="gacha_kuji_items_v4",HISTORY_KEY="gacha_kuji_history_v4",BONUS_KEY="gacha_kuji_bonus_v3",DB_NAME="gacha_kuji_image_db_v3",DB_STORE="images",MAX_ITEMS=80;
+const STORAGE_KEY="gacha_kuji_items_v4",HISTORY_KEY="gacha_kuji_history_v4",BONUS_KEY="gacha_kuji_bonus_v3",DB_NAME="gacha_kuji_image_db_v3",DB_STORE="images",MAX_ITEMS=120;
 let prizes=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]"),history=JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]"),bonusChances=Number(localStorage.getItem(BONUS_KEY)||"0");
 const ranks=["A상","B상","C상","D상","E상","미스터리상","디지털상"],rankOrder={"A상":1,"B상":2,"C상":3,"D상":4,"E상":5,"미스터리상":6,"디지털상":7};
 function $(id){return document.getElementById(id)}function toast(msg){$("toast").textContent=msg;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1700)}

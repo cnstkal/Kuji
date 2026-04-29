@@ -277,13 +277,13 @@ function fileToBlob(file){
       const img=new Image();
       img.onload=()=>{
         const canvas=document.createElement("canvas");
-        const maxSize=500;
+        const maxSize=900;
         let w=img.width,h=img.height;
         if(w>h&&w>maxSize){h=Math.round(h*maxSize/w);w=maxSize}
         else if(h>maxSize){w=Math.round(w*maxSize/h);h=maxSize}
         canvas.width=w;canvas.height=h;
         canvas.getContext("2d").drawImage(img,0,0,w,h);
-        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("이미지 압축 실패")),"image/jpeg",0.38);
+        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("이미지 압축 실패")),"image/jpeg",0.72);
       };
       img.onerror=()=>reject(new Error("이미지 읽기 실패"));
       img.src=e.target.result;

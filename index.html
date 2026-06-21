@@ -1,393 +1,1058 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LUCKY KUJI</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>✦ IDOL KUJI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"/>
 <style>
-*{box-sizing:border-box}
-:root{--ink:#221625;--muted:#7f7288;--hot:#ff2f93;--blue:#42c8ff;--yellow:#ffd45f;--line:#eee4f0}
-html{scroll-behavior:smooth}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--ink);background:#fff}
-button,input,select,textarea{font:inherit}
-button{border:0;cursor:pointer}
-button:active{transform:scale(.98)}
-.header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.88);backdrop-filter:blur(18px);border-bottom:1px solid #f1e7f1;transition:.25s}
-.header.hide{transform:translateY(-105%)}
-.nav{max-width:980px;margin:auto;padding:10px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.nav a,.nav button{height:48px;border-radius:999px;background:#fff;color:#6d6475;text-decoration:none;display:flex;align-items:center;justify-content:center;font-weight:950;border:1px solid var(--line);box-shadow:0 8px 22px rgba(40,20,60,.07)}
-.nav a:first-child{color:var(--hot)}
-.app{max-width:980px;margin:auto;padding-bottom:80px}
-.hero{position:relative;overflow:hidden;padding:44px 22px 26px;min-height:560px;background:radial-gradient(circle at 72% 35%,rgba(255,255,255,.45),transparent 26%),radial-gradient(circle at 25% 18%,rgba(255,88,180,.34),transparent 26%),linear-gradient(135deg,#6e5bff 0%,#d86cff 45%,#ff8bc3 100%);color:#fff}
-.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 78%,rgba(255,255,255,.22),transparent 18%),radial-gradient(circle at 88% 12%,rgba(82,216,255,.35),transparent 18%)}
-.hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}
-.badge{display:inline-flex;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.45);font-weight:950;font-size:13px;backdrop-filter:blur(10px)}
-.hero h1{margin:18px 0 12px;font-size:clamp(42px,8vw,72px);line-height:.96;letter-spacing:-.055em;text-shadow:0 5px 0 rgba(50,25,90,.18)}
-.hero p{margin:0;font-size:17px;line-height:1.55;color:rgba(255,255,255,.9);font-weight:750}
-.stat{margin-top:22px;width:max-content;min-width:210px;padding:16px 18px;border-radius:26px;background:rgba(255,255,255,.86);color:var(--ink);display:flex;gap:12px;align-items:center;box-shadow:0 18px 46px rgba(50,20,80,.18)}
-.ball{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#fff,#ff5aa8 48%,#51d7ff 50%,#fff);box-shadow:0 8px 20px rgba(0,0,0,.12)}
-.stat span{display:block;color:var(--muted);font-size:13px;font-weight:800}.stat strong{font-size:26px}
-.gacha{width:min(360px,100%);margin:auto;position:relative}
-.globe{aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.32);border:10px solid rgba(255,255,255,.45);box-shadow:inset 0 0 42px rgba(255,255,255,.6),0 22px 50px rgba(50,20,80,.24);display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:12px;padding:40px}
-.g-ball{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#ffeff9,#ff4fa3);box-shadow:inset -8px -10px 16px rgba(120,20,90,.15),0 8px 18px rgba(0,0,0,.16)}
-.g-ball:nth-child(2n){background:linear-gradient(135deg,#e7f8ff,#42c8ff)}.g-ball:nth-child(3n){background:linear-gradient(135deg,#fff7d6,#ffd45f)}
-.g-base{margin:-20px auto 0;width:70%;height:150px;border-radius:30px 30px 22px 22px;background:linear-gradient(135deg,#fff,#ffbadc);border:8px solid rgba(255,255,255,.55);box-shadow:0 22px 46px rgba(50,20,80,.18);position:relative}
-.knob{position:absolute;left:50%;top:30px;transform:translateX(-50%);width:82px;height:82px;border-radius:50%;background:linear-gradient(135deg,#ffeaa1,#ff9a2e);border:8px solid rgba(255,255,255,.55);box-shadow:0 10px 22px rgba(0,0,0,.16)}
-.hole{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:78px;height:44px;border-radius:999px 999px 18px 18px;background:#1d1021}
-.draw-card{position:relative;z-index:5;margin:-12px 18px 0;padding:22px;border-radius:34px;background:#fff;box-shadow:0 22px 60px rgba(60,25,70,.15);text-align:center}
-.draw-card h2{margin:0 0 14px;font-size:22px}
-.draw-btn{width:min(360px,100%);height:78px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#ff7ac6,#ff2f93);font-size:32px;font-weight:950;letter-spacing:.02em;box-shadow:0 16px 34px rgba(255,47,147,.28)}
-.draw-sub{margin-top:8px;color:var(--muted);font-weight:800}.bonus-line{margin-top:8px;color:var(--hot);font-weight:950}
-.section{padding:28px 18px}.section h2{font-size:24px;margin:0 0 16px}
-.rank-counts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.rank-box{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;text-align:center;box-shadow:0 10px 28px rgba(40,20,60,.07)}
-.rank-icon{width:46px;height:46px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;font-weight:950;color:#fff;background:linear-gradient(135deg,#8a6cff,#cf7cff)}
-.rank-box.digital .rank-icon{background:linear-gradient(135deg,#42c8ff,#7657ff)}
-.rank-box strong{display:block;font-size:18px}.rank-box span{color:var(--muted);font-weight:800}
-.prize-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:9px;box-shadow:0 10px 28px rgba(40,20,60,.07)}
-.imgbox{aspect-ratio:1;border-radius:13px;overflow:hidden;background:#f5eef6;display:grid;place-items:center;color:#aaa;font-weight:900;font-size:10px}
-.imgbox img{width:100%;height:100%;object-fit:cover}
-.pill{display:inline-flex;margin-top:7px;padding:4px 7px;border-radius:999px;background:#ffe5f3;color:#d9197d;font-weight:950;font-size:10px}
-.pill.digital{background:#e8f5ff;color:#2369ff}
-.card h3{margin:7px 0 3px;font-size:13px;line-height:1.2}.card p{margin:0;color:var(--muted);font-size:10px;line-height:1.3}.card small{display:block;margin-top:5px;color:#aaa;font-weight:800;font-size:10px}
-.history{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.history-item{display:grid;grid-template-columns:58px 1fr;gap:10px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:9px}
-.thumb{width:58px;height:58px;border-radius:14px;overflow:hidden;background:#f5eef6}.thumb img{width:100%;height:100%;object-fit:cover}
-.empty{padding:18px;border-radius:20px;border:1px dashed #e7d8e9;text-align:center;color:var(--muted);background:#fff}
-.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(18,10,25,.55);backdrop-filter:blur(12px)}.modal.show{display:flex}
-.win{width:min(480px,100%);border-radius:34px;background:#fff;padding:18px;box-shadow:0 35px 100px rgba(0,0,0,.28);animation:pop .35s cubic-bezier(.2,1.25,.2,1)}
-@keyframes pop{from{transform:scale(.82);opacity:0}to{transform:scale(1);opacity:1}}
-.win-img{aspect-ratio:1;border-radius:28px;overflow:hidden;background:#f5eef6;display:grid;place-items:center}.win-img img{width:100%;height:100%;object-fit:cover}
-.win-rank{width:max-content;margin:15px auto 8px;padding:8px 15px;border-radius:999px;background:linear-gradient(135deg,#ffd45f,#ff4fa3);font-weight:950}.win h2{text-align:center;margin:0;font-size:30px}.win p{text-align:center;color:var(--muted);line-height:1.5}
-.btn{min-height:48px;border-radius:16px;font-weight:950;padding:0 16px}.dark{background:#221625;color:#fff;width:100%}
-.drawer{position:fixed;inset:0 0 0 auto;z-index:80;width:min(500px,100%);background:#fff;transform:translateX(105%);transition:.25s;overflow:auto;padding:20px;box-shadow:-30px 0 70px rgba(20,10,30,.18)}
-.drawer.open{transform:translateX(0)}.drawer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.drawer h2{margin:0}.form{display:grid;gap:12px}
-label{display:grid;gap:7px;color:var(--muted);font-size:13px;font-weight:900}
-input,select,textarea{width:100%;min-height:46px;border:1px solid var(--line);border-radius:15px;padding:10px;background:#fff;color:var(--ink)}textarea{min-height:70px;resize:vertical}
-.form .save{height:50px;border-radius:16px;background:linear-gradient(135deg,#ffd45f,#ff4fa3);font-weight:950}.form .ghost{height:46px;border-radius:16px;background:#fff;border:1px solid var(--line);font-weight:950}
-.admin-list{display:grid;gap:10px;margin-top:18px}.admin-item{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:18px;padding:9px}
-.mini{height:34px;border-radius:11px;padding:0 10px;font-weight:900;background:#f7f0f8}.danger{color:#de3e57;background:#fff0f4}
-.toast{position:fixed;left:50%;bottom:24px;z-index:200;transform:translateX(-50%) translateY(20px);opacity:0;transition:.2s;background:#221625;color:#fff;border-radius:999px;padding:12px 16px;font-weight:900;max-width:90%;text-align:center}.toast.show{opacity:1;transform:translateX(-50%)}
-@media(max-width:760px){.hero{padding:30px 18px 20px;min-height:auto}.hero-inner{grid-template-columns:1fr}.hero h1{font-size:40px;letter-spacing:-.045em}.hero p{font-size:15px}.gacha{width:min(320px,100%)}.globe{padding:34px}.g-ball{width:52px;height:52px}.rank-counts{grid-template-columns:repeat(3,1fr)}.prize-grid{grid-template-columns:repeat(3,1fr)}.history{grid-template-columns:1fr}}
-@media(max-width:430px){.nav{padding:9px 10px}.nav a,.nav button{height:44px;font-size:13px}.hero h1{font-size:37px}.draw-card{margin-left:12px;margin-right:12px}.draw-btn{height:70px;font-size:28px}.rank-counts{grid-template-columns:repeat(2,1fr)}.prize-grid{grid-template-columns:repeat(3,1fr);gap:7px}}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0F;--bg2:#12121A;--bg3:#1A1A26;--card:#1E1E2E;
+  --border:#2A2A3E;--text:#F0F0FF;--sub:#8888AA;--accent:#A78BFA;
+  --accent2:#F472B6;--btn-grad:linear-gradient(135deg,#A78BFA,#F472B6);
+}
+body.light{
+  --bg:#F5F5FA;--bg2:#EBEBF5;--bg3:#E0E0EF;--card:#FFFFFF;
+  --border:#D0D0E0;--text:#1A1A2E;--sub:#66668A;--accent:#7C3AED;
+  --accent2:#DB2777;--btn-grad:linear-gradient(135deg,#7C3AED,#DB2777);
+}
+body{background:var(--bg);color:var(--text);font-family:'Outfit','Noto Sans KR',sans-serif;min-height:100vh;transition:background .3s,color .3s}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes pop{0%{transform:scale(0.5);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes glow-ssr{0%,100%{box-shadow:0 0 20px #FFD70080}50%{box-shadow:0 0 40px #FFD700,0 0 60px #FFD70080}}
+@keyframes glow-sr{0%,100%{box-shadow:0 0 20px #C084FC80}50%{box-shadow:0 0 40px #C084FC,0 0 60px #C084FC80}}
+@keyframes glow-r{0%,100%{box-shadow:0 0 20px #60A5FA80}50%{box-shadow:0 0 40px #60A5FA,0 0 60px #60A5FA80}}
+@keyframes glow-n{0%,100%{box-shadow:0 0 10px #94A3B840}50%{box-shadow:0 0 20px #94A3B880}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+@keyframes cardReveal{0%{transform:rotateY(0deg) scale(1)}50%{transform:rotateY(90deg) scale(1.08)}100%{transform:rotateY(0deg) scale(1)}}
+
+.fade-in{animation:fadeIn .4s ease}
+
+/* Header */
+header{
+  position:sticky;top:0;z-index:100;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;
+}
+.logo{
+  font-size:1.2rem;font-weight:800;
+  background:linear-gradient(135deg,#A78BFA,#F472B6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+nav{display:flex;gap:4px}
+.nav-btn{
+  padding:6px 14px;border-radius:20px;border:none;cursor:pointer;
+  font-size:0.8rem;font-weight:600;letter-spacing:.05em;
+  background:transparent;color:var(--sub);transition:all .2s;font-family:inherit;
+}
+.nav-btn.active{background:var(--btn-grad);color:#fff}
+.nav-btn.admin-active{background:linear-gradient(135deg,#FF6B6B,#FFD700);color:#000}
+.icon-btn{
+  width:32px;height:32px;border-radius:50%;border:1px solid var(--border);
+  background:var(--card);cursor:pointer;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+}
+.text-btn{
+  padding:4px 10px;border-radius:20px;border:1px solid var(--border);
+  background:transparent;color:var(--sub);cursor:pointer;font-size:0.7rem;font-family:inherit;
+}
+.logout-btn{
+  padding:4px 10px;border-radius:20px;border:1px solid #FF6B6B44;
+  background:#FF6B6B22;color:#FF6B6B;cursor:pointer;font-size:0.7rem;font-family:inherit;
+}
+.header-right{display:flex;gap:8px;align-items:center}
+
+/* Tabs */
+.tab{display:none}.tab.active{display:block}
+
+/* Main container */
+.main{max-width:640px;margin:0 auto;padding:32px 20px}
+
+/* Draw tab */
+.kuji-title-area{text-align:center;margin-bottom:32px}
+.kuji-eyebrow{
+  font-size:.75rem;letter-spacing:.3em;color:var(--accent);
+  font-weight:600;margin-bottom:8px;text-transform:uppercase;
+}
+.kuji-title{
+  font-size:2.2rem;font-weight:800;letter-spacing:.05em;
+  background:linear-gradient(135deg,#A78BFA 30%,#F472B6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:8px;
+}
+.draw-limit-badge{
+  display:inline-block;padding:4px 14px;border-radius:20px;
+  background:var(--card);border:1px solid var(--border);
+  font-size:.78rem;color:var(--sub);
+}
+.draw-limit-badge span{color:var(--accent);font-weight:700}
+
+/* Grade summary */
+.grade-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:28px}
+.grade-card{
+  background:var(--card);border-radius:12px;
+  padding:10px 6px;text-align:center;
+}
+.grade-label{font-size:.6rem;font-weight:700;letter-spacing:.1em;margin-bottom:4px}
+.grade-count{font-size:1rem;font-weight:700;color:var(--text)}
+.grade-sub{font-size:.55rem;color:var(--sub)}
+
+/* Count selector */
+.count-label{font-size:.78rem;color:var(--sub);margin-bottom:10px;text-align:center}
+.count-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.count-btn{
+  padding:10px 20px;border-radius:12px;cursor:pointer;
+  font-weight:700;font-size:.9rem;transition:all .2s;min-width:60px;
+  font-family:inherit;
+}
+.count-btn.active{background:var(--btn-grad);color:#fff;border:1px solid transparent}
+.count-btn.inactive{background:var(--card);color:var(--text);border:1px solid var(--border)}
+
+/* Draw button */
+.draw-btn-wrap{text-align:center;margin-bottom:32px}
+.draw-btn{
+  padding:16px 48px;border-radius:50px;border:none;cursor:pointer;
+  background:var(--btn-grad);color:#fff;font-size:1.1rem;font-weight:800;
+  letter-spacing:.1em;box-shadow:0 0 30px rgba(167,139,250,.4);
+  transition:all .3s;font-family:inherit;display:inline-flex;align-items:center;gap:10px;
+}
+.draw-btn:disabled{background:var(--border);box-shadow:none;cursor:not-allowed;transform:scale(.97)}
+.spinner{
+  width:18px;height:18px;border:2px solid #fff;border-top:2px solid transparent;
+  border-radius:50%;animation:spin 1s linear infinite;display:inline-block;
+}
+
+/* Results */
+#results-area{margin-bottom:24px}
+.results-grid{gap:12px;margin-bottom:16px}
+.result-summary{
+  background:var(--card);border-radius:16px;padding:16px;
+  border:1px solid var(--border);text-align:center;
+}
+.result-summary-title{font-size:.75rem;color:var(--sub);margin-bottom:10px}
+.result-tags{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.result-tag{
+  padding:4px 12px;border-radius:20px;
+  font-size:.78rem;font-weight:700;
+}
+
+/* Kuji Card */
+.kuji-card-wrap{perspective:800px;border-radius:16px}
+.kuji-card-wrap.glow-ssr{animation:glow-ssr 2s infinite}
+.kuji-card-wrap.glow-sr{animation:glow-sr 2s infinite}
+.kuji-card-wrap.glow-r{animation:glow-r 2s infinite}
+.kuji-card-wrap.glow-n{animation:glow-n 2s infinite}
+.kuji-card-inner{
+  width:100%;padding-top:140%;position:relative;
+  transform-style:preserve-3d;
+  transition:transform 0.6s cubic-bezier(.4,0,.2,1);
+}
+.kuji-card-inner.flipped{transform:rotateY(180deg)}
+.kuji-card-face{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border-radius:16px;overflow:hidden;
+}
+.kuji-card-back{
+  background:linear-gradient(135deg,#A78BFA22,#F472B622);
+  border:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.kuji-card-back-icon{font-size:2rem;margin-bottom:8px;animation:float 2s ease-in-out infinite}
+.kuji-card-back-label{color:var(--sub);font-size:.75rem;letter-spacing:.1em}
+.kuji-shimmer{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 40%,rgba(167,139,250,.08) 50%,transparent 60%);
+  background-size:200% 200%;animation:shimmer 2s infinite;
+}
+.kuji-card-front{
+  transform:rotateY(180deg);
+  display:flex;flex-direction:column;
+}
+.kuji-card-front.popped{animation:pop .4s ease}
+.grade-badge{
+  position:absolute;top:8px;right:8px;
+  font-size:.6rem;font-weight:700;letter-spacing:.1em;
+  padding:2px 8px;border-radius:20px;color:#000;z-index:1;
+}
+.kuji-img{width:100%;height:60%;object-fit:cover;flex-shrink:0}
+.kuji-no-img{
+  height:60%;display:flex;align-items:center;justify-content:center;
+  font-size:3rem;flex-shrink:0;
+}
+.kuji-card-info{padding:10px;flex:1;display:flex;flex-direction:column;justify-content:center}
+.kuji-card-name{font-size:.8rem;font-weight:700;margin-bottom:4px;word-break:break-all;line-height:1.3}
+.kuji-card-desc{font-size:.65rem;color:var(--sub);line-height:1.4;word-break:break-all}
+
+/* Reset btn */
+.reset-wrap{text-align:center;margin-top:40px}
+.reset-btn{
+  padding:8px 20px;border-radius:20px;border:1px solid var(--border);
+  background:transparent;color:var(--sub);cursor:pointer;font-size:.78rem;
+  transition:all .2s;font-family:inherit;
+}
+.reset-btn:hover{color:var(--text);border-color:var(--sub)}
+
+/* Collection */
+.col-header{margin-bottom:24px}
+.col-header h2{font-weight:800;font-size:1.5rem;margin-bottom:4px}
+.col-header .sub{color:var(--sub);font-size:.85rem}
+.col-empty{
+  text-align:center;padding:80px 20px;color:var(--sub);
+  background:var(--card);border-radius:20px;border:1px solid var(--border);
+}
+.col-empty-icon{font-size:3rem;margin-bottom:12px}
+.col-empty-title{font-weight:600;margin-bottom:4px}
+.col-empty-sub{font-size:.8rem}
+.col-stats{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.col-stat-tag{padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:700}
+.col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.col-item{
+  background:var(--card);border-radius:16px;overflow:hidden;
+  transition:transform .2s;cursor:default;
+}
+.col-item:hover{transform:translateY(-4px)}
+.col-item-img{width:100%;height:120px;object-fit:cover}
+.col-item-no-img{
+  height:120px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;
+}
+.col-item-body{padding:10px}
+.col-item-grade{font-size:.58rem;font-weight:700;letter-spacing:.1em;margin-bottom:4px}
+.col-item-name{font-size:.8rem;font-weight:600;color:var(--text);word-break:break-all;line-height:1.3}
+
+/* Admin */
+.admin-title{
+  font-weight:800;font-size:1.5rem;margin-bottom:24px;
+  background:linear-gradient(135deg,#FF6B6B,#FFD700);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.admin-card{
+  background:var(--card);border-radius:20px;padding:24px;
+  border:1px solid var(--border);margin-bottom:24px;
+}
+.admin-card-title{font-weight:700;margin-bottom:16px;font-size:.9rem;color:var(--accent)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-field{margin-bottom:12px}
+.field-label{font-size:.75rem;color:var(--sub);margin-bottom:6px}
+.field-input{
+  width:100%;padding:10px 14px;border-radius:10px;
+  border:1px solid var(--border);background:var(--bg2);
+  color:var(--text);font-size:.9rem;outline:none;font-family:inherit;
+}
+.field-input:focus{border-color:var(--accent)}
+select.field-input{cursor:pointer}
+.save-btn{
+  padding:10px 24px;border-radius:10px;border:none;
+  background:var(--btn-grad);color:#fff;font-weight:700;cursor:pointer;font-size:.85rem;font-family:inherit;
+}
+.cancel-btn{
+  padding:10px 20px;border-radius:10px;border:1px solid var(--border);
+  background:transparent;color:var(--sub);cursor:pointer;font-size:.85rem;font-family:inherit;
+}
+.upload-btn{
+  padding:10px 20px;border-radius:10px;border:1px dashed var(--border);
+  background:var(--bg2);color:var(--text);cursor:pointer;font-size:.85rem;font-family:inherit;
+}
+.image-preview{width:48px;height:48px;object-fit:cover;border-radius:8px}
+.del-img-btn{background:none;border:none;color:#FF6B6B;cursor:pointer;font-size:.8rem;font-family:inherit}
+.product-list{display:flex;flex-direction:column;gap:10px}
+.product-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg2);border-radius:12px;padding:12px;
+}
+.product-thumb{width:48px;height:48px;object-fit:cover;border-radius:8px;flex-shrink:0}
+.product-no-thumb{
+  width:48px;height:48px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;
+}
+.product-info{flex:1;min-width:0}
+.product-name-row{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.product-grade-badge{
+  font-size:.6rem;font-weight:700;
+  padding:2px 6px;border-radius:10px;flex-shrink:0;
+}
+.product-name{font-size:.85rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.product-meta{font-size:.72rem;color:var(--sub)}
+.product-actions{display:flex;gap:6px;flex-shrink:0}
+.edit-btn{
+  padding:6px 12px;border-radius:8px;border:1px solid var(--border);
+  background:transparent;color:var(--text);cursor:pointer;font-size:.75rem;font-family:inherit;
+}
+.del-btn{
+  padding:6px 12px;border-radius:8px;border:1px solid #FF6B6B44;
+  background:#FF6B6B22;color:#FF6B6B;cursor:pointer;font-size:.75rem;font-family:inherit;
+}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;
+  display:flex;align-items:center;justify-content:center;
+}
+.modal-box{
+  background:var(--card);border-radius:20px;padding:32px;width:300px;
+  border:1px solid var(--border);animation:pop .3s ease;
+}
+.modal-title{font-weight:700;font-size:1.1rem;margin-bottom:20px;text-align:center}
+.modal-input{
+  width:100%;padding:12px 16px;border-radius:12px;
+  border:1px solid var(--border);background:var(--bg2);
+  color:var(--text);font-size:.9rem;margin-bottom:12px;outline:none;font-family:inherit;
+}
+.modal-btn{
+  width:100%;padding:12px;border-radius:12px;border:none;
+  background:var(--btn-grad);color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;font-family:inherit;
+}
+
+/* Loading */
+#loading{display:flex;align-items:center;justify-content:center;height:60vh;flex-direction:column;gap:16px}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top:3px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+.loading-text{color:var(--sub);font-size:.85rem}
+
+/* Confetti */
+#confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
 </style>
 </head>
 <body>
-<header class="header" id="header"><nav class="nav"><a href="#draw">뽑기</a><a href="#prizes">상품</a><button type="button" onclick="openAdmin()">관리자</button></nav></header>
 
-<main class="app">
-<section class="hero"><div class="hero-inner"><div><span class="badge">1회 뽑기 ✦</span><h1>오늘의 운!<br>굿즈를 뽑아보세요</h1><p>과연 어떤 굿즈가 나올까?</p><div class="stat"><div class="ball"></div><div><span>등록된 상품</span><strong id="heroTotal">0개</strong></div></div></div><div class="gacha"><div class="globe"><div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div><div class="g-ball"></div></div><div class="g-base"><div class="knob"></div><div class="hole"></div></div></div></div></section>
-<section class="draw-card" id="draw"><h2>지금 바로 뽑기!</h2><button class="draw-btn" id="drawBtn" onclick="drawKuji()">🪙 DRAW</button><div class="draw-sub">총 <b id="totalCount">0</b>개 중 랜덤</div><div class="bonus-line" id="bonusLine"></div></section>
-<section class="section"><h2>등급별 보유 수량</h2><div class="rank-counts" id="rankCounts"></div></section>
-<section class="section" id="prizes"><h2>상품 라인업</h2><div class="prize-grid" id="prizeGrid"></div></section>
-<section class="section"><h2>최근 당첨 내역</h2><div class="history" id="historyList"></div></section>
-</main>
+<!-- Header -->
+<header>
+  <div class="logo">✦ KUJI</div>
+  <nav>
+    <button class="nav-btn active" id="nav-draw" onclick="switchTab('draw')">뽑기</button>
+    <button class="nav-btn" id="nav-collection" onclick="switchTab('collection')">컬렉션</button>
+    <button class="nav-btn" id="nav-admin" style="display:none" onclick="switchTab('admin')">관리자</button>
+  </nav>
+  <div class="header-right">
+    <button class="icon-btn" onclick="toggleTheme()" id="theme-btn">☀️</button>
+    <button class="text-btn" id="admin-login-btn" onclick="showAdminLogin()">관리자</button>
+    <button class="logout-btn" id="admin-logout-btn" style="display:none" onclick="adminLogout()">로그아웃</button>
+  </div>
+</header>
 
-<div class="modal" id="winModal" onclick="if(event.target.id==='winModal')closeWin()"><div class="win"><div class="win-img" id="winImg"></div><div class="win-rank" id="winRank"></div><h2 id="winName"></h2><p id="winDesc"></p><button class="btn dark" onclick="closeWin()">닫기</button></div></div>
-
-<aside class="drawer" id="adminDrawer">
-<div class="drawer-top"><h2>상품 관리</h2><button class="mini" onclick="closeAdmin()">닫기</button></div>
-<div class="form">
-<input type="hidden" id="editIndex">
-<label>상품 이미지 <input id="itemImg" type="file" accept="image/*"></label>
-<label>등급 <select id="itemRank"><option>A상</option><option>B상</option><option>C상</option><option>D상</option><option>E상</option><option>미스터리상</option><option>디지털상</option></select></label>
-<label>상품명 <input id="itemName" placeholder="예: 토끼 인형 키링"></label>
-<label>상품 설명 <textarea id="itemDesc" placeholder="짧게 설명"></textarea></label>
-<label>수량 <input id="itemQty" type="number" min="1" value="1"></label>
-<label>확률 가중치 <input id="itemWeight" type="number" min="1" value="10"></label>
-<button class="save" onclick="savePrize()">상품 저장</button>
-<button class="ghost" onclick="resetForm()">입력 초기화</button>
-<button class="ghost" onclick="exportData()">데이터 백업</button>
-<button class="ghost" onclick="document.getElementById('importFile').click()">백업 불러오기</button>
-<input id="importFile" type="file" accept="application/json" style="display:none" onchange="importData(event)">
-<button class="ghost danger" onclick="resetAllData()">전체 초기화</button>
+<!-- Admin Login Modal -->
+<div class="modal-overlay" id="admin-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">관리자 로그인</div>
+    <input type="password" class="modal-input" id="admin-pw-input" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    <button class="modal-btn" onclick="doAdminLogin()">로그인</button>
+  </div>
 </div>
-<div class="admin-list" id="adminList"></div>
-</aside>
-<div class="toast" id="toast"></div>
 
-<script>
-const STORAGE_KEY="kuji_meta_v10";
-const HISTORY_KEY="kuji_history_v10";
-const BONUS_KEY="kuji_bonus_v10";
-const DB_NAME="kuji_images_v10";
-const DB_STORE="images";
-const MAX_ITEMS=180;
+<!-- Confetti -->
+<div id="confetti-container"></div>
 
-let prizes=[];
-let history=[];
-let bonusChances=0;
-let imageCache={};
+<!-- Loading -->
+<div id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">로딩 중...</div>
+</div>
 
-const ranks=["A상","B상","C상","D상","E상","미스터리상","디지털상"];
-const rankOrder={"A상":1,"B상":2,"C상":3,"D상":4,"E상":5,"미스터리상":6,"디지털상":7};
+<!-- Draw Tab -->
+<div class="tab" id="tab-draw" style="display:none">
+  <div class="main fade-in">
+    <div class="kuji-title-area">
+      <div class="kuji-eyebrow" id="kuji-subtitle">당신의 운명을 뽑아보세요</div>
+      <h1 class="kuji-title" id="kuji-title">IDOL KUJI</h1>
+      <div class="draw-limit-badge" id="draw-limit-badge" style="display:none">
+        내 뽑기: <span id="drawn-count">0</span> / <span id="max-draws">0</span>
+      </div>
+    </div>
+    <div class="grade-grid" id="grade-grid"></div>
+    <div class="count-label">뽑기 수 선택</div>
+    <div class="count-btns">
+      <button class="count-btn active" data-count="1" onclick="selectCount(1)">1개</button>
+      <button class="count-btn inactive" data-count="3" onclick="selectCount(3)">3개</button>
+      <button class="count-btn inactive" data-count="5" onclick="selectCount(5)">5개</button>
+      <button class="count-btn inactive" data-count="10" onclick="selectCount(10)">10개</button>
+    </div>
+    <div class="draw-btn-wrap">
+      <button class="draw-btn" id="draw-btn" onclick="handleDraw()">✦ <span id="draw-btn-label">1개 뽑기</span></button>
+    </div>
+    <div id="results-area" style="display:none" class="fade-in">
+      <div class="results-grid" id="results-grid"></div>
+      <div class="result-summary">
+        <div class="result-summary-title">이번 결과</div>
+        <div class="result-tags" id="result-tags"></div>
+      </div>
+    </div>
+    <div class="reset-wrap">
+      <button class="reset-btn" onclick="handleReset()">🔄 초기화</button>
+    </div>
+  </div>
+</div>
 
-function $(id){return document.getElementById(id)}
-function toast(msg){$("toast").textContent=msg;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2000)}
-function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function imgHTML(src){return src?`<img src="${src}" alt="">`:"<span>NO IMAGE</span>"}
-function makeId(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
-function totalQty(){return prizes.reduce((a,p)=>a+(Number(p.qty)||0),0)}
-function normalize(){prizes.forEach(p=>{p.qty=Math.max(0,Number(p.qty)||0);p.weight=Math.max(1,Number(p.weight)||10);if(!p.rank)p.rank="A상";if(!p.imgId)p.imgId=""})}
-function sortPrizes(){normalize();prizes.sort((a,b)=>(rankOrder[a.rank]||99)-(rankOrder[b.rank]||99)||String(a.name).localeCompare(String(b.name)))}
+<!-- Collection Tab -->
+<div class="tab" id="tab-collection" style="display:none">
+  <div class="main fade-in">
+    <div class="col-header">
+      <h2>내 컬렉션</h2>
+      <div class="sub" id="col-count">총 0개 보유</div>
+    </div>
+    <div id="col-empty" class="col-empty" style="display:none">
+      <div class="col-empty-icon">🎴</div>
+      <div class="col-empty-title">아직 뽑은 상품이 없어요</div>
+      <div class="col-empty-sub">뽑기 탭에서 시작해보세요!</div>
+    </div>
+    <div id="col-content" style="display:none">
+      <div class="col-stats" id="col-stats"></div>
+      <div class="col-grid" id="col-grid"></div>
+    </div>
+  </div>
+</div>
 
-async function loadMeta(){
-  try{prizes=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")||[]}catch(e){prizes=[]}
-  try{history=JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]")||[]}catch(e){history=[]}
-  bonusChances=Number(localStorage.getItem(BONUS_KEY)||"0");
-  sortPrizes();
+<!-- Admin Tab -->
+<div class="tab" id="tab-admin" style="display:none">
+  <div class="main fade-in" style="max-width:800px">
+    <div class="admin-title">관리자 패널</div>
+
+    <!-- Settings -->
+    <div class="admin-card">
+      <div class="admin-card-title">⚙️ 쿠지 설정</div>
+      <div class="form-grid">
+        <div>
+          <div class="field-label">쿠지 제목</div>
+          <input class="field-input" id="s-title" value="IDOL KUJI"/>
+        </div>
+        <div>
+          <div class="field-label">서브타이틀</div>
+          <input class="field-input" id="s-subtitle" value="당신의 운명을 뽑아보세요"/>
+        </div>
+      </div>
+      <div class="form-field">
+        <div class="field-label">인당 최대 뽑기 횟수 (0 = 무제한)</div>
+        <input type="number" min="0" class="field-input" id="s-max" value="0" style="width:160px"/>
+      </div>
+      <button class="save-btn" onclick="saveSettings()">저장</button>
+    </div>
+
+    <!-- Add / Edit product -->
+    <div class="admin-card">
+      <div class="admin-card-title" id="form-title">➕ 상품 추가</div>
+      <div class="form-grid">
+        <div>
+          <div class="field-label">상품명</div>
+          <input class="field-input" id="f-name" placeholder="예: 포토카드 세트"/>
+        </div>
+        <div>
+          <div class="field-label">등급</div>
+          <select class="field-input" id="f-grade">
+            <option value="SSR">SSR</option>
+            <option value="SR">SR</option>
+            <option value="R" selected>R</option>
+            <option value="N">N</option>
+          </select>
+        </div>
+        <div>
+          <div class="field-label">확률 가중치 (높을수록 자주 나옴)</div>
+          <input type="number" min="1" class="field-input" id="f-rate" value="10"/>
+        </div>
+        <div>
+          <div class="field-label">재고 수량</div>
+          <input type="number" min="1" class="field-input" id="f-count" value="100"/>
+        </div>
+      </div>
+      <div class="form-field">
+        <div class="field-label">상품 설명</div>
+        <input class="field-input" id="f-desc" placeholder="간단한 설명"/>
+      </div>
+      <div class="form-field">
+        <div class="field-label">상품 이미지</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="upload-btn" id="upload-btn" onclick="document.getElementById('file-input').click()">이미지 선택</button>
+          <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleImageUpload(event)"/>
+          <img id="img-preview" class="image-preview" style="display:none"/>
+          <button id="del-img-btn" class="del-img-btn" style="display:none" onclick="clearImage()">삭제</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="save-btn" onclick="saveProduct()">상품 추가</button>
+        <button class="cancel-btn" id="cancel-edit-btn" style="display:none" onclick="cancelEdit()">취소</button>
+      </div>
+    </div>
+
+    <!-- Product list -->
+    <div class="admin-card">
+      <div class="admin-card-title">📦 상품 목록 (<span id="product-count">0</span>)</div>
+      <div class="product-list" id="product-list">
+        <div style="color:var(--sub);text-align:center;padding:20px">상품을 추가해주세요</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase + App Script -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs, doc,
+  updateDoc, deleteDoc, setDoc, getDoc, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// ── Firebase init ──
+const firebaseConfig = {
+  apiKey: "AIzaSyAA6mbdYfLrrgCJjN47PX91_mU7I53RiBs",
+  authDomain: "site-c67b4.firebaseapp.com",
+  projectId: "site-c67b4",
+  storageBucket: "site-c67b4.firebasestorage.app",
+  messagingSenderId: "744761377245",
+  appId: "1:744761377245:web:3ddaee14f184716eeef634"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+
+// ── Cloudinary ──
+const CLOUD = "dbljkloal";
+const PRESET = "Everything";
+
+// ── Grade meta ──
+const GRADE_META = {
+  SSR: { color: "#FFD700", glow: "glow-ssr", bg: "#FFD70022" },
+  SR:  { color: "#C084FC", glow: "glow-sr",  bg: "#C084FC22" },
+  R:   { color: "#60A5FA", glow: "glow-r",   bg: "#60A5FA22" },
+  N:   { color: "#94A3B8", glow: "glow-n",   bg: "#94A3B822" },
+};
+
+// ── State ──
+let products = [];
+let settings = { maxPerUser: 0, title: "IDOL KUJI", subtitle: "당신의 운명을 뽑아보세요" };
+let userDraws = [];
+let drawCount = 1;
+let currentResults = [];
+let editId = null;
+let currentImageUrl = "";
+let isDrawing = false;
+let isAdmin = false;
+const ADMIN_PW = "kuji2025";
+
+// ── User ID ──
+let userId = localStorage.getItem("kuji_uid");
+if (!userId) {
+  userId = `user_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  localStorage.setItem("kuji_uid", userId);
 }
-function saveMeta(){
-  sortPrizes();
-  try{
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(prizes));
-    localStorage.setItem(HISTORY_KEY,JSON.stringify(history));
-    localStorage.setItem(BONUS_KEY,String(bonusChances));
-    return true;
-  }catch(e){
-    toast("저장공간 오류. 전체 초기화나 백업 후 재시도 필요.");
-    return false;
+
+// ── Expose globals ──
+window.switchTab = switchTab;
+window.toggleTheme = toggleTheme;
+window.showAdminLogin = showAdminLogin;
+window.doAdminLogin = doAdminLogin;
+window.adminLogout = adminLogout;
+window.selectCount = selectCount;
+window.handleDraw = handleDraw;
+window.handleReset = handleReset;
+window.saveSettings = saveSettings;
+window.saveProduct = saveProduct;
+window.cancelEdit = cancelEdit;
+window.clearImage = clearImage;
+window.handleImageUpload = handleImageUpload;
+window.editProduct = editProduct;
+window.deleteProduct = deleteProduct;
+
+// ── Helpers ──
+function weightedDraw(items) {
+  const pool = [];
+  items.forEach(item => {
+    const slots = item.remaining !== undefined ? item.remaining : (item.count || 1);
+    if (slots <= 0) return;
+    const w = Math.round((item.rate || 1) * 10);
+    for (let i = 0; i < w; i++) pool.push(item);
+  });
+  if (!pool.length) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// ── Load all data ──
+async function loadAll() {
+  try {
+    const [pSnap, sSnap, dSnap] = await Promise.all([
+      getDocs(query(collection(db, "products"), orderBy("grade"))),
+      getDoc(doc(db, "settings", "global")),
+      getDocs(query(collection(db, "draws", userId, "items"), orderBy("drawnAt", "desc")))
+    ]);
+    products = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (sSnap.exists()) Object.assign(settings, sSnap.data());
+    userDraws = dSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { console.error(e); }
+}
+
+// ── Init ──
+async function init() {
+  await loadAll();
+  document.getElementById("loading").style.display = "none";
+  renderDrawTab();
+  renderCollectionTab();
+  if (isAdmin) renderAdminTab();
+  switchTab("draw");
+}
+init();
+
+// ── Theme ──
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.className = isDark ? "" : "light";
+  document.getElementById("theme-btn").textContent = isDark ? "☀️" : "🌙";
+}
+
+// ── Tab switch ──
+function switchTab(name) {
+  ["draw","collection","admin"].forEach(t => {
+    document.getElementById(`tab-${t}`).style.display = "none";
+    const nb = document.getElementById(`nav-${t}`);
+    if (nb) { nb.className = "nav-btn"; }
+  });
+  document.getElementById(`tab-${name}`).style.display = "block";
+  const nb = document.getElementById(`nav-${name}`);
+  if (nb) nb.className = name === "admin" ? "nav-btn admin-active" : "nav-btn active";
+  if (name === "collection") renderCollectionTab();
+  if (name === "admin") renderAdminTab();
+}
+
+// ── Admin ──
+function showAdminLogin() {
+  document.getElementById("admin-modal").style.display = "flex";
+  setTimeout(() => document.getElementById("admin-pw-input").focus(), 100);
+}
+function doAdminLogin() {
+  const pw = document.getElementById("admin-pw-input").value;
+  if (pw === ADMIN_PW) {
+    isAdmin = true;
+    document.getElementById("admin-modal").style.display = "none";
+    document.getElementById("admin-pw-input").value = "";
+    document.getElementById("nav-admin").style.display = "";
+    document.getElementById("admin-login-btn").style.display = "none";
+    document.getElementById("admin-logout-btn").style.display = "";
+    renderAdminTab();
+    switchTab("admin");
+  } else {
+    alert("비밀번호가 틀렸어요");
   }
 }
+function adminLogout() {
+  isAdmin = false;
+  document.getElementById("nav-admin").style.display = "none";
+  document.getElementById("admin-login-btn").style.display = "";
+  document.getElementById("admin-logout-btn").style.display = "none";
+  switchTab("draw");
+}
 
-function openDB(){
-  return new Promise((resolve,reject)=>{
-    if(!window.indexedDB){reject(new Error("IndexedDB not supported"));return}
-    const req=indexedDB.open(DB_NAME,1);
-    req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(DB_STORE))req.result.createObjectStore(DB_STORE)};
-    req.onsuccess=()=>resolve(req.result);
-    req.onerror=()=>reject(req.error);
+// ── Count selector ──
+function selectCount(n) {
+  drawCount = n;
+  document.querySelectorAll(".count-btn").forEach(b => {
+    b.className = "count-btn " + (parseInt(b.dataset.count) === n ? "active" : "inactive");
+  });
+  document.getElementById("draw-btn-label").textContent = `${n}개 뽑기`;
+}
+
+// ── Render draw tab ──
+function renderDrawTab() {
+  // Title
+  document.getElementById("kuji-title").textContent = settings.title;
+  document.getElementById("kuji-subtitle").textContent = settings.subtitle;
+  // Settings in admin form
+  document.getElementById("s-title").value = settings.title;
+  document.getElementById("s-subtitle").value = settings.subtitle;
+  document.getElementById("s-max").value = settings.maxPerUser || 0;
+
+  // Limit badge
+  const badge = document.getElementById("draw-limit-badge");
+  if (settings.maxPerUser > 0) {
+    badge.style.display = "";
+    document.getElementById("drawn-count").textContent = userDraws.length;
+    document.getElementById("max-draws").textContent = settings.maxPerUser;
+  } else badge.style.display = "none";
+
+  // Grade grid
+  const gg = document.getElementById("grade-grid");
+  gg.innerHTML = "";
+  Object.entries(GRADE_META).forEach(([g, m]) => {
+    const cnt = products.filter(p => p.grade === g && (p.remaining ?? p.count) > 0)
+      .reduce((a, b) => a + (b.remaining ?? b.count), 0);
+    const el = document.createElement("div");
+    el.className = "grade-card";
+    el.style.border = `1px solid ${m.color}44`;
+    el.innerHTML = `
+      <div class="grade-label" style="color:${m.color}">${g}</div>
+      <div class="grade-count">${cnt}</div>
+      <div class="grade-sub">남음</div>
+    `;
+    gg.appendChild(el);
   });
 }
-async function setImage(id,blob){
-  const db=await openDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(DB_STORE,"readwrite");
-    tx.objectStore(DB_STORE).put(blob,id);
-    tx.oncomplete=()=>resolve();
-    tx.onerror=()=>reject(tx.error);
+
+// ── Draw ──
+async function handleDraw() {
+  if (isDrawing) return;
+  if (settings.maxPerUser > 0 && userDraws.length + drawCount > settings.maxPerUser) {
+    alert(`최대 ${settings.maxPerUser}번 뽑을 수 있어요. 남은 횟수: ${settings.maxPerUser - userDraws.length}`);
+    return;
+  }
+  const avail = products.filter(p => (p.remaining ?? p.count) > 0);
+  if (!avail.length) { alert("남은 상품이 없어요!"); return; }
+
+  isDrawing = true;
+  const btn = document.getElementById("draw-btn");
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> 뽑는 중...`;
+  document.getElementById("results-area").style.display = "none";
+
+  await new Promise(r => setTimeout(r, 600));
+
+  // Pick items
+  const drawn = [];
+  const used = {};
+  const poolSnap = avail.map(p => ({ ...p }));
+
+  for (let i = 0; i < drawCount; i++) {
+    const eligible = poolSnap.map(p => ({
+      ...p, remaining: (p.remaining ?? p.count) - (used[p.id] || 0)
+    })).filter(p => p.remaining > 0);
+    const pick = weightedDraw(eligible);
+    if (!pick) break;
+    drawn.push(pick);
+    used[pick.id] = (used[pick.id] || 0) + 1;
+  }
+
+  // Update Firestore remaining
+  await Promise.all(Object.entries(used).map(([id, cnt]) => {
+    const p = products.find(x => x.id === id);
+    const rem = (p.remaining ?? p.count) - cnt;
+    return updateDoc(doc(db, "products", id), { remaining: rem });
+  }));
+
+  // Save user draws
+  await Promise.all(drawn.map(item =>
+    addDoc(collection(db, "draws", userId, "items"), {
+      productId: item.id, name: item.name, grade: item.grade,
+      imageUrl: item.imageUrl || "", drawnAt: Date.now()
+    })
+  ));
+
+  currentResults = drawn;
+  isDrawing = false;
+  btn.disabled = false;
+  btn.innerHTML = `✦ <span id="draw-btn-label">${drawCount}개 뽑기</span>`;
+
+  await loadAll();
+  renderDrawTab();
+  renderResults(drawn);
+
+  const hasRare = drawn.some(d => d.grade === "SSR" || d.grade === "SR");
+  if (hasRare) launchConfetti();
+}
+
+// ── Render results ──
+function renderResults(items) {
+  const area = document.getElementById("results-area");
+  const grid = document.getElementById("results-grid");
+  area.style.display = "block";
+  grid.innerHTML = "";
+
+  const n = items.length;
+  const cols = n <= 3 ? n : n <= 6 ? 3 : n <= 8 ? 4 : 5;
+  grid.style.display = "grid";
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+  items.forEach((item, i) => {
+    const meta = GRADE_META[item.grade] || GRADE_META.N;
+    const wrap = document.createElement("div");
+    wrap.className = "kuji-card-wrap";
+    wrap.style.borderRadius = "16px";
+
+    const inner = document.createElement("div");
+    inner.className = "kuji-card-inner";
+
+    // Back face
+    const back = document.createElement("div");
+    back.className = "kuji-card-face kuji-card-back";
+    back.innerHTML = `
+      <div class="kuji-card-back-icon">🎴</div>
+      <div class="kuji-card-back-label">KUJI</div>
+      <div class="kuji-shimmer"></div>
+    `;
+
+    // Front face
+    const front = document.createElement("div");
+    front.className = "kuji-card-face kuji-card-front";
+    front.style.background = `linear-gradient(135deg, ${meta.color}18, ${meta.bg})`;
+    front.style.border = `1px solid ${meta.color}`;
+
+    const imgHtml = item.imageUrl
+      ? `<img class="kuji-img" src="${item.imageUrl}" alt="${item.name}"/>`
+      : `<div class="kuji-no-img" style="background:rgba(0,0,0,.2)">🎁</div>`;
+
+    front.innerHTML = `
+      <div class="grade-badge" style="background:${meta.color}">${item.grade}</div>
+      ${imgHtml}
+      <div class="kuji-card-info">
+        <div class="kuji-card-name" style="color:${meta.color}">${item.name}</div>
+        ${item.description ? `<div class="kuji-card-desc">${item.description}</div>` : ""}
+      </div>
+    `;
+
+    inner.appendChild(back);
+    inner.appendChild(front);
+    wrap.appendChild(inner);
+    grid.appendChild(wrap);
+
+    // Flip animation
+    setTimeout(() => {
+      inner.classList.add("flipped");
+      setTimeout(() => {
+        wrap.classList.add(meta.glow);
+        front.classList.add("popped");
+      }, 600);
+    }, i * 150);
+  });
+
+  // Result tags
+  const tags = document.getElementById("result-tags");
+  tags.innerHTML = "";
+  Object.entries(GRADE_META).forEach(([g, m]) => {
+    const cnt = items.filter(r => r.grade === g).length;
+    if (!cnt) return;
+    const tag = document.createElement("span");
+    tag.className = "result-tag";
+    tag.style.cssText = `background:${m.color}22;border:1px solid ${m.color};color:${m.color}`;
+    tag.textContent = `${g} ×${cnt}`;
+    tags.appendChild(tag);
   });
 }
-async function getImage(id){
-  if(!id)return "";
-  if(imageCache[id])return imageCache[id];
-  const db=await openDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(DB_STORE,"readonly");
-    const req=tx.objectStore(DB_STORE).get(id);
-    req.onsuccess=()=>{
-      const blob=req.result;
-      const url=blob?URL.createObjectURL(blob):"";
-      if(url)imageCache[id]=url;
-      resolve(url);
-    };
-    req.onerror=()=>reject(req.error);
+
+// ── Collection ──
+function renderCollectionTab() {
+  const count = userDraws.length;
+  document.getElementById("col-count").textContent = `총 ${count}개 보유`;
+  const empty = document.getElementById("col-empty");
+  const content = document.getElementById("col-content");
+
+  if (count === 0) {
+    empty.style.display = "";
+    content.style.display = "none";
+    return;
+  }
+  empty.style.display = "none";
+  content.style.display = "";
+
+  // Stats
+  const stats = document.getElementById("col-stats");
+  stats.innerHTML = "";
+  Object.entries(GRADE_META).forEach(([g, m]) => {
+    const cnt = userDraws.filter(d => d.grade === g).length;
+    if (!cnt) return;
+    const el = document.createElement("div");
+    el.className = "col-stat-tag";
+    el.style.cssText = `background:${m.color}18;border:1px solid ${m.color};color:${m.color}`;
+    el.textContent = `${g}: ${cnt}개`;
+    stats.appendChild(el);
+  });
+
+  // Grid
+  const grid = document.getElementById("col-grid");
+  grid.innerHTML = "";
+  userDraws.forEach(item => {
+    const meta = GRADE_META[item.grade] || GRADE_META.N;
+    const el = document.createElement("div");
+    el.className = "col-item";
+    el.style.border = `1px solid ${meta.color}44`;
+    const imgHtml = item.imageUrl
+      ? `<img class="col-item-img" src="${item.imageUrl}" alt="${item.name}"/>`
+      : `<div class="col-item-no-img" style="background:${meta.color}18">🎁</div>`;
+    el.innerHTML = `
+      ${imgHtml}
+      <div class="col-item-body">
+        <div class="col-item-grade" style="color:${meta.color}">${item.grade}</div>
+        <div class="col-item-name">${item.name}</div>
+      </div>
+    `;
+    grid.appendChild(el);
   });
 }
-async function deleteImage(id){
-  if(!id)return;
-  const db=await openDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(DB_STORE,"readwrite");
-    tx.objectStore(DB_STORE).delete(id);
-    tx.oncomplete=()=>resolve();
-    tx.onerror=()=>reject(tx.error);
+
+// ── Reset ──
+async function handleReset() {
+  if (!confirm("정말 초기화할까요? 모든 뽑기 기록과 재고가 초기화돼요.")) return;
+  const pDocs = await getDocs(collection(db, "products"));
+  await Promise.all(pDocs.docs.map(d => updateDoc(doc(db, "products", d.id), { remaining: d.data().count })));
+  const uItems = await getDocs(collection(db, "draws", userId, "items"));
+  await Promise.all(uItems.docs.map(d => deleteDoc(doc(db, "draws", userId, "items", d.id))));
+  await loadAll();
+  renderDrawTab();
+  document.getElementById("results-area").style.display = "none";
+  alert("초기화 완료!");
+}
+
+// ── Save settings ──
+async function saveSettings() {
+  settings.title = document.getElementById("s-title").value;
+  settings.subtitle = document.getElementById("s-subtitle").value;
+  settings.maxPerUser = parseInt(document.getElementById("s-max").value) || 0;
+  await setDoc(doc(db, "settings", "global"), settings);
+  renderDrawTab();
+  alert("저장됐어요!");
+}
+
+// ── Image upload ──
+async function handleImageUpload(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const btn = document.getElementById("upload-btn");
+  btn.textContent = "업로드 중...";
+  btn.disabled = true;
+  try {
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("upload_preset", PRESET);
+    const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, { method: "POST", body: fd });
+    const d = await r.json();
+    currentImageUrl = d.secure_url;
+    const preview = document.getElementById("img-preview");
+    preview.src = currentImageUrl;
+    preview.style.display = "";
+    document.getElementById("del-img-btn").style.display = "";
+  } catch { alert("업로드 실패"); }
+  btn.textContent = "이미지 선택";
+  btn.disabled = false;
+}
+function clearImage() {
+  currentImageUrl = "";
+  document.getElementById("img-preview").style.display = "none";
+  document.getElementById("del-img-btn").style.display = "none";
+  document.getElementById("file-input").value = "";
+}
+
+// ── Save product ──
+async function saveProduct() {
+  const name = document.getElementById("f-name").value.trim();
+  if (!name) { alert("상품명을 입력하세요"); return; }
+  const data = {
+    name,
+    grade: document.getElementById("f-grade").value,
+    rate: Number(document.getElementById("f-rate").value) || 10,
+    count: Number(document.getElementById("f-count").value) || 100,
+    description: document.getElementById("f-desc").value,
+    imageUrl: currentImageUrl
+  };
+  if (editId) {
+    await updateDoc(doc(db, "products", editId), data);
+  } else {
+    await addDoc(collection(db, "products"), { ...data, remaining: data.count });
+  }
+  cancelEdit();
+  await loadAll();
+  renderAdminTab();
+  renderDrawTab();
+}
+
+function cancelEdit() {
+  editId = null;
+  currentImageUrl = "";
+  document.getElementById("f-name").value = "";
+  document.getElementById("f-grade").value = "R";
+  document.getElementById("f-rate").value = "10";
+  document.getElementById("f-count").value = "100";
+  document.getElementById("f-desc").value = "";
+  document.getElementById("img-preview").style.display = "none";
+  document.getElementById("del-img-btn").style.display = "none";
+  document.getElementById("file-input").value = "";
+  document.getElementById("form-title").textContent = "➕ 상품 추가";
+  const saveBtn = document.querySelector("#tab-admin .admin-card:nth-child(2) .save-btn");
+  if (saveBtn) saveBtn.textContent = "상품 추가";
+  document.getElementById("cancel-edit-btn").style.display = "none";
+}
+
+function editProduct(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  editId = id;
+  currentImageUrl = p.imageUrl || "";
+  document.getElementById("f-name").value = p.name;
+  document.getElementById("f-grade").value = p.grade;
+  document.getElementById("f-rate").value = p.rate;
+  document.getElementById("f-count").value = p.count;
+  document.getElementById("f-desc").value = p.description || "";
+  const preview = document.getElementById("img-preview");
+  if (p.imageUrl) { preview.src = p.imageUrl; preview.style.display = ""; document.getElementById("del-img-btn").style.display = ""; }
+  else { preview.style.display = "none"; document.getElementById("del-img-btn").style.display = "none"; }
+  document.getElementById("form-title").textContent = "✏️ 상품 수정";
+  const saveBtn = document.querySelector("#tab-admin .save-btn");
+  if (saveBtn) saveBtn.textContent = "수정 완료";
+  document.getElementById("cancel-edit-btn").style.display = "";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function deleteProduct(id) {
+  if (!confirm("삭제할까요?")) return;
+  await deleteDoc(doc(db, "products", id));
+  await loadAll();
+  renderAdminTab();
+  renderDrawTab();
+}
+
+// ── Render admin ──
+function renderAdminTab() {
+  const list = document.getElementById("product-list");
+  document.getElementById("product-count").textContent = products.length;
+  if (!products.length) {
+    list.innerHTML = `<div style="color:var(--sub);text-align:center;padding:20px">상품을 추가해주세요</div>`;
+    return;
+  }
+  list.innerHTML = "";
+  products.forEach(p => {
+    const meta = GRADE_META[p.grade] || GRADE_META.N;
+    const el = document.createElement("div");
+    el.className = "product-item";
+    el.style.border = `1px solid ${meta.color}33`;
+    const imgHtml = p.imageUrl
+      ? `<img class="product-thumb" src="${p.imageUrl}" alt="${p.name}"/>`
+      : `<div class="product-no-thumb" style="background:${meta.color}22">🎁</div>`;
+    el.innerHTML = `
+      ${imgHtml}
+      <div class="product-info">
+        <div class="product-name-row">
+          <span class="product-grade-badge" style="color:${meta.color};background:${meta.color}22">${p.grade}</span>
+          <span class="product-name">${p.name}</span>
+        </div>
+        <div class="product-meta">가중치 ${p.rate} · 재고 ${p.remaining ?? p.count}/${p.count}</div>
+      </div>
+      <div class="product-actions">
+        <button class="edit-btn" onclick="editProduct('${p.id}')">수정</button>
+        <button class="del-btn" onclick="deleteProduct('${p.id}')">삭제</button>
+      </div>
+    `;
+    list.appendChild(el);
   });
 }
-async function clearImages(){
-  const db=await openDB();
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(DB_STORE,"readwrite");
-    tx.objectStore(DB_STORE).clear();
-    tx.oncomplete=()=>resolve();
-    tx.onerror=()=>reject(tx.error);
-  });
-}
 
-async function render(){
-  sortPrizes();
-  $("heroTotal").textContent=prizes.length+"종 / "+totalQty()+"개";
-  $("totalCount").textContent=totalQty();
-  $("bonusLine").textContent=bonusChances>0?`디지털상 보너스 기회 ${bonusChances}회 보유 중`:"";
-
-  const counts={};ranks.forEach(r=>counts[r]=0);
-  prizes.forEach(p=>counts[p.rank]=(counts[p.rank]||0)+(Number(p.qty)||0));
-  $("rankCounts").innerHTML=ranks.map(r=>`<div class="rank-box ${r==="디지털상"?"digital":""}"><div class="rank-icon">${r==="미스터리상"?"?":r==="디지털상"?"D":r.replace("상","")}</div><strong>${esc(r)}</strong><span>${counts[r]||0}개</span></div>`).join("");
-
-  let prizeHTML="";
-  for(const p of prizes){
-    const img=await getImage(p.imgId);
-    prizeHTML+=`<article class="card"><div class="imgbox">${imgHTML(img)}</div><span class="pill ${p.rank==="디지털상"?"digital":""}">${esc(p.rank)}</span><h3>${esc(p.name)}</h3><p>${esc(p.desc)}</p><small>수량 ${Number(p.qty)||0}개 · 확률 ${Number(p.weight)||1}</small></article>`;
+// ── Confetti ──
+function launchConfetti() {
+  const container = document.getElementById("confetti-container");
+  container.innerHTML = "";
+  const colors = ["#A78BFA","#F472B6","#FFD700","#60A5FA","#34D399"];
+  for (let i = 0; i < 50; i++) {
+    const el = document.createElement("div");
+    const size = 6 + Math.random() * 8;
+    el.style.cssText = `
+      position:absolute;
+      left:${Math.random()*100}%;
+      top:-10px;
+      width:${size}px;height:${size}px;
+      border-radius:2px;
+      background:${colors[i % 5]};
+      animation:confettiFall ${1.5+Math.random()}s ${Math.random()*1.5}s ease-in forwards;
+    `;
+    container.appendChild(el);
   }
-  $("prizeGrid").innerHTML=prizes.length?prizeHTML:`<div class="empty" style="grid-column:1/-1">아직 등록된 상품이 없습니다.</div>`;
-
-  let historyHTML="";
-  for(const h of history){
-    const img=await getImage(h.imgId);
-    historyHTML+=`<div class="history-item"><div class="thumb">${imgHTML(img)}</div><div><b>${esc(h.rank)} · ${esc(h.name)}</b><br><small>${esc(h.time)}</small></div></div>`;
-  }
-  $("historyList").innerHTML=history.length?historyHTML:`<div class="empty">아직 당첨 내역이 없습니다.</div>`;
-  await renderAdmin();
+  setTimeout(() => { container.innerHTML = ""; }, 4000);
 }
-async function renderAdmin(){
-  let html=`<div class="empty">등록 품목 ${prizes.length}/${MAX_ITEMS}종</div>`;
-  for(let i=0;i<prizes.length;i++){
-    const p=prizes[i],img=await getImage(p.imgId);
-    html+=`<div class="admin-item"><div class="thumb">${imgHTML(img)}</div><div><b>${esc(p.rank)} · ${esc(p.name)}</b><br><small>수량 ${Number(p.qty)||0}개 · 확률 ${Number(p.weight)||1}</small></div><div style="display:grid;gap:6px"><button class="mini" onclick="editPrize(${i})">수정</button><button class="mini danger" onclick="deletePrize(${i})">삭제</button></div></div>`;
-  }
-  $("adminList").innerHTML=html;
-}
-function weightedPool(){
-  const pool=[];
-  prizes.forEach((p,i)=>{
-    const q=Math.max(0,Number(p.qty)||0),w=Math.max(1,Number(p.weight)||1);
-    for(let n=0;n<q*w;n++)pool.push(i);
-  });
-  return pool;
-}
-async function drawKuji(){
-  const pool=weightedPool();
-  if(!pool.length){toast("등록된 상품이 없습니다.");openAdmin();return}
-  const btn=$("drawBtn");
-  btn.disabled=true;btn.textContent="...";
-  setTimeout(async()=>{
-    const idx=pool[Math.floor(Math.random()*pool.length)],pick=prizes[idx];
-    pick.qty=Math.max(0,(Number(pick.qty)||0)-1);
-    if(pick.rank==="디지털상")bonusChances+=1;else if(bonusChances>0)bonusChances-=1;
-    history.unshift({rank:pick.rank,name:pick.name,desc:pick.desc,imgId:pick.imgId,time:new Date().toLocaleString("ko-KR")});
-    history=history.slice(0,30);
-    const img=await getImage(pick.imgId);
-    $("winImg").innerHTML=imgHTML(img);
-    $("winRank").textContent=pick.rank+" 당첨!";
-    $("winName").textContent=pick.name;
-    $("winDesc").textContent=pick.rank==="디지털상"?(pick.desc||"디지털 상품이 지급됩니다.")+" 보너스 뽑기 기회 1회가 추가되었습니다.":pick.desc;
-    $("winModal").classList.add("show");
-    btn.disabled=false;btn.textContent=bonusChances>0?"🎁 BONUS DRAW":"🪙 DRAW";
-    saveMeta();await render();
-  },650)
-}
-function closeWin(){$("winModal").classList.remove("show")}
-function openAdmin(){$("adminDrawer").classList.add("open");toast("관리자 메뉴가 열렸습니다.")}
-function closeAdmin(){$("adminDrawer").classList.remove("open")}
-
-function fileToBlob(file){
-  return new Promise((resolve,reject)=>{
-    if(!file){resolve(null);return}
-    const reader=new FileReader();
-    reader.onload=e=>{
-      const img=new Image();
-      img.onload=()=>{
-        const canvas=document.createElement("canvas");
-        const maxSize=900;
-        let w=img.width,h=img.height;
-        if(w>h&&w>maxSize){h=Math.round(h*maxSize/w);w=maxSize}
-        else if(h>maxSize){w=Math.round(w*maxSize/h);h=maxSize}
-        canvas.width=w;canvas.height=h;
-        canvas.getContext("2d").drawImage(img,0,0,w,h);
-        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("이미지 압축 실패")),"image/jpeg",0.72);
-      };
-      img.onerror=()=>reject(new Error("이미지 읽기 실패"));
-      img.src=e.target.result;
-    };
-    reader.onerror=()=>reject(new Error("파일 읽기 실패"));
-    reader.readAsDataURL(file);
-  })
-}
-async function savePrize(){
-  const editIndex=$("editIndex").value,isEdit=editIndex!=="";
-  const rank=$("itemRank").value,name=$("itemName").value.trim(),desc=$("itemDesc").value.trim();
-  const qty=Math.max(1,Number($("itemQty").value)||1),weight=Math.max(1,Number($("itemWeight").value)||1),file=$("itemImg").files[0];
-
-  if(!name){toast("상품명을 입력하세요.");return}
-  if(!isEdit&&prizes.length>=MAX_ITEMS){toast(`최대 ${MAX_ITEMS}종까지 등록 가능합니다.`);return}
-
-  let imgId=isEdit?(prizes[Number(editIndex)].imgId||makeId()):makeId();
-
-  if(file){
-    try{
-      const blob=await fileToBlob(file);
-      await setImage(imgId,blob);
-    }catch(e){
-      toast(e.message||"이미지 저장 실패. 이미지 없이 등록합니다.");
-      if(!isEdit) imgId="";
-    }
-  }
-
-  const item={rank,name,desc,qty,weight,imgId};
-
-  if(isEdit){prizes[Number(editIndex)]=item;toast("상품을 수정했습니다.")}
-  else{prizes.push(item);toast("상품을 추가했습니다.")}
-
-  resetForm();
-  if(saveMeta()) await render();
-}
-function editPrize(i){
-  const p=prizes[i];
-  $("editIndex").value=i;$("itemRank").value=p.rank;$("itemName").value=p.name;$("itemDesc").value=p.desc||"";$("itemQty").value=p.qty||1;$("itemWeight").value=p.weight||10;$("itemImg").value="";
-  toast("수정할 상품을 불러왔습니다.");
-}
-async function deletePrize(i){
-  const p=prizes[i];
-  await deleteImage(p.imgId);
-  prizes.splice(i,1);
-  saveMeta();
-  await render();
-  toast("삭제했습니다.");
-}
-function resetForm(){
-  $("editIndex").value="";$("itemRank").value="A상";$("itemName").value="";$("itemDesc").value="";$("itemQty").value=1;$("itemWeight").value=10;$("itemImg").value="";
-}
-async function resetAllData(){
-  const ok=confirm("모든 상품/이미지/기록을 삭제할까요?");
-  if(!ok)return;
-  prizes=[];history=[];bonusChances=0;imageCache={};
-  localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(HISTORY_KEY);localStorage.removeItem(BONUS_KEY);
-  try{await clearImages()}catch(e){}
-  await render();
-  toast("초기화 완료");
-}
-async function exportData(){
-  const images={};
-  for(const p of prizes){
-    if(p.imgId){
-      const db=await openDB();
-      const blob=await new Promise((resolve,reject)=>{
-        const tx=db.transaction(DB_STORE,"readonly");
-        const req=tx.objectStore(DB_STORE).get(p.imgId);
-        req.onsuccess=()=>resolve(req.result||null);
-        req.onerror=()=>reject(req.error);
-      });
-      if(blob){
-        images[p.imgId]=await new Promise(resolve=>{
-          const r=new FileReader();
-          r.onload=()=>resolve(r.result);
-          r.readAsDataURL(blob);
-        });
-      }
-    }
-  }
-  const data={prizes,history,bonusChances,images};
-  const url=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:"application/json"}));
-  const a=document.createElement("a");
-  a.href=url;a.download="kuji-backup.json";a.click();URL.revokeObjectURL(url);
-}
-async function importData(event){
-  const file=event.target.files[0];if(!file)return;
-  const text=await file.text();
-  const data=JSON.parse(text);
-  prizes=data.prizes||[];history=data.history||[];bonusChances=Number(data.bonusChances||0);
-  if(data.images){
-    for(const [id,src] of Object.entries(data.images)){
-      const blob=await (await fetch(src)).blob();
-      await setImage(id,blob);
-    }
-  }
-  saveMeta();await render();toast("백업 불러오기 완료");
-  event.target.value="";
-}
-
-let last=0;
-window.addEventListener("scroll",()=>{const cur=window.scrollY;if(cur>last&&cur>90)$("header").classList.add("hide");else $("header").classList.remove("hide");last=cur});
-loadMeta().then(render);
 </script>
 </body>
 </html>

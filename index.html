@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
 <title>✦ IDOL KUJI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"/>
@@ -10,15 +10,16 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0A0A0F;--bg2:#12121A;--bg3:#1A1A26;--card:#1E1E2E;
-  --border:#2A2A3E;--text:#F0F0FF;--sub:#8888AA;--accent:#A78BFA;
-  --accent2:#F472B6;--btn-grad:linear-gradient(135deg,#A78BFA,#F472B6);
+  --border:#2A2A3E;--text:#F0F0FF;--sub:#8888AA;--accent:#38BDF8;
+  --accent2:#22D3EE;--btn-grad:linear-gradient(135deg,#38BDF8,#22D3EE);
 }
 body.light{
   --bg:#F5F5FA;--bg2:#EBEBF5;--bg3:#E0E0EF;--card:#FFFFFF;
-  --border:#D0D0E0;--text:#1A1A2E;--sub:#66668A;--accent:#7C3AED;
-  --accent2:#DB2777;--btn-grad:linear-gradient(135deg,#7C3AED,#DB2777);
+  --border:#D0D0E0;--text:#1A1A2E;--sub:#66668A;--accent:#0284C7;
+  --accent2:#0891B2;--btn-grad:linear-gradient(135deg,#0284C7,#0891B2);
 }
-body{background:var(--bg);color:var(--text);font-family:'Outfit','Noto Sans KR',sans-serif;min-height:100vh;transition:background .3s,color .3s}
+html{touch-action:pan-y;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Outfit','Noto Sans KR',sans-serif;min-height:100vh;transition:background .3s,color .3s;touch-action:pan-y;overflow-x:hidden;overscroll-behavior-x:none}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
@@ -45,7 +46,7 @@ header{
 }
 .logo{
   font-size:1.2rem;font-weight:800;
-  background:linear-gradient(135deg,#A78BFA,#F472B6);
+  background:linear-gradient(135deg,#38BDF8,#22D3EE);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
 nav{display:flex;gap:4px}
@@ -85,7 +86,7 @@ nav{display:flex;gap:4px}
 }
 .kuji-title{
   font-size:2.2rem;font-weight:800;letter-spacing:.05em;
-  background:linear-gradient(135deg,#A78BFA 30%,#F472B6);
+  background:linear-gradient(135deg,#38BDF8 30%,#22D3EE);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   margin-bottom:8px;
 }
@@ -122,7 +123,7 @@ nav{display:flex;gap:4px}
 .draw-btn{
   padding:16px 48px;border-radius:50px;border:none;cursor:pointer;
   background:var(--btn-grad);color:#fff;font-size:1.1rem;font-weight:800;
-  letter-spacing:.1em;box-shadow:0 0 30px rgba(167,139,250,.4);
+  letter-spacing:.1em;box-shadow:0 0 30px rgba(56,189,248,.4);
   transition:all .3s;font-family:inherit;display:inline-flex;align-items:center;gap:10px;
 }
 .draw-btn:disabled{background:var(--border);box-shadow:none;cursor:not-allowed;transform:scale(.97)}
@@ -162,7 +163,7 @@ nav{display:flex;gap:4px}
   border-radius:16px;overflow:hidden;
 }
 .kuji-card-back{
-  background:linear-gradient(135deg,#A78BFA22,#F472B622);
+  background:linear-gradient(135deg,#38BDF822,#22D3EE22);
   border:1px solid var(--border);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
 }
@@ -170,7 +171,7 @@ nav{display:flex;gap:4px}
 .kuji-card-back-label{color:var(--sub);font-size:.75rem;letter-spacing:.1em}
 .kuji-shimmer{
   position:absolute;inset:0;
-  background:linear-gradient(135deg,transparent 40%,rgba(167,139,250,.08) 50%,transparent 60%);
+  background:linear-gradient(135deg,transparent 40%,rgba(56,189,248,.08) 50%,transparent 60%);
   background-size:200% 200%;animation:shimmer 2s infinite;
 }
 .kuji-card-front{
@@ -530,7 +531,7 @@ let editId = null;
 let currentImageUrl = "";
 let isDrawing = false;
 let isAdmin = false;
-const ADMIN_PW = "kuji2025";
+const ADMIN_PW = "2026";
 
 // ── User ID ──
 let userId = localStorage.getItem("kuji_uid");
@@ -580,8 +581,21 @@ async function loadAll() {
     products = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     if (sSnap.exists()) Object.assign(settings, sSnap.data());
     userDraws = dSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch(e) { console.error(e); }
+  } catch(e) {
+    console.error("loadAll error:", e);
+    alert("데이터를 불러오지 못했어요.\n사유: " + (e && e.message ? e.message : e) + "\n\nFirestore 보안 규칙 또는 인덱스 설정을 확인해주세요.");
+  }
 }
+
+// ── Disable zoom gestures (double-tap, pinch) ──
+let lastTouchEnd = 0;
+document.addEventListener("touchend", (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
+document.addEventListener("gesturestart", (e) => e.preventDefault());
+document.addEventListener("gesturechange", (e) => e.preventDefault());
 
 // ── Init ──
 async function init() {
@@ -641,7 +655,9 @@ function adminLogout() {
   document.getElementById("nav-admin").style.display = "none";
   document.getElementById("admin-login-btn").style.display = "";
   document.getElementById("admin-logout-btn").style.display = "none";
-  switchTab("draw");
+  // 관리자 탭을 보고 있었을 때만 뽑기 탭으로 전환, 그 외 화면은 그대로 유지
+  const adminTabVisible = document.getElementById("tab-admin").style.display !== "none";
+  if (adminTabVisible) switchTab("draw");
 }
 
 // ── Count selector ──
@@ -881,14 +897,19 @@ function renderCollectionTab() {
 // ── Reset ──
 async function handleReset() {
   if (!confirm("정말 초기화할까요? 모든 뽑기 기록과 재고가 초기화돼요.")) return;
-  const pDocs = await getDocs(collection(db, "products"));
-  await Promise.all(pDocs.docs.map(d => updateDoc(doc(db, "products", d.id), { remaining: d.data().count })));
-  const uItems = await getDocs(collection(db, "draws", userId, "items"));
-  await Promise.all(uItems.docs.map(d => deleteDoc(doc(db, "draws", userId, "items", d.id))));
-  await loadAll();
-  renderDrawTab();
-  document.getElementById("results-area").style.display = "none";
-  alert("초기화 완료!");
+  try {
+    const pDocs = await getDocs(collection(db, "products"));
+    await Promise.all(pDocs.docs.map(d => updateDoc(doc(db, "products", d.id), { remaining: d.data().count })));
+    const uItems = await getDocs(collection(db, "draws", userId, "items"));
+    await Promise.all(uItems.docs.map(d => deleteDoc(doc(db, "draws", userId, "items", d.id))));
+    await loadAll();
+    renderDrawTab();
+    document.getElementById("results-area").style.display = "none";
+    alert("초기화 완료!");
+  } catch (e) {
+    console.error("handleReset error:", e);
+    alert("초기화에 실패했어요.\n사유: " + (e && e.message ? e.message : e));
+  }
 }
 
 // ── Save settings ──
@@ -896,9 +917,14 @@ async function saveSettings() {
   settings.title = document.getElementById("s-title").value;
   settings.subtitle = document.getElementById("s-subtitle").value;
   settings.maxPerUser = parseInt(document.getElementById("s-max").value) || 0;
-  await setDoc(doc(db, "settings", "global"), settings);
-  renderDrawTab();
-  alert("저장됐어요!");
+  try {
+    await setDoc(doc(db, "settings", "global"), settings);
+    renderDrawTab();
+    alert("저장됐어요!");
+  } catch (e) {
+    console.error("saveSettings error:", e);
+    alert("설정 저장에 실패했어요.\n사유: " + (e && e.message ? e.message : e));
+  }
 }
 
 // ── Image upload ──
@@ -941,15 +967,25 @@ async function saveProduct() {
     description: document.getElementById("f-desc").value,
     imageUrl: currentImageUrl
   };
-  if (editId) {
-    await updateDoc(doc(db, "products", editId), data);
-  } else {
-    await addDoc(collection(db, "products"), { ...data, remaining: data.count });
+  const saveBtn = document.querySelector("#tab-admin .admin-card:nth-child(2) .save-btn");
+  const originalLabel = saveBtn ? saveBtn.textContent : "";
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "저장 중..."; }
+  try {
+    if (editId) {
+      await updateDoc(doc(db, "products", editId), data);
+    } else {
+      await addDoc(collection(db, "products"), { ...data, remaining: data.count });
+    }
+    cancelEdit();
+    await loadAll();
+    renderAdminTab();
+    renderDrawTab();
+  } catch (e) {
+    console.error("saveProduct error:", e);
+    alert("상품 저장에 실패했어요.\n사유: " + (e && e.message ? e.message : e) + "\n\nFirestore 보안 규칙에서 products 쓰기 권한을 확인해주세요.");
+  } finally {
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = originalLabel || (editId ? "수정 완료" : "상품 추가"); }
   }
-  cancelEdit();
-  await loadAll();
-  renderAdminTab();
-  renderDrawTab();
 }
 
 function cancelEdit() {
@@ -991,10 +1027,15 @@ function editProduct(id) {
 
 async function deleteProduct(id) {
   if (!confirm("삭제할까요?")) return;
-  await deleteDoc(doc(db, "products", id));
-  await loadAll();
-  renderAdminTab();
-  renderDrawTab();
+  try {
+    await deleteDoc(doc(db, "products", id));
+    await loadAll();
+    renderAdminTab();
+    renderDrawTab();
+  } catch (e) {
+    console.error("deleteProduct error:", e);
+    alert("상품 삭제에 실패했어요.\n사유: " + (e && e.message ? e.message : e));
+  }
 }
 
 // ── Render admin ──
@@ -1036,7 +1077,7 @@ function renderAdminTab() {
 function launchConfetti() {
   const container = document.getElementById("confetti-container");
   container.innerHTML = "";
-  const colors = ["#A78BFA","#F472B6","#FFD700","#60A5FA","#34D399"];
+  const colors = ["#38BDF8","#22D3EE","#FFD700","#60A5FA","#34D399"];
   for (let i = 0; i < 50; i++) {
     const el = document.createElement("div");
     const size = 6 + Math.random() * 8;

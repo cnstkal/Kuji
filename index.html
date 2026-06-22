@@ -34,7 +34,9 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit','Noto Sans KR',
 @keyframes glow-n{0%,100%{box-shadow:0 0 10px #94A3B840}50%{box-shadow:0 0 20px #94A3B880}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
-@keyframes cardReveal{0%{transform:rotateY(0deg) scale(1)}50%{transform:rotateY(90deg) scale(1.08)}100%{transform:rotateY(0deg) scale(1)}}
+@keyframes flipCard{0%{transform:rotateY(0deg)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0deg)}}
+@keyframes cardSlotSpin{0%{opacity:.3;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}100%{opacity:.3;transform:scale(.95)}}
+@keyframes reveal{0%{transform:rotateY(180deg) scale(.8);opacity:0}100%{transform:rotateY(180deg) scale(1);opacity:1}}
 
 .fade-in{animation:fadeIn .4s ease}
 
@@ -71,15 +73,20 @@ nav{display:flex;gap:4px}
   background:#FF6B6B22;color:#FF6B6B;cursor:pointer;font-size:0.7rem;font-family:inherit;
 }
 .header-right{display:flex;gap:8px;align-items:center}
+.user-badge{
+  padding:4px 10px;border-radius:20px;border:1px solid var(--accent);
+  background:var(--accent)22;color:var(--accent);font-size:.7rem;font-weight:600;
+  max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
 
 /* Tabs */
 .tab{display:none}.tab.active{display:block}
 
 /* Main container */
-.main{max-width:640px;margin:0 auto;padding:32px 20px}
+.main{max-width:640px;margin:0 auto;padding:24px 16px}
 
 /* Draw tab */
-.kuji-title-area{text-align:center;margin-bottom:32px}
+.kuji-title-area{text-align:center;margin-bottom:24px}
 .kuji-eyebrow{
   font-size:.75rem;letter-spacing:.3em;color:var(--accent);
   font-weight:600;margin-bottom:8px;text-transform:uppercase;
@@ -98,7 +105,7 @@ nav{display:flex;gap:4px}
 .draw-limit-badge span{color:var(--accent);font-weight:700}
 
 /* Grade summary */
-.grade-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:28px}
+.grade-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
 .grade-card{
   background:var(--card);border-radius:12px;
   padding:10px 6px;text-align:center;
@@ -107,65 +114,96 @@ nav{display:flex;gap:4px}
 .grade-count{font-size:1rem;font-weight:700;color:var(--text)}
 .grade-sub{font-size:.55rem;color:var(--sub)}
 
-/* Count selector */
-.count-label{font-size:.78rem;color:var(--sub);margin-bottom:10px;text-align:center}
-.count-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
-.count-btn{
-  padding:10px 20px;border-radius:12px;cursor:pointer;
-  font-weight:700;font-size:.9rem;transition:all .2s;min-width:60px;
-  font-family:inherit;
+/* ── 뽑기판 ── */
+.kujiboard-section{margin-bottom:20px}
+.kujiboard-label{
+  font-size:.8rem;color:var(--sub);margin-bottom:10px;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:8px;
 }
-.count-btn.active{background:var(--btn-grad);color:#fff;border:1px solid transparent}
-.count-btn.inactive{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.kujiboard-label strong{color:var(--accent);font-size:1rem}
+.kujiboard-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(60px,1fr));
+  gap:6px;
+  margin-bottom:14px;
+}
+.slot{
+  aspect-ratio:1;border-radius:10px;border:1.5px dashed var(--border);
+  background:var(--card);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:700;color:var(--sub);
+  transition:all .15s;position:relative;overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+.slot:hover{border-color:var(--accent);color:var(--accent)}
+.slot.selected{
+  border:2px solid var(--accent);background:var(--accent)22;
+  color:var(--accent);transform:scale(1.06);
+}
+.slot.drawn{
+  border:2px solid var(--border);background:var(--bg2);
+  color:var(--sub);cursor:default;opacity:.4;
+}
+.slot.spinning{animation:cardSlotSpin .4s ease infinite}
+.slot-num{font-size:.75rem;font-weight:700}
 
-/* Draw button */
-.draw-btn-wrap{text-align:center;margin-bottom:32px}
-.draw-btn{
-  padding:16px 48px;border-radius:50px;border:none;cursor:pointer;
-  background:var(--btn-grad);color:#fff;font-size:1.1rem;font-weight:800;
-  letter-spacing:.1em;box-shadow:0 0 30px rgba(56,189,248,.4);
+.open-btn-wrap{text-align:center;margin-bottom:20px}
+.open-btn{
+  padding:14px 44px;border-radius:50px;border:none;cursor:pointer;
+  background:var(--btn-grad);color:#fff;font-size:1rem;font-weight:800;
+  letter-spacing:.1em;box-shadow:0 0 28px rgba(56,189,248,.4);
   transition:all .3s;font-family:inherit;display:inline-flex;align-items:center;gap:10px;
 }
-.draw-btn:disabled{background:var(--border);box-shadow:none;cursor:not-allowed;transform:scale(.97)}
+.open-btn:disabled{background:var(--border);box-shadow:none;cursor:not-allowed;transform:scale(.97)}
+.open-btn-hint{font-size:.75rem;color:var(--sub);margin-top:8px}
 .spinner{
   width:18px;height:18px;border:2px solid #fff;border-top:2px solid transparent;
   border-radius:50%;animation:spin 1s linear infinite;display:inline-block;
 }
 
 /* Results */
-#results-area{margin-bottom:24px}
-.results-grid{gap:12px;margin-bottom:16px}
+#results-area{margin-bottom:16px}
+.results-grid{gap:10px;margin-bottom:12px}
 .result-summary{
-  background:var(--card);border-radius:16px;padding:16px;
+  background:var(--card);border-radius:16px;padding:12px;
   border:1px solid var(--border);text-align:center;
 }
-.result-summary-title{font-size:.75rem;color:var(--sub);margin-bottom:10px}
-.result-tags{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.result-summary-title{font-size:.75rem;color:var(--sub);margin-bottom:8px}
+.result-tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .result-tag{
   padding:4px 12px;border-radius:20px;
   font-size:.78rem;font-weight:700;
 }
 
 /* Kuji Card */
-.kuji-card-wrap{perspective:800px;border-radius:16px}
+.kuji-card-wrap{perspective:800px;border-radius:14px}
 .kuji-card-wrap.glow-ssr{animation:glow-ssr 2s infinite}
 .kuji-card-wrap.glow-sr{animation:glow-sr 2s infinite}
 .kuji-card-wrap.glow-r{animation:glow-r 2s infinite}
 .kuji-card-wrap.glow-n{animation:glow-n 2s infinite}
 .kuji-card-inner{
-  width:100%;padding-top:140%;position:relative;
+  width:100%;position:relative;
   transform-style:preserve-3d;
   transition:transform 0.6s cubic-bezier(.4,0,.2,1);
 }
 .kuji-card-inner.flipped{transform:rotateY(180deg)}
 .kuji-card-face{
   position:absolute;inset:0;backface-visibility:hidden;
-  border-radius:16px;overflow:hidden;
+  border-radius:14px;overflow:hidden;
+}
+/* 앞면은 relative로 높이 결정 */
+.kuji-card-front-sizer{
+  width:100%;
+  border-radius:14px;overflow:hidden;
+  transform:rotateY(180deg);
+  display:flex;flex-direction:column;
+  backface-visibility:hidden;
 }
 .kuji-card-back{
   background:linear-gradient(135deg,#38BDF822,#22D3EE22);
   border:1px solid var(--border);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:100%;height:100%;
 }
 .kuji-card-back-icon{font-size:2rem;margin-bottom:8px;animation:float 2s ease-in-out infinite}
 .kuji-card-back-label{color:var(--sub);font-size:.75rem;letter-spacing:.1em}
@@ -174,74 +212,87 @@ nav{display:flex;gap:4px}
   background:linear-gradient(135deg,transparent 40%,rgba(56,189,248,.08) 50%,transparent 60%);
   background-size:200% 200%;animation:shimmer 2s infinite;
 }
-.kuji-card-front{
-  transform:rotateY(180deg);
-  display:flex;flex-direction:column;
+.kuji-img{
+  width:100%;
+  max-height:220px;
+  object-fit:contain;
+  background:rgba(0,0,0,.15);
+  display:block;
 }
-.kuji-card-front.popped{animation:pop .4s ease}
+.kuji-no-img{
+  height:140px;display:flex;align-items:center;justify-content:center;
+  font-size:3rem;background:rgba(0,0,0,.2);
+}
 .grade-badge{
   position:absolute;top:8px;right:8px;
   font-size:.6rem;font-weight:700;letter-spacing:.1em;
   padding:2px 8px;border-radius:20px;color:#000;z-index:1;
 }
-.kuji-img{width:100%;height:60%;object-fit:cover;flex-shrink:0}
-.kuji-no-img{
-  height:60%;display:flex;align-items:center;justify-content:center;
-  font-size:3rem;flex-shrink:0;
+.kuji-card-info{
+  padding:8px 10px 10px;display:flex;flex-direction:column;gap:2px;
+  background:inherit;
 }
-.kuji-card-info{padding:10px;flex:1;display:flex;flex-direction:column;justify-content:center}
-.kuji-card-name{font-size:.8rem;font-weight:700;margin-bottom:4px;word-break:break-all;line-height:1.3}
-.kuji-card-desc{font-size:.65rem;color:var(--sub);line-height:1.4;word-break:break-all}
+.kuji-card-name{font-size:1rem;font-weight:800;word-break:break-all;line-height:1.3}
+.kuji-card-desc{font-size:.7rem;color:var(--sub);line-height:1.4;word-break:break-all}
 
-/* Reset btn */
-.reset-wrap{text-align:center;margin-top:40px}
+/* Reset */
+.reset-wrap{text-align:center;margin-top:32px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .reset-btn{
   padding:8px 20px;border-radius:20px;border:1px solid var(--border);
   background:transparent;color:var(--sub);cursor:pointer;font-size:.78rem;
   transition:all .2s;font-family:inherit;
 }
 .reset-btn:hover{color:var(--text);border-color:var(--sub)}
+.reset-btn.danger{border-color:#FF6B6B44;color:#FF6B6B}
+.reset-btn.danger:hover{background:#FF6B6B22}
 
 /* Collection */
-.col-header{margin-bottom:24px}
+.col-header{margin-bottom:20px}
 .col-header h2{font-weight:800;font-size:1.5rem;margin-bottom:4px}
 .col-header .sub{color:var(--sub);font-size:.85rem}
 .col-empty{
-  text-align:center;padding:80px 20px;color:var(--sub);
+  text-align:center;padding:60px 20px;color:var(--sub);
   background:var(--card);border-radius:20px;border:1px solid var(--border);
 }
 .col-empty-icon{font-size:3rem;margin-bottom:12px}
 .col-empty-title{font-weight:600;margin-bottom:4px}
 .col-empty-sub{font-size:.8rem}
-.col-stats{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.col-stats{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .col-stat-tag{padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:700}
-.col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 .col-item{
-  background:var(--card);border-radius:16px;overflow:hidden;
-  transition:transform .2s;cursor:default;
+  background:var(--card);border-radius:14px;overflow:hidden;
+  transition:transform .2s;cursor:default;position:relative;
 }
-.col-item:hover{transform:translateY(-4px)}
-.col-item-img{width:100%;height:120px;object-fit:cover}
+.col-item:hover{transform:translateY(-3px)}
+.col-item-img{width:100%;max-height:160px;object-fit:contain;background:rgba(0,0,0,.1);display:block;}
 .col-item-no-img{
-  height:120px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;
+  height:100px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;
 }
-.col-item-body{padding:10px}
-.col-item-grade{font-size:.58rem;font-weight:700;letter-spacing:.1em;margin-bottom:4px}
-.col-item-name{font-size:.8rem;font-weight:600;color:var(--text);word-break:break-all;line-height:1.3}
+.col-item-body{padding:8px 10px}
+.col-item-grade{font-size:.58rem;font-weight:700;letter-spacing:.1em;margin-bottom:3px}
+.col-item-name{font-size:.85rem;font-weight:700;color:var(--text);word-break:break-all;line-height:1.3}
+.col-count-badge{
+  position:absolute;top:6px;right:6px;
+  background:rgba(0,0,0,.7);color:#fff;
+  font-size:.7rem;font-weight:700;
+  padding:2px 7px;border-radius:20px;
+  backdrop-filter:blur(4px);
+}
 
 /* Admin */
 .admin-title{
-  font-weight:800;font-size:1.5rem;margin-bottom:24px;
+  font-weight:800;font-size:1.5rem;margin-bottom:20px;
   background:linear-gradient(135deg,#FF6B6B,#FFD700);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
 .admin-card{
-  background:var(--card);border-radius:20px;padding:24px;
-  border:1px solid var(--border);margin-bottom:24px;
+  background:var(--card);border-radius:20px;padding:20px;
+  border:1px solid var(--border);margin-bottom:20px;
 }
-.admin-card-title{font-weight:700;margin-bottom:16px;font-size:.9rem;color:var(--accent)}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.form-field{margin-bottom:12px}
+.admin-card-title{font-weight:700;margin-bottom:14px;font-size:.9rem;color:var(--accent)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-field{margin-bottom:10px}
 .field-label{font-size:.75rem;color:var(--sub);margin-bottom:6px}
 .field-input{
   width:100%;padding:10px 14px;border-radius:10px;
@@ -295,22 +346,34 @@ select.field-input{cursor:pointer}
 /* Modal */
 .modal-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:center;padding:20px;
 }
 .modal-box{
-  background:var(--card);border-radius:20px;padding:32px;width:300px;
+  background:var(--card);border-radius:20px;padding:28px;width:100%;max-width:320px;
   border:1px solid var(--border);animation:pop .3s ease;
 }
-.modal-title{font-weight:700;font-size:1.1rem;margin-bottom:20px;text-align:center}
+.modal-title{font-weight:700;font-size:1.1rem;margin-bottom:6px;text-align:center}
+.modal-sub{font-size:.8rem;color:var(--sub);text-align:center;margin-bottom:20px}
 .modal-input{
   width:100%;padding:12px 16px;border-radius:12px;
   border:1px solid var(--border);background:var(--bg2);
-  color:var(--text);font-size:.9rem;margin-bottom:12px;outline:none;font-family:inherit;
+  color:var(--text);font-size:.9rem;margin-bottom:10px;outline:none;font-family:inherit;
 }
+.modal-input:focus{border-color:var(--accent)}
 .modal-btn{
   width:100%;padding:12px;border-radius:12px;border:none;
   background:var(--btn-grad);color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;font-family:inherit;
+  margin-bottom:8px;
 }
+.modal-btn.secondary{
+  background:transparent;border:1px solid var(--border);color:var(--sub);
+}
+.modal-divider{text-align:center;color:var(--sub);font-size:.78rem;margin:4px 0 8px;position:relative}
+.modal-divider::before,.modal-divider::after{
+  content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--border);
+}
+.modal-divider::before{left:0}.modal-divider::after{right:0}
+.modal-error{font-size:.78rem;color:#FF6B6B;text-align:center;margin-bottom:8px;min-height:20px}
 
 /* Loading */
 #loading{display:flex;align-items:center;justify-content:center;height:60vh;flex-direction:column;gap:16px}
@@ -333,8 +396,11 @@ select.field-input{cursor:pointer}
   </nav>
   <div class="header-right">
     <button class="icon-btn" onclick="toggleTheme()" id="theme-btn">☀️</button>
+    <span class="user-badge" id="user-email-badge" style="display:none"></span>
+    <button class="text-btn" id="login-btn" onclick="showLoginModal()">로그인</button>
+    <button class="logout-btn" id="user-logout-btn" style="display:none" onclick="userLogout()">로그아웃</button>
     <button class="text-btn" id="admin-login-btn" onclick="showAdminLogin()">관리자</button>
-    <button class="logout-btn" id="admin-logout-btn" style="display:none" onclick="adminLogout()">로그아웃</button>
+    <button class="logout-btn" id="admin-logout-btn" style="display:none" onclick="adminLogout()">관리자 로그아웃</button>
   </div>
 </header>
 
@@ -342,8 +408,24 @@ select.field-input{cursor:pointer}
 <div class="modal-overlay" id="admin-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
   <div class="modal-box">
     <div class="modal-title">관리자 로그인</div>
+    <div class="modal-sub">관리자 비밀번호를 입력하세요</div>
     <input type="password" class="modal-input" id="admin-pw-input" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
     <button class="modal-btn" onclick="doAdminLogin()">로그인</button>
+  </div>
+</div>
+
+<!-- User Auth Modal -->
+<div class="modal-overlay" id="auth-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title" id="auth-modal-title">로그인</div>
+    <div class="modal-sub" id="auth-modal-sub">이메일과 비밀번호를 입력하세요</div>
+    <div class="modal-error" id="auth-error"></div>
+    <input type="email" class="modal-input" id="auth-email" placeholder="이메일" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('auth-pw').focus()"/>
+    <input type="password" class="modal-input" id="auth-pw" placeholder="비밀번호" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAuth()"/>
+    <input type="password" class="modal-input" id="auth-pw2" placeholder="비밀번호 확인" style="display:none" onkeydown="if(event.key==='Enter')doAuth()"/>
+    <button class="modal-btn" id="auth-submit-btn" onclick="doAuth()">로그인</button>
+    <div class="modal-divider">또는</div>
+    <button class="modal-btn secondary" id="auth-toggle-btn" onclick="toggleAuthMode()">회원가입</button>
   </div>
 </div>
 
@@ -367,16 +449,23 @@ select.field-input{cursor:pointer}
       </div>
     </div>
     <div class="grade-grid" id="grade-grid"></div>
-    <div class="count-label">뽑기 수 선택</div>
-    <div class="count-btns">
-      <button class="count-btn active" data-count="1" onclick="selectCount(1)">1개</button>
-      <button class="count-btn inactive" data-count="3" onclick="selectCount(3)">3개</button>
-      <button class="count-btn inactive" data-count="5" onclick="selectCount(5)">5개</button>
-      <button class="count-btn inactive" data-count="10" onclick="selectCount(10)">10개</button>
+
+    <!-- 뽑기판 -->
+    <div class="kujiboard-section">
+      <div class="kujiboard-label">
+        뽑기판에서 원하는 슬롯을 골라주세요 ·
+        <strong id="selected-count-label">0</strong>개 선택
+      </div>
+      <div class="kujiboard-grid" id="kujiboard-grid"></div>
     </div>
-    <div class="draw-btn-wrap">
-      <button class="draw-btn" id="draw-btn" onclick="handleDraw()">✦ <span id="draw-btn-label">1개 뽑기</span></button>
+
+    <div class="open-btn-wrap">
+      <button class="open-btn" id="open-btn" onclick="handleDraw()" disabled>
+        ✦ <span id="open-btn-label">슬롯을 선택해주세요</span>
+      </button>
+      <div class="open-btn-hint" id="open-btn-hint">선택한 슬롯을 한꺼번에 오픈합니다</div>
     </div>
+
     <div id="results-area" style="display:none" class="fade-in">
       <div class="results-grid" id="results-grid"></div>
       <div class="result-summary">
@@ -384,8 +473,10 @@ select.field-input{cursor:pointer}
         <div class="result-tags" id="result-tags"></div>
       </div>
     </div>
+
     <div class="reset-wrap">
-      <button class="reset-btn" onclick="handleReset()">🔄 초기화</button>
+      <button class="reset-btn" onclick="handleResetStock()">🔄 재고만 초기화</button>
+      <button class="reset-btn danger" onclick="handleResetAll()">🗑️ 전체 초기화</button>
     </div>
   </div>
 </div>
@@ -414,7 +505,6 @@ select.field-input{cursor:pointer}
   <div class="main fade-in" style="max-width:800px">
     <div class="admin-title">관리자 패널</div>
 
-    <!-- Settings -->
     <div class="admin-card">
       <div class="admin-card-title">⚙️ 쿠지 설정</div>
       <div class="form-grid">
@@ -428,13 +518,16 @@ select.field-input{cursor:pointer}
         </div>
       </div>
       <div class="form-field">
+        <div class="field-label">뽑기판 슬롯 수 (총 몇 개의 슬롯?)</div>
+        <input type="number" min="1" max="100" class="field-input" id="s-slots" value="30" style="width:160px"/>
+      </div>
+      <div class="form-field">
         <div class="field-label">인당 최대 뽑기 횟수 (0 = 무제한)</div>
         <input type="number" min="0" class="field-input" id="s-max" value="0" style="width:160px"/>
       </div>
       <button class="save-btn" onclick="saveSettings()">저장</button>
     </div>
 
-    <!-- Add / Edit product -->
     <div class="admin-card">
       <div class="admin-card-title" id="form-title">➕ 상품 추가</div>
       <div class="form-grid">
@@ -452,7 +545,7 @@ select.field-input{cursor:pointer}
           </select>
         </div>
         <div>
-          <div class="field-label">확률 가중치 (높을수록 자주 나옴)</div>
+          <div class="field-label">확률 가중치</div>
           <input type="number" min="1" class="field-input" id="f-rate" value="10"/>
         </div>
         <div>
@@ -474,12 +567,11 @@ select.field-input{cursor:pointer}
         </div>
       </div>
       <div style="display:flex;gap:10px">
-        <button class="save-btn" onclick="saveProduct()">상품 추가</button>
+        <button class="save-btn" id="save-product-btn" onclick="saveProduct()">상품 추가</button>
         <button class="cancel-btn" id="cancel-edit-btn" style="display:none" onclick="cancelEdit()">취소</button>
       </div>
     </div>
 
-    <!-- Product list -->
     <div class="admin-card">
       <div class="admin-card-title">📦 상품 목록 (<span id="product-count">0</span>)</div>
       <div class="product-list" id="product-list">
@@ -489,15 +581,18 @@ select.field-input{cursor:pointer}
   </div>
 </div>
 
-<!-- Firebase + App Script -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore, collection, addDoc, getDocs, doc,
   updateDoc, deleteDoc, setDoc, getDoc, query, orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// ── Firebase init ──
+// ── Firebase ──
 const firebaseConfig = {
   apiKey: "AIzaSyBafQDv-J-6t0P8-es8VTVJ-liO1sYb9Lk",
   authDomain: "kuji-9b614.firebaseapp.com",
@@ -508,6 +603,7 @@ const firebaseConfig = {
 };
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
+const auth = getAuth(fbApp);
 
 // ── Cloudinary ──
 const CLOUD = "dbljkloal";
@@ -523,9 +619,8 @@ const GRADE_META = {
 
 // ── State ──
 let products = [];
-let settings = { maxPerUser: 0, title: "IDOL KUJI", subtitle: "당신의 운명을 뽑아보세요" };
+let settings = { maxPerUser: 0, title: "IDOL KUJI", subtitle: "당신의 운명을 뽑아보세요", totalSlots: 30 };
 let userDraws = [];
-let drawCount = 1;
 let currentResults = [];
 let editId = null;
 let currentImageUrl = "";
@@ -533,12 +628,51 @@ let isDrawing = false;
 let isAdmin = false;
 const ADMIN_PW = "2026";
 
-// ── User ID ──
-let userId = localStorage.getItem("kuji_uid");
-if (!userId) {
-  userId = `user_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-  localStorage.setItem("kuji_uid", userId);
-}
+// 뽑기판 상태
+let selectedSlots = new Set();  // 선택한 슬롯 인덱스
+let drawnSlots = new Set();     // 이미 뽑은 슬롯 인덱스
+
+// ── Auth state ──
+let currentUser = null;
+let userId = null;
+let isAuthMode = "login"; // "login" | "signup"
+
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  if (user) {
+    userId = user.uid;
+    document.getElementById("user-email-badge").textContent = user.email.split("@")[0];
+    document.getElementById("user-email-badge").style.display = "";
+    document.getElementById("login-btn").style.display = "none";
+    document.getElementById("user-logout-btn").style.display = "";
+  } else {
+    // 비로그인 시 anonymous ID
+    userId = localStorage.getItem("kuji_uid");
+    if (!userId) {
+      userId = `anon_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem("kuji_uid", userId);
+    }
+    document.getElementById("user-email-badge").style.display = "none";
+    document.getElementById("login-btn").style.display = "";
+    document.getElementById("user-logout-btn").style.display = "none";
+  }
+  await loadAll();
+  document.getElementById("loading").style.display = "none";
+  renderDrawTab();
+  renderCollectionTab();
+  if (isAdmin) renderAdminTab();
+  switchTab("draw");
+});
+
+// ── Zoom 방지 ──
+let lastTouchEnd = 0;
+document.addEventListener("touchend", (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
+document.addEventListener("gesturestart", e => e.preventDefault());
+document.addEventListener("gesturechange", e => e.preventDefault());
 
 // ── Expose globals ──
 window.switchTab = switchTab;
@@ -546,9 +680,13 @@ window.toggleTheme = toggleTheme;
 window.showAdminLogin = showAdminLogin;
 window.doAdminLogin = doAdminLogin;
 window.adminLogout = adminLogout;
-window.selectCount = selectCount;
+window.showLoginModal = showLoginModal;
+window.toggleAuthMode = toggleAuthMode;
+window.doAuth = doAuth;
+window.userLogout = userLogout;
 window.handleDraw = handleDraw;
-window.handleReset = handleReset;
+window.handleResetStock = handleResetStock;
+window.handleResetAll = handleResetAll;
 window.saveSettings = saveSettings;
 window.saveProduct = saveProduct;
 window.cancelEdit = cancelEdit;
@@ -556,6 +694,69 @@ window.clearImage = clearImage;
 window.handleImageUpload = handleImageUpload;
 window.editProduct = editProduct;
 window.deleteProduct = deleteProduct;
+
+// ── Sound ──
+function playSound(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (type === "select") {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(660, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.05);
+      g.gain.setValueAtTime(0.15, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+      o.start(); o.stop(ctx.currentTime + 0.12);
+    } else if (type === "deselect") {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(440, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(330, ctx.currentTime + 0.07);
+      g.gain.setValueAtTime(0.12, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      o.start(); o.stop(ctx.currentTime + 0.1);
+    } else if (type === "open") {
+      // 두근두근 효과음
+      [0, 0.08, 0.16].forEach((t, i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine";
+        o.frequency.setValueAtTime(300 + i * 120, ctx.currentTime + t);
+        g.gain.setValueAtTime(0.2, ctx.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.12);
+        o.start(ctx.currentTime + t);
+        o.stop(ctx.currentTime + t + 0.12);
+      });
+    } else if (type === "reveal") {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = "sine";
+      o.frequency.setValueAtTime(500, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.2);
+      g.gain.setValueAtTime(0.25, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      o.start(); o.stop(ctx.currentTime + 0.3);
+    } else if (type === "ssr") {
+      // 황금 SSR 효과음
+      [0,0.1,0.2,0.3].forEach((t,i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine";
+        const freqs = [523,659,784,1047];
+        o.frequency.setValueAtTime(freqs[i], ctx.currentTime + t);
+        g.gain.setValueAtTime(0.2, ctx.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.15);
+        o.start(ctx.currentTime + t);
+        o.stop(ctx.currentTime + t + 0.15);
+      });
+    }
+  } catch(e) { /* 사운드 실패는 무시 */ }
+}
 
 // ── Helpers ──
 function weightedDraw(items) {
@@ -583,30 +784,9 @@ async function loadAll() {
     userDraws = dSnap.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch(e) {
     console.error("loadAll error:", e);
-    alert("데이터를 불러오지 못했어요.\n사유: " + (e && e.message ? e.message : e) + "\n\nFirestore 보안 규칙 또는 인덱스 설정을 확인해주세요.");
+    alert("데이터를 불러오지 못했어요.\n사유: " + (e && e.message ? e.message : e));
   }
 }
-
-// ── Disable zoom gestures (double-tap, pinch) ──
-let lastTouchEnd = 0;
-document.addEventListener("touchend", (e) => {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) e.preventDefault();
-  lastTouchEnd = now;
-}, { passive: false });
-document.addEventListener("gesturestart", (e) => e.preventDefault());
-document.addEventListener("gesturechange", (e) => e.preventDefault());
-
-// ── Init ──
-async function init() {
-  await loadAll();
-  document.getElementById("loading").style.display = "none";
-  renderDrawTab();
-  renderCollectionTab();
-  if (isAdmin) renderAdminTab();
-  switchTab("draw");
-}
-init();
 
 // ── Theme ──
 let isDark = true;
@@ -621,7 +801,7 @@ function switchTab(name) {
   ["draw","collection","admin"].forEach(t => {
     document.getElementById(`tab-${t}`).style.display = "none";
     const nb = document.getElementById(`nav-${t}`);
-    if (nb) { nb.className = "nav-btn"; }
+    if (nb) nb.className = "nav-btn";
   });
   document.getElementById(`tab-${name}`).style.display = "block";
   const nb = document.getElementById(`nav-${name}`);
@@ -630,7 +810,68 @@ function switchTab(name) {
   if (name === "admin") renderAdminTab();
 }
 
-// ── Admin ──
+// ── User Auth ──
+function showLoginModal() {
+  isAuthMode = "login";
+  updateAuthModal();
+  document.getElementById("auth-modal").style.display = "flex";
+  document.getElementById("auth-error").textContent = "";
+  setTimeout(() => document.getElementById("auth-email").focus(), 100);
+}
+function updateAuthModal() {
+  const isLogin = isAuthMode === "login";
+  document.getElementById("auth-modal-title").textContent = isLogin ? "로그인" : "회원가입";
+  document.getElementById("auth-modal-sub").textContent = isLogin ? "이메일과 비밀번호로 로그인하세요" : "새 계정을 만들어보세요";
+  document.getElementById("auth-submit-btn").textContent = isLogin ? "로그인" : "가입하기";
+  document.getElementById("auth-toggle-btn").textContent = isLogin ? "회원가입" : "이미 계정이 있어요";
+  document.getElementById("auth-pw2").style.display = isLogin ? "none" : "";
+  document.getElementById("auth-pw").autocomplete = isLogin ? "current-password" : "new-password";
+}
+function toggleAuthMode() {
+  isAuthMode = isAuthMode === "login" ? "signup" : "login";
+  updateAuthModal();
+  document.getElementById("auth-error").textContent = "";
+}
+async function doAuth() {
+  const email = document.getElementById("auth-email").value.trim();
+  const pw = document.getElementById("auth-pw").value;
+  const pw2 = document.getElementById("auth-pw2").value;
+  const errEl = document.getElementById("auth-error");
+  errEl.textContent = "";
+  if (!email || !pw) { errEl.textContent = "이메일과 비밀번호를 입력하세요"; return; }
+  if (isAuthMode === "signup" && pw !== pw2) { errEl.textContent = "비밀번호가 일치하지 않아요"; return; }
+  if (isAuthMode === "signup" && pw.length < 6) { errEl.textContent = "비밀번호는 6자 이상이어야 해요"; return; }
+  const btn = document.getElementById("auth-submit-btn");
+  btn.disabled = true; btn.textContent = "처리 중...";
+  try {
+    if (isAuthMode === "login") {
+      await signInWithEmailAndPassword(auth, email, pw);
+    } else {
+      await createUserWithEmailAndPassword(auth, email, pw);
+    }
+    document.getElementById("auth-modal").style.display = "none";
+    document.getElementById("auth-email").value = "";
+    document.getElementById("auth-pw").value = "";
+    document.getElementById("auth-pw2").value = "";
+  } catch(e) {
+    const msgs = {
+      "auth/user-not-found": "존재하지 않는 계정이에요",
+      "auth/wrong-password": "비밀번호가 틀렸어요",
+      "auth/email-already-in-use": "이미 사용 중인 이메일이에요",
+      "auth/invalid-email": "올바른 이메일 형식이 아니에요",
+      "auth/weak-password": "비밀번호가 너무 약해요",
+      "auth/invalid-credential": "이메일 또는 비밀번호가 올바르지 않아요",
+    };
+    errEl.textContent = msgs[e.code] || e.message;
+  }
+  btn.disabled = false;
+  btn.textContent = isAuthMode === "login" ? "로그인" : "가입하기";
+}
+async function userLogout() {
+  await signOut(auth);
+}
+
+// ── Admin Auth ──
 function showAdminLogin() {
   document.getElementById("admin-modal").style.display = "flex";
   setTimeout(() => document.getElementById("admin-pw-input").focus(), 100);
@@ -646,40 +887,26 @@ function doAdminLogin() {
     document.getElementById("admin-logout-btn").style.display = "";
     renderAdminTab();
     switchTab("admin");
-  } else {
-    alert("비밀번호가 틀렸어요");
-  }
+  } else { alert("비밀번호가 틀렸어요"); }
 }
 function adminLogout() {
   isAdmin = false;
   document.getElementById("nav-admin").style.display = "none";
   document.getElementById("admin-login-btn").style.display = "";
   document.getElementById("admin-logout-btn").style.display = "none";
-  // 관리자 탭을 보고 있었을 때만 뽑기 탭으로 전환, 그 외 화면은 그대로 유지
-  const adminTabVisible = document.getElementById("tab-admin").style.display !== "none";
-  if (adminTabVisible) switchTab("draw");
-}
-
-// ── Count selector ──
-function selectCount(n) {
-  drawCount = n;
-  document.querySelectorAll(".count-btn").forEach(b => {
-    b.className = "count-btn " + (parseInt(b.dataset.count) === n ? "active" : "inactive");
-  });
-  document.getElementById("draw-btn-label").textContent = `${n}개 뽑기`;
+  const adminVisible = document.getElementById("tab-admin").style.display !== "none";
+  if (adminVisible) switchTab("draw");
 }
 
 // ── Render draw tab ──
 function renderDrawTab() {
-  // Title
   document.getElementById("kuji-title").textContent = settings.title;
   document.getElementById("kuji-subtitle").textContent = settings.subtitle;
-  // Settings in admin form
   document.getElementById("s-title").value = settings.title;
   document.getElementById("s-subtitle").value = settings.subtitle;
   document.getElementById("s-max").value = settings.maxPerUser || 0;
+  document.getElementById("s-slots").value = settings.totalSlots || 30;
 
-  // Limit badge
   const badge = document.getElementById("draw-limit-badge");
   if (settings.maxPerUser > 0) {
     badge.style.display = "";
@@ -687,7 +914,6 @@ function renderDrawTab() {
     document.getElementById("max-draws").textContent = settings.maxPerUser;
   } else badge.style.display = "none";
 
-  // Grade grid
   const gg = document.getElementById("grade-grid");
   gg.innerHTML = "";
   Object.entries(GRADE_META).forEach(([g, m]) => {
@@ -696,18 +922,70 @@ function renderDrawTab() {
     const el = document.createElement("div");
     el.className = "grade-card";
     el.style.border = `1px solid ${m.color}44`;
-    el.innerHTML = `
-      <div class="grade-label" style="color:${m.color}">${g}</div>
-      <div class="grade-count">${cnt}</div>
-      <div class="grade-sub">남음</div>
-    `;
+    el.innerHTML = `<div class="grade-label" style="color:${m.color}">${g}</div><div class="grade-count">${cnt}</div><div class="grade-sub">남음</div>`;
     gg.appendChild(el);
   });
+
+  renderKujiBoard();
+}
+
+// ── 뽑기판 렌더 ──
+function renderKujiBoard() {
+  const total = settings.totalSlots || 30;
+  const grid = document.getElementById("kujiboard-grid");
+  grid.innerHTML = "";
+  for (let i = 0; i < total; i++) {
+    const slot = document.createElement("div");
+    slot.className = "slot" + (drawnSlots.has(i) ? " drawn" : selectedSlots.has(i) ? " selected" : "");
+    slot.dataset.idx = i;
+    slot.innerHTML = `<span class="slot-num">${String(i+1).padStart(2,"0")}</span>`;
+    if (!drawnSlots.has(i)) {
+      slot.onclick = () => toggleSlot(i);
+    }
+    grid.appendChild(slot);
+  }
+  updateOpenBtn();
+}
+
+function toggleSlot(idx) {
+  if (drawnSlots.has(idx)) return;
+  const avail = products.filter(p => (p.remaining ?? p.count) > 0);
+  if (!avail.length) { alert("남은 상품이 없어요!"); return; }
+  if (selectedSlots.has(idx)) {
+    selectedSlots.delete(idx);
+    playSound("deselect");
+  } else {
+    selectedSlots.add(idx);
+    playSound("select");
+  }
+  const slotEl = document.querySelector(`.slot[data-idx="${idx}"]`);
+  if (slotEl) {
+    slotEl.className = "slot" + (selectedSlots.has(idx) ? " selected" : "");
+  }
+  updateOpenBtn();
+}
+
+function updateOpenBtn() {
+  const cnt = selectedSlots.size;
+  const btn = document.getElementById("open-btn");
+  const label = document.getElementById("open-btn-label");
+  const selLabel = document.getElementById("selected-count-label");
+  selLabel.textContent = cnt;
+  if (cnt === 0) {
+    btn.disabled = true;
+    label.textContent = "슬롯을 선택해주세요";
+  } else {
+    btn.disabled = false;
+    label.textContent = `${cnt}개 오픈하기`;
+  }
 }
 
 // ── Draw ──
 async function handleDraw() {
   if (isDrawing) return;
+  const drawCount = selectedSlots.size;
+  if (drawCount === 0) return;
+
   if (settings.maxPerUser > 0 && userDraws.length + drawCount > settings.maxPerUser) {
     alert(`최대 ${settings.maxPerUser}번 뽑을 수 있어요. 남은 횟수: ${settings.maxPerUser - userDraws.length}`);
     return;
@@ -716,12 +994,21 @@ async function handleDraw() {
   if (!avail.length) { alert("남은 상품이 없어요!"); return; }
 
   isDrawing = true;
-  const btn = document.getElementById("draw-btn");
+  const btn = document.getElementById("open-btn");
   btn.disabled = true;
-  btn.innerHTML = `<span class="spinner"></span> 뽑는 중...`;
+  btn.innerHTML = `<span class="spinner"></span> 오픈 중...`;
   document.getElementById("results-area").style.display = "none";
 
-  await new Promise(r => setTimeout(r, 600));
+  playSound("open");
+
+  // 슬롯 spinning 효과
+  const slotsToOpen = [...selectedSlots];
+  slotsToOpen.forEach(idx => {
+    const el = document.querySelector(`.slot[data-idx="${idx}"]`);
+    if (el) el.className = "slot spinning";
+  });
+
+  await new Promise(r => setTimeout(r, 700));
 
   // Pick items
   const drawn = [];
@@ -738,32 +1025,54 @@ async function handleDraw() {
     used[pick.id] = (used[pick.id] || 0) + 1;
   }
 
-  // Update Firestore remaining
+  // Update Firestore
   await Promise.all(Object.entries(used).map(([id, cnt]) => {
     const p = products.find(x => x.id === id);
     const rem = (p.remaining ?? p.count) - cnt;
     return updateDoc(doc(db, "products", id), { remaining: rem });
   }));
 
-  // Save user draws
   await Promise.all(drawn.map(item =>
     addDoc(collection(db, "draws", userId, "items"), {
       productId: item.id, name: item.name, grade: item.grade,
-      imageUrl: item.imageUrl || "", drawnAt: Date.now()
+      imageUrl: item.imageUrl || "", description: item.description || "",
+      drawnAt: Date.now()
     })
   ));
 
+  // 뽑은 슬롯으로 표시
+  slotsToOpen.forEach(idx => drawnSlots.add(idx));
+  selectedSlots.clear();
+
   currentResults = drawn;
   isDrawing = false;
-  btn.disabled = false;
-  btn.innerHTML = `✦ <span id="draw-btn-label">${drawCount}개 뽑기</span>`;
+  btn.innerHTML = `✦ <span id="open-btn-label">슬롯을 선택해주세요</span>`;
+  btn.disabled = true;
 
   await loadAll();
-  renderDrawTab();
+  renderKujiBoard();
+  renderGradeGrid();
   renderResults(drawn);
 
-  const hasRare = drawn.some(d => d.grade === "SSR" || d.grade === "SR");
-  if (hasRare) launchConfetti();
+  const hasSSR = drawn.some(d => d.grade === "SSR");
+  const hasRare = drawn.some(d => d.grade === "SR");
+  if (hasSSR) { playSound("ssr"); launchConfetti(); }
+  else if (hasRare) launchConfetti();
+  else playSound("reveal");
+}
+
+function renderGradeGrid() {
+  const gg = document.getElementById("grade-grid");
+  gg.innerHTML = "";
+  Object.entries(GRADE_META).forEach(([g, m]) => {
+    const cnt = products.filter(p => p.grade === g && (p.remaining ?? p.count) > 0)
+      .reduce((a, b) => a + (b.remaining ?? b.count), 0);
+    const el = document.createElement("div");
+    el.className = "grade-card";
+    el.style.border = `1px solid ${m.color}44`;
+    el.innerHTML = `<div class="grade-label" style="color:${m.color}">${g}</div><div class="grade-count">${cnt}</div><div class="grade-sub">남음</div>`;
+    gg.appendChild(el);
+  });
 }
 
 // ── Render results ──
@@ -774,165 +1083,186 @@ function renderResults(items) {
   grid.innerHTML = "";
 
   const n = items.length;
-  const cols = n <= 3 ? n : n <= 6 ? 3 : n <= 8 ? 4 : 5;
+  const cols = n <= 2 ? n : n <= 4 ? 2 : n <= 6 ? 3 : n <= 9 ? 3 : 4;
   grid.style.display = "grid";
   grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.style.gap = "10px";
+  grid.style.marginBottom = "12px";
 
   items.forEach((item, i) => {
     const meta = GRADE_META[item.grade] || GRADE_META.N;
     const wrap = document.createElement("div");
-    wrap.className = "kuji-card-wrap";
-    wrap.style.borderRadius = "16px";
+    wrap.className = `kuji-card-wrap ${meta.glow}`;
 
-    const inner = document.createElement("div");
-    inner.className = "kuji-card-inner";
-
-    // Back face
-    const back = document.createElement("div");
-    back.className = "kuji-card-face kuji-card-back";
-    back.innerHTML = `
-      <div class="kuji-card-back-icon">🎴</div>
-      <div class="kuji-card-back-label">KUJI</div>
-      <div class="kuji-shimmer"></div>
-    `;
-
-    // Front face
+    // 카드 앞면 (relative sizer)
     const front = document.createElement("div");
-    front.className = "kuji-card-face kuji-card-front";
-    front.style.background = `linear-gradient(135deg, ${meta.color}18, ${meta.bg})`;
-    front.style.border = `1px solid ${meta.color}`;
+    front.className = "kuji-card-front-sizer";
+    front.style.background = `linear-gradient(160deg, ${meta.color}18, ${meta.bg})`;
+    front.style.border = `1.5px solid ${meta.color}`;
+    front.style.borderRadius = "14px";
+    front.style.opacity = "0";
+    front.style.transform = "scale(.9)";
+    front.style.transition = "opacity .3s ease, transform .3s ease";
 
     const imgHtml = item.imageUrl
-      ? `<img class="kuji-img" src="${item.imageUrl}" alt="${item.name}"/>`
+      ? `<img class="kuji-img" src="${item.imageUrl}" alt="${item.name}" loading="lazy"/>`
       : `<div class="kuji-no-img" style="background:rgba(0,0,0,.2)">🎁</div>`;
 
     front.innerHTML = `
-      <div class="grade-badge" style="background:${meta.color}">${item.grade}</div>
-      ${imgHtml}
-      <div class="kuji-card-info">
+      <div style="position:relative">
+        <div class="grade-badge" style="background:${meta.color};color:#000">${item.grade}</div>
+        ${imgHtml}
+      </div>
+      <div class="kuji-card-info" style="background:linear-gradient(160deg,${meta.color}18,${meta.bg})">
         <div class="kuji-card-name" style="color:${meta.color}">${item.name}</div>
         ${item.description ? `<div class="kuji-card-desc">${item.description}</div>` : ""}
       </div>
     `;
 
-    inner.appendChild(back);
-    inner.appendChild(front);
-    wrap.appendChild(inner);
+    wrap.appendChild(front);
     grid.appendChild(wrap);
 
-    // Flip animation
+    // 순차적 등장
     setTimeout(() => {
-      inner.classList.add("flipped");
-      setTimeout(() => {
-        wrap.classList.add(meta.glow);
-        front.classList.add("popped");
-      }, 600);
+      front.style.opacity = "1";
+      front.style.transform = "scale(1)";
+      playSound("reveal");
     }, i * 150);
   });
 
-  // Result tags
-  const tags = document.getElementById("result-tags");
-  tags.innerHTML = "";
-  Object.entries(GRADE_META).forEach(([g, m]) => {
-    const cnt = items.filter(r => r.grade === g).length;
-    if (!cnt) return;
-    const tag = document.createElement("span");
-    tag.className = "result-tag";
-    tag.style.cssText = `background:${m.color}22;border:1px solid ${m.color};color:${m.color}`;
-    tag.textContent = `${g} ×${cnt}`;
-    tags.appendChild(tag);
+  // 요약
+  const tagEl = document.getElementById("result-tags");
+  tagEl.innerHTML = "";
+  const counts = {};
+  items.forEach(i => { counts[i.grade] = (counts[i.grade] || 0) + 1; });
+  Object.entries(counts).forEach(([g, c]) => {
+    const m = GRADE_META[g] || GRADE_META.N;
+    const t = document.createElement("div");
+    t.className = "result-tag";
+    t.style.background = m.bg;
+    t.style.color = m.color;
+    t.style.border = `1px solid ${m.color}44`;
+    t.textContent = `${g} ×${c}`;
+    tagEl.appendChild(t);
   });
+
+  area.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 // ── Collection ──
 function renderCollectionTab() {
-  const count = userDraws.length;
-  document.getElementById("col-count").textContent = `총 ${count}개 보유`;
-  const empty = document.getElementById("col-empty");
-  const content = document.getElementById("col-content");
-
-  if (count === 0) {
-    empty.style.display = "";
-    content.style.display = "none";
+  if (!userDraws.length) {
+    document.getElementById("col-empty").style.display = "";
+    document.getElementById("col-content").style.display = "none";
+    document.getElementById("col-count").textContent = "총 0개 보유";
     return;
   }
-  empty.style.display = "none";
-  content.style.display = "";
+  document.getElementById("col-empty").style.display = "none";
+  document.getElementById("col-content").style.display = "";
+  document.getElementById("col-count").textContent = `총 ${userDraws.length}개 보유`;
 
-  // Stats
+  // 등급 통계
   const stats = document.getElementById("col-stats");
   stats.innerHTML = "";
+  const counts = {};
+  userDraws.forEach(d => { counts[d.grade] = (counts[d.grade] || 0) + 1; });
   Object.entries(GRADE_META).forEach(([g, m]) => {
-    const cnt = userDraws.filter(d => d.grade === g).length;
-    if (!cnt) return;
-    const el = document.createElement("div");
-    el.className = "col-stat-tag";
-    el.style.cssText = `background:${m.color}18;border:1px solid ${m.color};color:${m.color}`;
-    el.textContent = `${g}: ${cnt}개`;
-    stats.appendChild(el);
+    if (!counts[g]) return;
+    const t = document.createElement("div");
+    t.className = "col-stat-tag";
+    t.style.background = m.bg;
+    t.style.color = m.color;
+    t.style.border = `1px solid ${m.color}44`;
+    t.textContent = `${g} ×${counts[g]}`;
+    stats.appendChild(t);
   });
 
-  // Grid
+  // 아이템 묶음 (같은 productId끼리 카운트)
+  const grouped = {};
+  userDraws.forEach(d => {
+    const key = d.productId || d.name;
+    if (!grouped[key]) {
+      grouped[key] = { ...d, qty: 0 };
+    }
+    grouped[key].qty++;
+  });
+
   const grid = document.getElementById("col-grid");
   grid.innerHTML = "";
-  userDraws.forEach(item => {
-    const meta = GRADE_META[item.grade] || GRADE_META.N;
-    const el = document.createElement("div");
-    el.className = "col-item";
-    el.style.border = `1px solid ${meta.color}44`;
-    const imgHtml = item.imageUrl
-      ? `<img class="col-item-img" src="${item.imageUrl}" alt="${item.name}"/>`
-      : `<div class="col-item-no-img" style="background:${meta.color}18">🎁</div>`;
-    el.innerHTML = `
-      ${imgHtml}
-      <div class="col-item-body">
-        <div class="col-item-grade" style="color:${meta.color}">${item.grade}</div>
-        <div class="col-item-name">${item.name}</div>
-      </div>
-    `;
-    grid.appendChild(el);
-  });
+  // 등급 우선 정렬
+  const gradeOrder = { SSR:0, SR:1, R:2, N:3 };
+  Object.values(grouped)
+    .sort((a,b) => (gradeOrder[a.grade]??9) - (gradeOrder[b.grade]??9))
+    .forEach(item => {
+      const meta = GRADE_META[item.grade] || GRADE_META.N;
+      const el = document.createElement("div");
+      el.className = "col-item";
+      el.style.border = `1px solid ${meta.color}44`;
+      const imgHtml = item.imageUrl
+        ? `<img class="col-item-img" src="${item.imageUrl}" alt="${item.name}" loading="lazy"/>`
+        : `<div class="col-item-no-img" style="background:${meta.color}18">🎁</div>`;
+      el.innerHTML = `
+        ${imgHtml}
+        ${item.qty > 1 ? `<div class="col-count-badge">×${item.qty}</div>` : ""}
+        <div class="col-item-body">
+          <div class="col-item-grade" style="color:${meta.color}">${item.grade}</div>
+          <div class="col-item-name">${item.name}</div>
+        </div>
+      `;
+      grid.appendChild(el);
+    });
 }
 
-// ── Reset ──
-async function handleReset() {
-  if (!confirm("정말 초기화할까요? 모든 뽑기 기록과 재고가 초기화돼요.")) return;
+// ── Reset (재고만) ──
+async function handleResetStock() {
+  if (!confirm("재고만 초기화할까요? 뽑기 기록은 유지돼요.")) return;
+  try {
+    const pDocs = await getDocs(collection(db, "products"));
+    await Promise.all(pDocs.docs.map(d => updateDoc(doc(db, "products", d.id), { remaining: d.data().count })));
+    drawnSlots.clear(); selectedSlots.clear();
+    await loadAll();
+    renderDrawTab();
+    document.getElementById("results-area").style.display = "none";
+    alert("재고가 초기화됐어요! 뽑기 기록은 유지됩니다.");
+  } catch(e) { alert("실패: " + e.message); }
+}
+
+// ── Reset (전체) ──
+async function handleResetAll() {
+  if (!confirm("정말 전체 초기화할까요?\n재고 + 뽑기 기록이 모두 삭제돼요.")) return;
   try {
     const pDocs = await getDocs(collection(db, "products"));
     await Promise.all(pDocs.docs.map(d => updateDoc(doc(db, "products", d.id), { remaining: d.data().count })));
     const uItems = await getDocs(collection(db, "draws", userId, "items"));
     await Promise.all(uItems.docs.map(d => deleteDoc(doc(db, "draws", userId, "items", d.id))));
+    drawnSlots.clear(); selectedSlots.clear();
     await loadAll();
     renderDrawTab();
+    renderCollectionTab();
     document.getElementById("results-area").style.display = "none";
-    alert("초기화 완료!");
-  } catch (e) {
-    console.error("handleReset error:", e);
-    alert("초기화에 실패했어요.\n사유: " + (e && e.message ? e.message : e));
-  }
+    alert("전체 초기화 완료!");
+  } catch(e) { alert("실패: " + e.message); }
 }
 
-// ── Save settings ──
+// ── Settings ──
 async function saveSettings() {
   settings.title = document.getElementById("s-title").value;
   settings.subtitle = document.getElementById("s-subtitle").value;
   settings.maxPerUser = parseInt(document.getElementById("s-max").value) || 0;
+  settings.totalSlots = parseInt(document.getElementById("s-slots").value) || 30;
   try {
     await setDoc(doc(db, "settings", "global"), settings);
+    drawnSlots.clear(); selectedSlots.clear();
     renderDrawTab();
     alert("저장됐어요!");
-  } catch (e) {
-    console.error("saveSettings error:", e);
-    alert("설정 저장에 실패했어요.\n사유: " + (e && e.message ? e.message : e));
-  }
+  } catch(e) { alert("저장 실패: " + e.message); }
 }
 
 // ── Image upload ──
 async function handleImageUpload(e) {
   const file = e.target.files[0]; if (!file) return;
   const btn = document.getElementById("upload-btn");
-  btn.textContent = "업로드 중...";
-  btn.disabled = true;
+  btn.textContent = "업로드 중..."; btn.disabled = true;
   try {
     const fd = new FormData();
     fd.append("file", file);
@@ -945,8 +1275,7 @@ async function handleImageUpload(e) {
     preview.style.display = "";
     document.getElementById("del-img-btn").style.display = "";
   } catch { alert("업로드 실패"); }
-  btn.textContent = "이미지 선택";
-  btn.disabled = false;
+  btn.textContent = "이미지 선택"; btn.disabled = false;
 }
 function clearImage() {
   currentImageUrl = "";
@@ -967,9 +1296,8 @@ async function saveProduct() {
     description: document.getElementById("f-desc").value,
     imageUrl: currentImageUrl
   };
-  const saveBtn = document.querySelector("#tab-admin .admin-card:nth-child(2) .save-btn");
-  const originalLabel = saveBtn ? saveBtn.textContent : "";
-  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "저장 중..."; }
+  const saveBtn = document.getElementById("save-product-btn");
+  saveBtn.disabled = true; saveBtn.textContent = "저장 중...";
   try {
     if (editId) {
       await updateDoc(doc(db, "products", editId), data);
@@ -980,36 +1308,31 @@ async function saveProduct() {
     await loadAll();
     renderAdminTab();
     renderDrawTab();
-  } catch (e) {
-    console.error("saveProduct error:", e);
-    alert("상품 저장에 실패했어요.\n사유: " + (e && e.message ? e.message : e) + "\n\nFirestore 보안 규칙에서 products 쓰기 권한을 확인해주세요.");
+  } catch(e) {
+    alert("저장 실패: " + (e.message || e) + "\n\nFirestore 보안 규칙을 확인해주세요.");
   } finally {
-    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = originalLabel || (editId ? "수정 완료" : "상품 추가"); }
+    saveBtn.disabled = false;
+    saveBtn.textContent = editId ? "수정 완료" : "상품 추가";
   }
 }
 
 function cancelEdit() {
-  editId = null;
-  currentImageUrl = "";
-  document.getElementById("f-name").value = "";
+  editId = null; currentImageUrl = "";
+  ["f-name","f-desc"].forEach(id => document.getElementById(id).value = "");
   document.getElementById("f-grade").value = "R";
   document.getElementById("f-rate").value = "10";
   document.getElementById("f-count").value = "100";
-  document.getElementById("f-desc").value = "";
   document.getElementById("img-preview").style.display = "none";
   document.getElementById("del-img-btn").style.display = "none";
   document.getElementById("file-input").value = "";
   document.getElementById("form-title").textContent = "➕ 상품 추가";
-  const saveBtn = document.querySelector("#tab-admin .admin-card:nth-child(2) .save-btn");
-  if (saveBtn) saveBtn.textContent = "상품 추가";
+  document.getElementById("save-product-btn").textContent = "상품 추가";
   document.getElementById("cancel-edit-btn").style.display = "none";
 }
 
 function editProduct(id) {
-  const p = products.find(x => x.id === id);
-  if (!p) return;
-  editId = id;
-  currentImageUrl = p.imageUrl || "";
+  const p = products.find(x => x.id === id); if (!p) return;
+  editId = id; currentImageUrl = p.imageUrl || "";
   document.getElementById("f-name").value = p.name;
   document.getElementById("f-grade").value = p.grade;
   document.getElementById("f-rate").value = p.rate;
@@ -1019,8 +1342,7 @@ function editProduct(id) {
   if (p.imageUrl) { preview.src = p.imageUrl; preview.style.display = ""; document.getElementById("del-img-btn").style.display = ""; }
   else { preview.style.display = "none"; document.getElementById("del-img-btn").style.display = "none"; }
   document.getElementById("form-title").textContent = "✏️ 상품 수정";
-  const saveBtn = document.querySelector("#tab-admin .save-btn");
-  if (saveBtn) saveBtn.textContent = "수정 완료";
+  document.getElementById("save-product-btn").textContent = "수정 완료";
   document.getElementById("cancel-edit-btn").style.display = "";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -1032,10 +1354,7 @@ async function deleteProduct(id) {
     await loadAll();
     renderAdminTab();
     renderDrawTab();
-  } catch (e) {
-    console.error("deleteProduct error:", e);
-    alert("상품 삭제에 실패했어요.\n사유: " + (e && e.message ? e.message : e));
-  }
+  } catch(e) { alert("삭제 실패: " + e.message); }
 }
 
 // ── Render admin ──
@@ -1077,22 +1396,19 @@ function renderAdminTab() {
 function launchConfetti() {
   const container = document.getElementById("confetti-container");
   container.innerHTML = "";
-  const colors = ["#38BDF8","#22D3EE","#FFD700","#60A5FA","#34D399"];
-  for (let i = 0; i < 50; i++) {
+  const colors = ["#38BDF8","#22D3EE","#FFD700","#60A5FA","#34D399","#F472B6"];
+  for (let i = 0; i < 60; i++) {
     const el = document.createElement("div");
     const size = 6 + Math.random() * 8;
     el.style.cssText = `
-      position:absolute;
-      left:${Math.random()*100}%;
-      top:-10px;
-      width:${size}px;height:${size}px;
-      border-radius:2px;
-      background:${colors[i % 5]};
+      position:absolute;left:${Math.random()*100}%;top:-10px;
+      width:${size}px;height:${size}px;border-radius:${Math.random()>0.5?'50%':'2px'};
+      background:${colors[Math.floor(Math.random()*colors.length)]};
       animation:confettiFall ${1.5+Math.random()}s ${Math.random()*1.5}s ease-in forwards;
     `;
     container.appendChild(el);
   }
-  setTimeout(() => { container.innerHTML = ""; }, 4000);
+  setTimeout(() => { container.innerHTML = ""; }, 4500);
 }
 </script>
 </body>

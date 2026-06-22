@@ -19,7 +19,7 @@ body.light{
   --accent2:#0891B2;--btn-grad:linear-gradient(135deg,#0284C7,#0891B2);
 }
 html{touch-action:pan-y;overflow-x:hidden}
-body{background:var(--bg);color:var(--text);font-family:'Outfit','Noto Sans KR',sans-serif;min-height:100vh;transition:background .3s,color .3s;touch-action:pan-y;overflow-x:hidden;overscroll-behavior-x:none}
+body{background:var(--bg);color:var(--text);font-family:'Outfit','Noto Sans KR',sans-serif;min-height:100vh;transition:background .3s,color .3s;overflow-x:hidden;overscroll-behavior-x:none}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
@@ -34,354 +34,269 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit','Noto Sans KR',
 @keyframes glow-n{0%,100%{box-shadow:0 0 10px #94A3B840}50%{box-shadow:0 0 20px #94A3B880}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
-@keyframes flipCard{0%{transform:rotateY(0deg)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0deg)}}
 @keyframes cardSlotSpin{0%{opacity:.3;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}100%{opacity:.3;transform:scale(.95)}}
-@keyframes reveal{0%{transform:rotateY(180deg) scale(.8);opacity:0}100%{transform:rotateY(180deg) scale(1);opacity:1}}
+@keyframes pulseNotice{0%,100%{opacity:1}50%{opacity:.6}}
 
 .fade-in{animation:fadeIn .4s ease}
 
-/* Header */
+/* ── Header ── */
 header{
   position:sticky;top:0;z-index:100;
   background:var(--bg);border-bottom:1px solid var(--border);
-  padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;
+  padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px;
 }
-.logo{
-  font-size:1.2rem;font-weight:800;
-  background:linear-gradient(135deg,#38BDF8,#22D3EE);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
+.logo{font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,#38BDF8,#22D3EE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 nav{display:flex;gap:4px}
-.nav-btn{
-  padding:6px 14px;border-radius:20px;border:none;cursor:pointer;
-  font-size:0.8rem;font-weight:600;letter-spacing:.05em;
-  background:transparent;color:var(--sub);transition:all .2s;font-family:inherit;
-}
+.nav-btn{padding:6px 12px;border-radius:20px;border:none;cursor:pointer;font-size:.78rem;font-weight:600;letter-spacing:.04em;background:transparent;color:var(--sub);transition:all .2s;font-family:inherit;}
 .nav-btn.active{background:var(--btn-grad);color:#fff}
 .nav-btn.admin-active{background:linear-gradient(135deg,#FF6B6B,#FFD700);color:#000}
-.icon-btn{
-  width:32px;height:32px;border-radius:50%;border:1px solid var(--border);
-  background:var(--card);cursor:pointer;font-size:1rem;
-  display:flex;align-items:center;justify-content:center;
-}
-.text-btn{
-  padding:4px 10px;border-radius:20px;border:1px solid var(--border);
-  background:transparent;color:var(--sub);cursor:pointer;font-size:0.7rem;font-family:inherit;
-}
-.logout-btn{
-  padding:4px 10px;border-radius:20px;border:1px solid #FF6B6B44;
-  background:#FF6B6B22;color:#FF6B6B;cursor:pointer;font-size:0.7rem;font-family:inherit;
-}
-.header-right{display:flex;gap:8px;align-items:center}
-.user-badge{
-  padding:4px 10px;border-radius:20px;border:1px solid var(--accent);
-  background:var(--accent)22;color:var(--accent);font-size:.7rem;font-weight:600;
-  max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
+.icon-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
+.text-btn{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:.7rem;font-family:inherit;}
+.logout-btn{padding:4px 10px;border-radius:20px;border:1px solid #FF6B6B44;background:#FF6B6B22;color:#FF6B6B;cursor:pointer;font-size:.7rem;font-family:inherit;}
+.header-right{display:flex;gap:6px;align-items:center}
+.user-badge{padding:4px 10px;border-radius:20px;border:1px solid var(--accent);background:var(--accent)22;color:var(--accent);font-size:.7rem;font-weight:600;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.point-badge{padding:4px 10px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:#FFD700;font-size:.7rem;font-weight:700;cursor:pointer;white-space:nowrap;}
 
-/* Tabs */
+/* ── Tabs ── */
 .tab{display:none}.tab.active{display:block}
 
-/* Main container */
-.main{max-width:640px;margin:0 auto;padding:24px 16px}
+/* ── Main container ── */
+.main{max-width:680px;margin:0 auto;padding:24px 16px}
 
-/* Draw tab */
-.kuji-title-area{text-align:center;margin-bottom:24px}
-.kuji-eyebrow{
-  font-size:.75rem;letter-spacing:.3em;color:var(--accent);
-  font-weight:600;margin-bottom:8px;text-transform:uppercase;
+/* ── Notice banner ── */
+.notice-banner{
+  background:linear-gradient(135deg,var(--accent)22,var(--accent2)11);
+  border:1px solid var(--accent)44;border-radius:12px;
+  padding:10px 16px;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;font-size:.82rem;
 }
-.kuji-title{
-  font-size:2.2rem;font-weight:800;letter-spacing:.05em;
-  background:linear-gradient(135deg,#38BDF8 30%,#22D3EE);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  margin-bottom:8px;
-}
-.draw-limit-badge{
-  display:inline-block;padding:4px 14px;border-radius:20px;
-  background:var(--card);border:1px solid var(--border);
-  font-size:.78rem;color:var(--sub);
-}
-.draw-limit-badge span{color:var(--accent);font-weight:700}
+.notice-icon{font-size:1rem;animation:pulseNotice 2s infinite}
 
-/* Grade summary */
+/* ── Queue banner ── */
+.queue-banner{
+  background:linear-gradient(135deg,#FF6B6B22,#FFD70011);
+  border:1px solid #FF6B6B44;border-radius:12px;
+  padding:12px 16px;margin-bottom:16px;text-align:center;
+}
+.queue-banner-title{font-weight:700;color:#FF6B6B;margin-bottom:4px;font-size:.9rem;}
+.queue-banner-sub{font-size:.78rem;color:var(--sub)}
+
+/* ── Draw tab main page ── */
+.kuji-hero{text-align:center;padding:32px 0 24px}
+.kuji-eyebrow{font-size:.75rem;letter-spacing:.3em;color:var(--accent);font-weight:600;margin-bottom:8px;text-transform:uppercase;}
+.kuji-title{font-size:2.2rem;font-weight:800;letter-spacing:.05em;background:linear-gradient(135deg,#38BDF8 30%,#22D3EE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
+.kuji-price-tag{display:inline-block;padding:6px 18px;border-radius:20px;background:var(--card);border:1px solid var(--border);font-size:.85rem;color:var(--text);margin-bottom:16px;}
+.kuji-price-tag span{color:#FFD700;font-weight:800;font-size:1rem;}
+.session-info{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;}
+.session-badge{padding:5px 14px;border-radius:20px;background:var(--card);border:1px solid var(--border);font-size:.75rem;color:var(--sub);}
+.session-badge strong{color:var(--text);}
+
+/* ── Grade summary ── */
 .grade-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
-.grade-card{
-  background:var(--card);border-radius:12px;
-  padding:10px 6px;text-align:center;
-}
+.grade-card{background:var(--card);border-radius:12px;padding:10px 6px;text-align:center;}
 .grade-label{font-size:.6rem;font-weight:700;letter-spacing:.1em;margin-bottom:4px}
 .grade-count{font-size:1rem;font-weight:700;color:var(--text)}
 .grade-sub{font-size:.55rem;color:var(--sub)}
 
-/* ── 뽑기판 ── */
-.kujiboard-section{margin-bottom:20px}
-.kujiboard-label{
-  font-size:.8rem;color:var(--sub);margin-bottom:10px;text-align:center;
-  display:flex;align-items:center;justify-content:center;gap:8px;
+/* ── Products preview (main) ── */
+.products-section{margin-bottom:24px}
+.section-title{font-size:.8rem;color:var(--sub);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+.prod-card{background:var(--card);border-radius:14px;overflow:hidden;cursor:default;position:relative;border:1px solid var(--border);}
+.prod-card-img-wrap{width:100%;aspect-ratio:1;overflow:hidden;background:var(--bg2);}
+.prod-card-img{width:100%;height:100%;object-fit:contain;}
+.prod-card-no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;}
+.prod-card-body{padding:8px 10px;}
+.prod-card-grade{font-size:.58rem;font-weight:700;margin-bottom:2px;}
+.prod-card-name{font-size:.8rem;font-weight:600;line-height:1.3;word-break:break-all;}
+.prod-card-remain{font-size:.65rem;color:var(--sub);margin-top:3px;}
+.prod-sold-badge{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;}
+
+/* ── Enter board button ── */
+.enter-board-wrap{text-align:center;margin:28px 0}
+.enter-board-btn{
+  padding:16px 48px;border-radius:50px;border:none;cursor:pointer;
+  background:var(--btn-grad);color:#fff;font-size:1.05rem;font-weight:800;
+  letter-spacing:.08em;box-shadow:0 0 32px rgba(56,189,248,.4);
+  transition:all .3s;font-family:inherit;display:inline-flex;align-items:center;gap:10px;
 }
-.kujiboard-label strong{color:var(--accent);font-size:1rem}
-.kujiboard-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(60px,1fr));
-  gap:6px;
-  margin-bottom:14px;
-}
+.enter-board-btn:hover{transform:translateY(-2px);box-shadow:0 4px 40px rgba(56,189,248,.5);}
+.enter-board-btn:disabled{background:var(--border);box-shadow:none;cursor:not-allowed;transform:none;}
+
+/* ── Draw board view ── */
+#board-view{display:none}
+.board-top-bar{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.back-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:.78rem;font-family:inherit;}
+.board-session-info{flex:1;font-size:.78rem;color:var(--sub);text-align:center;}
+.board-session-info strong{color:var(--accent);}
+.limit-warn{font-size:.72rem;color:#FF6B6B;background:#FF6B6B11;border:1px solid #FF6B6B33;padding:4px 10px;border-radius:20px;}
+
+.kujiboard-label{font-size:.8rem;color:var(--sub);margin-bottom:10px;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;}
+.kujiboard-label strong{color:var(--accent);font-size:1rem;}
+.kujiboard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:5px;margin-bottom:14px;}
 .slot{
-  aspect-ratio:1;border-radius:10px;border:1.5px dashed var(--border);
-  background:var(--card);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.7rem;font-weight:700;color:var(--sub);
-  transition:all .15s;position:relative;overflow:hidden;
+  aspect-ratio:1;border-radius:8px;border:1.5px dashed var(--border);
+  background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:700;color:var(--sub);transition:all .15s;position:relative;overflow:hidden;
   -webkit-tap-highlight-color:transparent;
 }
 .slot:hover{border-color:var(--accent);color:var(--accent)}
-.slot.selected{
-  border:2px solid var(--accent);background:var(--accent)22;
-  color:var(--accent);transform:scale(1.06);
-}
-.slot.drawn{
-  border:2px solid var(--border);background:var(--bg2);
-  color:var(--sub);cursor:default;opacity:.4;
-}
+.slot.selected{border:2px solid var(--accent);background:var(--accent)22;color:var(--accent);transform:scale(1.06);}
+.slot.drawn{border:2px solid var(--border);background:var(--bg2);color:var(--sub);cursor:default;opacity:.35;}
 .slot.spinning{animation:cardSlotSpin .4s ease infinite}
-.slot-num{font-size:.75rem;font-weight:700}
+.slot-num{font-size:.65rem;font-weight:700;}
+.slot-marker{position:absolute;bottom:2px;right:3px;font-size:.5rem;color:var(--sub);}
 
-.open-btn-wrap{text-align:center;margin-bottom:20px}
-.open-btn{
-  padding:14px 44px;border-radius:50px;border:none;cursor:pointer;
-  background:var(--btn-grad);color:#fff;font-size:1rem;font-weight:800;
-  letter-spacing:.1em;box-shadow:0 0 28px rgba(56,189,248,.4);
-  transition:all .3s;font-family:inherit;display:inline-flex;align-items:center;gap:10px;
-}
+/* ── Open button ── */
+.open-btn-wrap{text-align:center;margin-bottom:20px;}
+.open-btn{padding:14px 44px;border-radius:50px;border:none;cursor:pointer;background:var(--btn-grad);color:#fff;font-size:1rem;font-weight:800;letter-spacing:.1em;box-shadow:0 0 28px rgba(56,189,248,.4);transition:all .3s;font-family:inherit;display:inline-flex;align-items:center;gap:10px;}
 .open-btn:disabled{background:var(--border);box-shadow:none;cursor:not-allowed;transform:scale(.97)}
-.open-btn-hint{font-size:.75rem;color:var(--sub);margin-top:8px}
-.spinner{
-  width:18px;height:18px;border:2px solid #fff;border-top:2px solid transparent;
-  border-radius:50%;animation:spin 1s linear infinite;display:inline-block;
-}
+.open-btn-hint{font-size:.75rem;color:var(--sub);margin-top:8px;}
+.spinner{width:18px;height:18px;border:2px solid #fff;border-top:2px solid transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;}
 
-/* Results */
+/* ── Results ── */
 #results-area{margin-bottom:16px}
-.results-grid{gap:10px;margin-bottom:12px}
-.result-summary{
-  background:var(--card);border-radius:16px;padding:12px;
-  border:1px solid var(--border);text-align:center;
-}
-.result-summary-title{font-size:.75rem;color:var(--sub);margin-bottom:8px}
-.result-tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.result-tag{
-  padding:4px 12px;border-radius:20px;
-  font-size:.78rem;font-weight:700;
-}
+.results-grid{gap:10px;margin-bottom:12px;}
+.result-summary{background:var(--card);border-radius:16px;padding:12px;border:1px solid var(--border);text-align:center;}
+.result-summary-title{font-size:.75rem;color:var(--sub);margin-bottom:8px;}
+.result-tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.result-tag{padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;}
 
-/* Kuji Card */
-.kuji-card-wrap{perspective:800px;border-radius:14px}
+/* ── Kuji Card ── */
+.kuji-card-wrap{perspective:800px;border-radius:14px;}
 .kuji-card-wrap.glow-ssr{animation:glow-ssr 2s infinite}
 .kuji-card-wrap.glow-sr{animation:glow-sr 2s infinite}
 .kuji-card-wrap.glow-r{animation:glow-r 2s infinite}
 .kuji-card-wrap.glow-n{animation:glow-n 2s infinite}
-.kuji-card-inner{
-  width:100%;position:relative;
-  transform-style:preserve-3d;
-  transition:transform 0.6s cubic-bezier(.4,0,.2,1);
-}
-.kuji-card-inner.flipped{transform:rotateY(180deg)}
-.kuji-card-face{
-  position:absolute;inset:0;backface-visibility:hidden;
-  border-radius:14px;overflow:hidden;
-}
-/* 앞면은 relative로 높이 결정 */
-.kuji-card-front-sizer{
-  width:100%;
-  border-radius:14px;overflow:hidden;
-  transform:rotateY(180deg);
+.kuji-card-front{
+  width:100%;border-radius:14px;overflow:hidden;
   display:flex;flex-direction:column;
-  backface-visibility:hidden;
 }
-.kuji-card-back{
-  background:linear-gradient(135deg,#38BDF822,#22D3EE22);
-  border:1px solid var(--border);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  width:100%;height:100%;
-}
-.kuji-card-back-icon{font-size:2rem;margin-bottom:8px;animation:float 2s ease-in-out infinite}
-.kuji-card-back-label{color:var(--sub);font-size:.75rem;letter-spacing:.1em}
-.kuji-shimmer{
-  position:absolute;inset:0;
-  background:linear-gradient(135deg,transparent 40%,rgba(56,189,248,.08) 50%,transparent 60%);
-  background-size:200% 200%;animation:shimmer 2s infinite;
-}
-.kuji-img{
-  width:100%;
-  max-height:220px;
-  object-fit:contain;
-  background:rgba(0,0,0,.15);
-  display:block;
-}
-.kuji-no-img{
-  height:140px;display:flex;align-items:center;justify-content:center;
-  font-size:3rem;background:rgba(0,0,0,.2);
-}
-.grade-badge{
-  position:absolute;top:8px;right:8px;
-  font-size:.6rem;font-weight:700;letter-spacing:.1em;
-  padding:2px 8px;border-radius:20px;color:#000;z-index:1;
-}
-.kuji-card-info{
-  padding:8px 10px 10px;display:flex;flex-direction:column;gap:2px;
-  background:inherit;
-}
-.kuji-card-name{font-size:1rem;font-weight:800;word-break:break-all;line-height:1.3}
-.kuji-card-desc{font-size:.7rem;color:var(--sub);line-height:1.4;word-break:break-all}
+.kuji-img-wrap{width:100%;aspect-ratio:1;overflow:hidden;background:rgba(0,0,0,.15);}
+.kuji-img{width:100%;height:100%;object-fit:contain;display:block;}
+.kuji-no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:3rem;}
+.grade-badge{position:absolute;top:8px;right:8px;font-size:.6rem;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:20px;color:#000;z-index:1;}
+.kuji-card-info{padding:8px 10px 10px;display:flex;flex-direction:column;gap:2px;}
+.kuji-card-name{font-size:.9rem;font-weight:800;word-break:break-all;line-height:1.3;}
+.kuji-card-desc{font-size:.7rem;color:var(--sub);line-height:1.4;word-break:break-all;}
 
-/* Reset */
-.reset-wrap{text-align:center;margin-top:32px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.reset-btn{
-  padding:8px 20px;border-radius:20px;border:1px solid var(--border);
-  background:transparent;color:var(--sub);cursor:pointer;font-size:.78rem;
-  transition:all .2s;font-family:inherit;
-}
-.reset-btn:hover{color:var(--text);border-color:var(--sub)}
-.reset-btn.danger{border-color:#FF6B6B44;color:#FF6B6B}
-.reset-btn.danger:hover{background:#FF6B6B22}
+/* ── Collection ── */
+.col-header{margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.col-header h2{font-weight:800;font-size:1.5rem;}
+.col-sort-select{padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:.75rem;font-family:inherit;cursor:pointer;outline:none;}
+.col-empty{text-align:center;padding:60px 20px;color:var(--sub);background:var(--card);border-radius:20px;border:1px solid var(--border);}
+.col-empty-icon{font-size:3rem;margin-bottom:12px;}
+.col-empty-title{font-weight:600;margin-bottom:4px;}
+.col-empty-sub{font-size:.8rem;}
+.col-stats{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.col-stat-tag{padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:700;}
+.col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+.col-item{background:var(--card);border-radius:14px;overflow:hidden;transition:transform .2s;cursor:default;position:relative;}
+.col-item:hover{transform:translateY(-3px);}
+.col-item-img-wrap{width:100%;aspect-ratio:1;overflow:hidden;background:rgba(0,0,0,.1);}
+.col-item-img{width:100%;height:100%;object-fit:contain;display:block;}
+.col-item-no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;}
+.col-item-body{padding:8px 10px;}
+.col-item-grade{font-size:.58rem;font-weight:700;letter-spacing:.1em;margin-bottom:3px;}
+.col-item-name{font-size:.82rem;font-weight:700;color:var(--text);word-break:break-all;line-height:1.3;}
+.col-item-date{font-size:.6rem;color:var(--sub);margin-top:2px;}
+.col-count-badge{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.7);color:#fff;font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:20px;backdrop-filter:blur(4px);}
 
-/* Collection */
-.col-header{margin-bottom:20px}
-.col-header h2{font-weight:800;font-size:1.5rem;margin-bottom:4px}
-.col-header .sub{color:var(--sub);font-size:.85rem}
-.col-empty{
-  text-align:center;padding:60px 20px;color:var(--sub);
-  background:var(--card);border-radius:20px;border:1px solid var(--border);
-}
-.col-empty-icon{font-size:3rem;margin-bottom:12px}
-.col-empty-title{font-weight:600;margin-bottom:4px}
-.col-empty-sub{font-size:.8rem}
-.col-stats{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.col-stat-tag{padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:700}
-.col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
-.col-item{
-  background:var(--card);border-radius:14px;overflow:hidden;
-  transition:transform .2s;cursor:default;position:relative;
-}
-.col-item:hover{transform:translateY(-3px)}
-.col-item-img{width:100%;max-height:160px;object-fit:contain;background:rgba(0,0,0,.1);display:block;}
-.col-item-no-img{
-  height:100px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;
-}
-.col-item-body{padding:8px 10px}
-.col-item-grade{font-size:.58rem;font-weight:700;letter-spacing:.1em;margin-bottom:3px}
-.col-item-name{font-size:.85rem;font-weight:700;color:var(--text);word-break:break-all;line-height:1.3}
-.col-count-badge{
-  position:absolute;top:6px;right:6px;
-  background:rgba(0,0,0,.7);color:#fff;
-  font-size:.7rem;font-weight:700;
-  padding:2px 7px;border-radius:20px;
-  backdrop-filter:blur(4px);
-}
+/* ── Admin ── */
+.admin-title{font-weight:800;font-size:1.5rem;margin-bottom:20px;background:linear-gradient(135deg,#FF6B6B,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.admin-card{background:var(--card);border-radius:20px;padding:20px;border:1px solid var(--border);margin-bottom:20px;}
+.admin-card-title{font-weight:700;margin-bottom:14px;font-size:.9rem;color:var(--accent);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.form-field{margin-bottom:10px;}
+.field-label{font-size:.75rem;color:var(--sub);margin-bottom:6px;}
+.field-input{width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:.9rem;outline:none;font-family:inherit;}
+.field-input:focus{border-color:var(--accent);}
+select.field-input{cursor:pointer;}
+.save-btn{padding:10px 24px;border-radius:10px;border:none;background:var(--btn-grad);color:#fff;font-weight:700;cursor:pointer;font-size:.85rem;font-family:inherit;}
+.cancel-btn{padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:.85rem;font-family:inherit;}
+.upload-btn{padding:10px 20px;border-radius:10px;border:1px dashed var(--border);background:var(--bg2);color:var(--text);cursor:pointer;font-size:.85rem;font-family:inherit;}
+.image-preview{width:48px;height:48px;object-fit:cover;border-radius:8px;}
+.del-img-btn{background:none;border:none;color:#FF6B6B;cursor:pointer;font-size:.8rem;font-family:inherit;}
+.product-list{display:flex;flex-direction:column;gap:10px;}
+.product-item{display:flex;align-items:center;gap:12px;background:var(--bg2);border-radius:12px;padding:12px;}
+.product-thumb{width:48px;height:48px;object-fit:cover;border-radius:8px;flex-shrink:0;}
+.product-no-thumb{width:48px;height:48px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+.product-info{flex:1;min-width:0;}
+.product-name-row{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+.product-grade-badge{font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:10px;flex-shrink:0;}
+.product-name{font-size:.85rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.product-meta{font-size:.72rem;color:var(--sub);}
+.product-actions{display:flex;gap:6px;flex-shrink:0;}
+.edit-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-size:.75rem;font-family:inherit;}
+.del-btn{padding:6px 12px;border-radius:8px;border:1px solid #FF6B6B44;background:#FF6B6B22;color:#FF6B6B;cursor:pointer;font-size:.75rem;font-family:inherit;}
+.reset-wrap{text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.reset-btn{padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:.78rem;transition:all .2s;font-family:inherit;}
+.reset-btn:hover{color:var(--text);border-color:var(--sub);}
+.reset-btn.danger{border-color:#FF6B6B44;color:#FF6B6B;}
+.reset-btn.danger:hover{background:#FF6B6B22;}
 
-/* Admin */
-.admin-title{
-  font-weight:800;font-size:1.5rem;margin-bottom:20px;
-  background:linear-gradient(135deg,#FF6B6B,#FFD700);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-.admin-card{
-  background:var(--card);border-radius:20px;padding:20px;
-  border:1px solid var(--border);margin-bottom:20px;
-}
-.admin-card-title{font-weight:700;margin-bottom:14px;font-size:.9rem;color:var(--accent)}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-.form-field{margin-bottom:10px}
-.field-label{font-size:.75rem;color:var(--sub);margin-bottom:6px}
-.field-input{
-  width:100%;padding:10px 14px;border-radius:10px;
-  border:1px solid var(--border);background:var(--bg2);
-  color:var(--text);font-size:.9rem;outline:none;font-family:inherit;
-}
-.field-input:focus{border-color:var(--accent)}
-select.field-input{cursor:pointer}
-.save-btn{
-  padding:10px 24px;border-radius:10px;border:none;
-  background:var(--btn-grad);color:#fff;font-weight:700;cursor:pointer;font-size:.85rem;font-family:inherit;
-}
-.cancel-btn{
-  padding:10px 20px;border-radius:10px;border:1px solid var(--border);
-  background:transparent;color:var(--sub);cursor:pointer;font-size:.85rem;font-family:inherit;
-}
-.upload-btn{
-  padding:10px 20px;border-radius:10px;border:1px dashed var(--border);
-  background:var(--bg2);color:var(--text);cursor:pointer;font-size:.85rem;font-family:inherit;
-}
-.image-preview{width:48px;height:48px;object-fit:cover;border-radius:8px}
-.del-img-btn{background:none;border:none;color:#FF6B6B;cursor:pointer;font-size:.8rem;font-family:inherit}
-.product-list{display:flex;flex-direction:column;gap:10px}
-.product-item{
-  display:flex;align-items:center;gap:12px;
-  background:var(--bg2);border-radius:12px;padding:12px;
-}
-.product-thumb{width:48px;height:48px;object-fit:cover;border-radius:8px;flex-shrink:0}
-.product-no-thumb{
-  width:48px;height:48px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;
-}
-.product-info{flex:1;min-width:0}
-.product-name-row{display:flex;align-items:center;gap:8px;margin-bottom:2px}
-.product-grade-badge{
-  font-size:.6rem;font-weight:700;
-  padding:2px 6px;border-radius:10px;flex-shrink:0;
-}
-.product-name{font-size:.85rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.product-meta{font-size:.72rem;color:var(--sub)}
-.product-actions{display:flex;gap:6px;flex-shrink:0}
-.edit-btn{
-  padding:6px 12px;border-radius:8px;border:1px solid var(--border);
-  background:transparent;color:var(--text);cursor:pointer;font-size:.75rem;font-family:inherit;
-}
-.del-btn{
-  padding:6px 12px;border-radius:8px;border:1px solid #FF6B6B44;
-  background:#FF6B6B22;color:#FF6B6B;cursor:pointer;font-size:.75rem;font-family:inherit;
-}
+/* ── Admin user list ── */
+.user-list{display:flex;flex-direction:column;gap:8px;}
+.user-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:12px;padding:10px 12px;}
+.user-row-email{flex:1;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.user-row-meta{font-size:.7rem;color:var(--sub);margin-top:1px;}
+.user-actions{display:flex;gap:6px;flex-shrink:0;}
+.warn-btn{padding:4px 10px;border-radius:8px;border:1px solid #FFD70044;background:#FFD70011;color:#FFD700;cursor:pointer;font-size:.7rem;font-family:inherit;}
+.kick-btn{padding:4px 10px;border-radius:8px;border:1px solid #FF6B6B44;background:#FF6B6B11;color:#FF6B6B;cursor:pointer;font-size:.7rem;font-family:inherit;}
+.msg-btn{padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:.7rem;font-family:inherit;}
+.admin-notice-area{display:flex;gap:8px;}
+.admin-notice-input{flex:1;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:.9rem;outline:none;font-family:inherit;}
+.admin-notice-btn{padding:10px 18px;border-radius:10px;border:none;background:var(--btn-grad);color:#fff;font-weight:700;cursor:pointer;font-size:.85rem;font-family:inherit;white-space:nowrap;}
 
-/* Modal */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;
-  display:flex;align-items:center;justify-content:center;padding:20px;
-}
-.modal-box{
-  background:var(--card);border-radius:20px;padding:28px;width:100%;max-width:320px;
-  border:1px solid var(--border);animation:pop .3s ease;
-}
-.modal-title{font-weight:700;font-size:1.1rem;margin-bottom:6px;text-align:center}
-.modal-sub{font-size:.8rem;color:var(--sub);text-align:center;margin-bottom:20px}
-.modal-input{
-  width:100%;padding:12px 16px;border-radius:12px;
-  border:1px solid var(--border);background:var(--bg2);
-  color:var(--text);font-size:.9rem;margin-bottom:10px;outline:none;font-family:inherit;
-}
-.modal-input:focus{border-color:var(--accent)}
-.modal-btn{
-  width:100%;padding:12px;border-radius:12px;border:none;
-  background:var(--btn-grad);color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;font-family:inherit;
-  margin-bottom:8px;
-}
-.modal-btn.secondary{
-  background:transparent;border:1px solid var(--border);color:var(--sub);
-}
-.modal-divider{text-align:center;color:var(--sub);font-size:.78rem;margin:4px 0 8px;position:relative}
-.modal-divider::before,.modal-divider::after{
-  content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--border);
-}
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal-box{background:var(--card);border-radius:20px;padding:28px;width:100%;max-width:340px;border:1px solid var(--border);animation:pop .3s ease;max-height:90vh;overflow-y:auto;}
+.modal-title{font-weight:700;font-size:1.1rem;margin-bottom:6px;text-align:center;}
+.modal-sub{font-size:.8rem;color:var(--sub);text-align:center;margin-bottom:20px;}
+.modal-input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:.9rem;margin-bottom:10px;outline:none;font-family:inherit;}
+.modal-input:focus{border-color:var(--accent);}
+.modal-btn{width:100%;padding:12px;border-radius:12px;border:none;background:var(--btn-grad);color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;font-family:inherit;margin-bottom:8px;}
+.modal-btn.secondary{background:transparent;border:1px solid var(--border);color:var(--sub);}
+.modal-btn.danger{background:linear-gradient(135deg,#FF6B6B,#FF4444);}
+.modal-divider{text-align:center;color:var(--sub);font-size:.78rem;margin:4px 0 8px;position:relative;}
+.modal-divider::before,.modal-divider::after{content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--border);}
 .modal-divider::before{left:0}.modal-divider::after{right:0}
-.modal-error{font-size:.78rem;color:#FF6B6B;text-align:center;margin-bottom:8px;min-height:20px}
+.modal-error{font-size:.78rem;color:#FF6B6B;text-align:center;margin-bottom:8px;min-height:20px;}
+.modal-success{font-size:.78rem;color:#34D399;text-align:center;margin-bottom:8px;min-height:20px;}
+.checkbox-row{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--sub);margin-bottom:12px;cursor:pointer;}
+.checkbox-row input{accent-color:var(--accent);}
 
-/* Loading */
-#loading{display:flex;align-items:center;justify-content:center;height:60vh;flex-direction:column;gap:16px}
-.loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top:3px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite}
-.loading-text{color:var(--sub);font-size:.85rem}
+/* ── Point modal ── */
+.point-history{margin-top:12px;max-height:200px;overflow-y:auto;}
+.point-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:.78rem;}
+.point-item:last-child{border-bottom:none;}
+.point-plus{color:#34D399;font-weight:700;}
+.point-minus{color:#FF6B6B;font-weight:700;}
 
-/* Confetti */
-#confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+/* ── Profile modal ── */
+.profile-section{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.profile-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.profile-label{font-size:.75rem;color:var(--sub);margin-bottom:8px;}
+.profile-value{font-size:.9rem;font-weight:600;}
+
+/* ── Loading ── */
+#loading{display:flex;align-items:center;justify-content:center;height:60vh;flex-direction:column;gap:16px;}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top:3px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite;}
+.loading-text{color:var(--sub);font-size:.85rem;}
+
+/* ── Confetti ── */
+#confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;}
+
+/* ── Personal message inbox ── */
+.inbox-empty{color:var(--sub);text-align:center;padding:20px;font-size:.82rem;}
+.msg-row{background:var(--bg2);border-radius:10px;padding:10px 12px;margin-bottom:8px;}
+.msg-row-from{font-size:.65rem;color:var(--accent);margin-bottom:4px;}
+.msg-row-text{font-size:.82rem;line-height:1.5;}
+.msg-row-time{font-size:.65rem;color:var(--sub);margin-top:4px;}
+
+/* ── Warning badge ── */
+.warn-badge{display:inline-block;background:#FFD70022;color:#FFD700;border:1px solid #FFD70044;border-radius:20px;padding:2px 8px;font-size:.65rem;font-weight:700;margin-left:6px;}
 </style>
 </head>
 <body>
@@ -392,29 +307,32 @@ select.field-input{cursor:pointer}
   <nav>
     <button class="nav-btn active" id="nav-draw" onclick="switchTab('draw')">뽑기</button>
     <button class="nav-btn" id="nav-collection" onclick="switchTab('collection')">컬렉션</button>
+    <button class="nav-btn" id="nav-mypage" onclick="switchTab('mypage')">MY</button>
     <button class="nav-btn" id="nav-admin" style="display:none" onclick="switchTab('admin')">관리자</button>
   </nav>
   <div class="header-right">
     <button class="icon-btn" onclick="toggleTheme()" id="theme-btn">☀️</button>
-    <span class="user-badge" id="user-email-badge" style="display:none"></span>
+    <span class="user-badge" id="user-email-badge" style="display:none" onclick="switchTab('mypage')" style="cursor:pointer"></span>
+    <span class="point-badge" id="point-badge" style="display:none" onclick="showPointModal()">💎 0P</span>
     <button class="text-btn" id="login-btn" onclick="showLoginModal()">로그인</button>
-    <button class="logout-btn" id="user-logout-btn" style="display:none" onclick="userLogout()">로그아웃</button>
     <button class="text-btn" id="admin-login-btn" onclick="showAdminLogin()">관리자</button>
     <button class="logout-btn" id="admin-logout-btn" style="display:none" onclick="adminLogout()">관리자 로그아웃</button>
   </div>
 </header>
 
-<!-- Admin Login Modal -->
+<!-- Modals -->
+
+<!-- Admin Login -->
 <div class="modal-overlay" id="admin-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
   <div class="modal-box">
-    <div class="modal-title">관리자 로그인</div>
+    <div class="modal-title">🔐 관리자 로그인</div>
     <div class="modal-sub">관리자 비밀번호를 입력하세요</div>
     <input type="password" class="modal-input" id="admin-pw-input" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
     <button class="modal-btn" onclick="doAdminLogin()">로그인</button>
   </div>
 </div>
 
-<!-- User Auth Modal -->
+<!-- User Auth -->
 <div class="modal-overlay" id="auth-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
   <div class="modal-box">
     <div class="modal-title" id="auth-modal-title">로그인</div>
@@ -423,9 +341,49 @@ select.field-input{cursor:pointer}
     <input type="email" class="modal-input" id="auth-email" placeholder="이메일" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('auth-pw').focus()"/>
     <input type="password" class="modal-input" id="auth-pw" placeholder="비밀번호" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAuth()"/>
     <input type="password" class="modal-input" id="auth-pw2" placeholder="비밀번호 확인" style="display:none" onkeydown="if(event.key==='Enter')doAuth()"/>
+    <label class="checkbox-row" id="remember-row">
+      <input type="checkbox" id="auth-remember" checked/> 로그인 유지하기
+    </label>
     <button class="modal-btn" id="auth-submit-btn" onclick="doAuth()">로그인</button>
     <div class="modal-divider">또는</div>
     <button class="modal-btn secondary" id="auth-toggle-btn" onclick="toggleAuthMode()">회원가입</button>
+  </div>
+</div>
+
+<!-- Point Modal -->
+<div class="modal-overlay" id="point-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">💎 포인트 충전</div>
+    <div class="modal-sub" id="point-modal-balance">보유: 0P</div>
+    <div class="modal-error" id="point-error"></div>
+    <div class="modal-success" id="point-success"></div>
+    <input type="number" class="modal-input" id="point-amount" placeholder="충전할 금액 (원)" min="1000" step="1000"/>
+    <div style="font-size:.72rem;color:var(--sub);margin-bottom:10px;text-align:center;">1원 = 1포인트 · 최소 1,000원</div>
+    <button class="modal-btn" onclick="doChargePoint()">충전하기</button>
+    <div class="point-history" id="point-history"></div>
+  </div>
+</div>
+
+<!-- Admin Send Message -->
+<div class="modal-overlay" id="admin-msg-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">📩 개인 메시지</div>
+    <div class="modal-sub" id="admin-msg-target"></div>
+    <textarea class="modal-input" id="admin-msg-text" placeholder="메시지 내용" style="height:80px;resize:vertical"></textarea>
+    <button class="modal-btn" onclick="doSendAdminMsg()">전송</button>
+    <button class="modal-btn secondary" onclick="document.getElementById('admin-msg-modal').style.display='none'">취소</button>
+  </div>
+</div>
+
+<!-- Profile / My Page extra modals: delete account -->
+<div class="modal-overlay" id="delete-account-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">⚠️ 회원 탈퇴</div>
+    <div class="modal-sub">비밀번호를 입력하면 계정이 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</div>
+    <div class="modal-error" id="delete-error"></div>
+    <input type="password" class="modal-input" id="delete-pw" placeholder="현재 비밀번호"/>
+    <button class="modal-btn danger" onclick="doDeleteAccount()">탈퇴하기</button>
+    <button class="modal-btn secondary" onclick="document.getElementById('delete-account-modal').style.display='none'">취소</button>
   </div>
 </div>
 
@@ -438,55 +396,106 @@ select.field-input{cursor:pointer}
   <div class="loading-text">로딩 중...</div>
 </div>
 
-<!-- Draw Tab -->
+<!-- ══════════════════ DRAW TAB ══════════════════ -->
 <div class="tab" id="tab-draw" style="display:none">
   <div class="main fade-in">
-    <div class="kuji-title-area">
+
+    <!-- Global notice -->
+    <div class="notice-banner" id="global-notice" style="display:none">
+      <span class="notice-icon">📢</span>
+      <span id="global-notice-text"></span>
+    </div>
+
+    <!-- Queue banner -->
+    <div class="queue-banner" id="queue-banner" style="display:none">
+      <div class="queue-banner-title">⏳ 현재 다른 분이 진행 중이에요</div>
+      <div class="queue-banner-sub" id="queue-banner-sub">대기를 신청하면 차례가 되면 알려드려요</div>
+      <button class="modal-btn" style="width:auto;display:inline-block;margin-top:10px;padding:8px 20px;" onclick="requestQueue()">대기 신청</button>
+    </div>
+
+    <!-- Hero -->
+    <div class="kuji-hero">
       <div class="kuji-eyebrow" id="kuji-subtitle">당신의 운명을 뽑아보세요</div>
       <h1 class="kuji-title" id="kuji-title">IDOL KUJI</h1>
-      <div class="draw-limit-badge" id="draw-limit-badge" style="display:none">
-        내 뽑기: <span id="drawn-count">0</span> / <span id="max-draws">0</span>
+      <div class="kuji-price-tag">1판 <span id="kuji-price-display">0</span>P</div>
+      <div class="session-info" id="session-info">
+        <span class="session-badge">남은 슬롯 <strong id="remain-slots-main">-</strong>개</span>
+        <span class="session-badge" id="session-num-badge">현재 <strong id="session-num-display">1</strong>판째</span>
       </div>
     </div>
+
+    <!-- Grade summary -->
     <div class="grade-grid" id="grade-grid"></div>
 
-    <!-- 뽑기판 -->
-    <div class="kujiboard-section">
+    <!-- Products preview -->
+    <div class="products-section">
+      <div class="section-title">상품 목록</div>
+      <div class="products-grid" id="products-preview"></div>
+    </div>
+
+    <!-- Enter board -->
+    <div class="enter-board-wrap">
+      <button class="enter-board-btn" id="enter-board-btn" onclick="enterBoard()">
+        🎫 쿠지 고르기
+      </button>
+      <div style="font-size:.75rem;color:var(--sub);margin-top:8px;" id="enter-btn-hint">로그인 후 이용 가능합니다</div>
+    </div>
+
+    <!-- ── Board view ── -->
+    <div id="board-view">
+      <div class="board-top-bar">
+        <button class="back-btn" onclick="exitBoard()">← 돌아가기</button>
+        <div class="board-session-info">
+          <strong id="board-remain-slots">-</strong>개 남음 · <strong id="board-session-num">1</strong>판째
+        </div>
+        <span class="limit-warn" id="board-limit-warn" style="display:none"></span>
+      </div>
+
       <div class="kujiboard-label">
-        뽑기판에서 원하는 슬롯을 골라주세요 ·
-        <strong id="selected-count-label">0</strong>개 선택
+        원하는 슬롯을 선택하세요 · <strong id="selected-count-label">0</strong>개 선택
       </div>
       <div class="kujiboard-grid" id="kujiboard-grid"></div>
-    </div>
 
-    <div class="open-btn-wrap">
-      <button class="open-btn" id="open-btn" onclick="handleDraw()" disabled>
-        ✦ <span id="open-btn-label">슬롯을 선택해주세요</span>
-      </button>
-      <div class="open-btn-hint" id="open-btn-hint">선택한 슬롯을 한꺼번에 오픈합니다</div>
-    </div>
+      <div class="open-btn-wrap">
+        <button class="open-btn" id="open-btn" onclick="handleDraw()" disabled>
+          ✦ <span id="open-btn-label">슬롯을 선택해주세요</span>
+        </button>
+        <div class="open-btn-hint" id="open-btn-hint">선택한 슬롯을 한꺼번에 오픈합니다</div>
+      </div>
 
-    <div id="results-area" style="display:none" class="fade-in">
-      <div class="results-grid" id="results-grid"></div>
-      <div class="result-summary">
-        <div class="result-summary-title">이번 결과</div>
-        <div class="result-tags" id="result-tags"></div>
+      <div id="results-area" style="display:none" class="fade-in">
+        <div class="results-grid" id="results-grid"></div>
+        <div class="result-summary">
+          <div class="result-summary-title">이번 결과</div>
+          <div class="result-tags" id="result-tags"></div>
+        </div>
       </div>
     </div>
 
-    <div class="reset-wrap">
-      <button class="reset-btn" onclick="handleResetStock()">🔄 재고만 초기화</button>
-      <button class="reset-btn danger" onclick="handleResetAll()">🗑️ 전체 초기화</button>
-    </div>
   </div>
 </div>
 
-<!-- Collection Tab -->
+<!-- ══════════════════ COLLECTION TAB ══════════════════ -->
 <div class="tab" id="tab-collection" style="display:none">
   <div class="main fade-in">
     <div class="col-header">
-      <h2>내 컬렉션</h2>
-      <div class="sub" id="col-count">총 0개 보유</div>
+      <div>
+        <h2>내 컬렉션</h2>
+        <div style="color:var(--sub);font-size:.85rem;margin-top:2px;" id="col-count">총 0개 보유</div>
+      </div>
+      <select class="col-sort-select" id="col-sort" onchange="renderCollectionTab()">
+        <option value="grade-asc">등급 높은순</option>
+        <option value="grade-desc">등급 낮은순</option>
+        <option value="date-desc">최근 획득순</option>
+        <option value="date-asc">오래된 순</option>
+        <option value="name-asc">이름 ㄱ-ㅎ</option>
+        <option value="count-desc">보유수 많은순</option>
+      </select>
+    </div>
+    <div id="col-login-notice" style="display:none" class="col-empty">
+      <div class="col-empty-icon">🔒</div>
+      <div class="col-empty-title">로그인이 필요해요</div>
+      <div class="col-empty-sub">로그인하면 내 컬렉션을 볼 수 있어요</div>
     </div>
     <div id="col-empty" class="col-empty" style="display:none">
       <div class="col-empty-icon">🎴</div>
@@ -500,11 +509,75 @@ select.field-input{cursor:pointer}
   </div>
 </div>
 
-<!-- Admin Tab -->
+<!-- ══════════════════ MY PAGE TAB ══════════════════ -->
+<div class="tab" id="tab-mypage" style="display:none">
+  <div class="main fade-in">
+    <div style="font-weight:800;font-size:1.5rem;margin-bottom:20px;">마이페이지</div>
+
+    <!-- Not logged in -->
+    <div id="mypage-login-notice" style="display:none" class="col-empty">
+      <div class="col-empty-icon">🔒</div>
+      <div class="col-empty-title">로그인이 필요해요</div>
+      <button class="modal-btn" style="width:auto;margin-top:16px;padding:10px 28px;" onclick="showLoginModal()">로그인</button>
+    </div>
+
+    <!-- Logged in content -->
+    <div id="mypage-content" style="display:none">
+      <!-- Inbox -->
+      <div class="admin-card" id="inbox-card" style="display:none">
+        <div class="admin-card-title">📬 받은 메시지</div>
+        <div id="inbox-list"></div>
+      </div>
+
+      <!-- Profile -->
+      <div class="admin-card">
+        <div class="admin-card-title">👤 내 정보</div>
+        <div class="profile-section">
+          <div class="profile-label">이메일</div>
+          <div class="profile-value" id="my-email">-</div>
+        </div>
+        <div class="profile-section">
+          <div class="profile-label">보유 포인트</div>
+          <div class="profile-value" style="color:#FFD700;" id="my-points">0P</div>
+          <button class="text-btn" style="margin-top:8px;" onclick="showPointModal()">💎 포인트 충전</button>
+        </div>
+        <div class="profile-section">
+          <div class="profile-label">경고</div>
+          <div class="profile-value" id="my-warn">없음</div>
+        </div>
+        <div class="profile-section">
+          <div class="profile-label">총 뽑기 횟수</div>
+          <div class="profile-value" id="my-draws">0회</div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="admin-card">
+        <div class="admin-card-title">⚙️ 계정 설정</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="reset-btn" onclick="userLogout()">🚪 로그아웃</button>
+          <button class="reset-btn danger" onclick="showDeleteAccount()">🗑️ 회원 탈퇴</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ ADMIN TAB ══════════════════ -->
 <div class="tab" id="tab-admin" style="display:none">
   <div class="main fade-in" style="max-width:800px">
-    <div class="admin-title">관리자 패널</div>
+    <div class="admin-title">⚡ 관리자 패널</div>
 
+    <!-- Notice -->
+    <div class="admin-card">
+      <div class="admin-card-title">📢 전체 공지</div>
+      <div class="admin-notice-area">
+        <input class="admin-notice-input" id="notice-input" placeholder="공지 내용 입력 (비워두면 공지 숨김)"/>
+        <button class="admin-notice-btn" onclick="saveNotice()">전송</button>
+      </div>
+    </div>
+
+    <!-- Settings -->
     <div class="admin-card">
       <div class="admin-card-title">⚙️ 쿠지 설정</div>
       <div class="form-grid">
@@ -517,17 +590,20 @@ select.field-input{cursor:pointer}
           <input class="field-input" id="s-subtitle" value="당신의 운명을 뽑아보세요"/>
         </div>
       </div>
-      <div class="form-field">
-        <div class="field-label">뽑기판 슬롯 수 (총 몇 개의 슬롯?)</div>
-        <input type="number" min="1" max="100" class="field-input" id="s-slots" value="30" style="width:160px"/>
-      </div>
-      <div class="form-field">
-        <div class="field-label">인당 최대 뽑기 횟수 (0 = 무제한)</div>
-        <input type="number" min="0" class="field-input" id="s-max" value="0" style="width:160px"/>
+      <div class="form-grid">
+        <div>
+          <div class="field-label">1판 가격 (포인트)</div>
+          <input type="number" min="0" class="field-input" id="s-price" value="3000"/>
+        </div>
+        <div>
+          <div class="field-label">대기 있을 때 최대 판 수</div>
+          <input type="number" min="1" max="50" class="field-input" id="s-queue-max" value="10"/>
+        </div>
       </div>
       <button class="save-btn" onclick="saveSettings()">저장</button>
     </div>
 
+    <!-- Product form -->
     <div class="admin-card">
       <div class="admin-card-title" id="form-title">➕ 상품 추가</div>
       <div class="form-grid">
@@ -550,7 +626,7 @@ select.field-input{cursor:pointer}
         </div>
         <div>
           <div class="field-label">재고 수량</div>
-          <input type="number" min="1" class="field-input" id="f-count" value="100"/>
+          <input type="number" min="1" class="field-input" id="f-count" value="2"/>
         </div>
       </div>
       <div class="form-field">
@@ -572,12 +648,26 @@ select.field-input{cursor:pointer}
       </div>
     </div>
 
+    <!-- Product list -->
     <div class="admin-card">
       <div class="admin-card-title">📦 상품 목록 (<span id="product-count">0</span>)</div>
       <div class="product-list" id="product-list">
         <div style="color:var(--sub);text-align:center;padding:20px">상품을 추가해주세요</div>
       </div>
+      <div class="reset-wrap">
+        <button class="reset-btn" onclick="handleResetStock()">🔄 재고만 초기화</button>
+        <button class="reset-btn danger" onclick="handleResetAll()">🗑️ 전체 초기화</button>
+      </div>
     </div>
+
+    <!-- User management -->
+    <div class="admin-card">
+      <div class="admin-card-title">👥 회원 관리</div>
+      <div class="user-list" id="user-list">
+        <div style="color:var(--sub);text-align:center;padding:20px">로딩 중...</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -585,11 +675,14 @@ select.field-input{cursor:pointer}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore, collection, addDoc, getDocs, doc,
-  updateDoc, deleteDoc, setDoc, getDoc, query, orderBy
+  updateDoc, deleteDoc, setDoc, getDoc, query, orderBy, where,
+  onSnapshot, serverTimestamp, increment, writeBatch
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  signOut, onAuthStateChanged
+  signOut, onAuthStateChanged, deleteUser, reauthenticateWithCredential,
+  EmailAuthProvider, browserLocalPersistence, browserSessionPersistence,
+  setPersistence
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // ── Firebase ──
@@ -609,6 +702,9 @@ const auth = getAuth(fbApp);
 const CLOUD = "dbljkloal";
 const PRESET = "Everything";
 
+// ── Admin password ──
+const ADMIN_PW = "2026";
+
 // ── Grade meta ──
 const GRADE_META = {
   SSR: { color: "#FFD700", glow: "glow-ssr", bg: "#FFD70022" },
@@ -616,176 +712,221 @@ const GRADE_META = {
   R:   { color: "#60A5FA", glow: "glow-r",   bg: "#60A5FA22" },
   N:   { color: "#94A3B8", glow: "glow-n",   bg: "#94A3B822" },
 };
+const GRADE_ORDER = { SSR:0, SR:1, R:2, N:3 };
 
 // ── State ──
 let products = [];
-let settings = { maxPerUser: 0, title: "IDOL KUJI", subtitle: "당신의 운명을 뽑아보세요", totalSlots: 30 };
+let settings = {
+  title: "IDOL KUJI",
+  subtitle: "당신의 운명을 뽑아보세요",
+  price: 3000,
+  queueMax: 10,
+  notice: ""
+};
 let userDraws = [];
-let currentResults = [];
+let currentUser = null;
+let userId = null;
+let userProfile = null;  // { points, warnings, email, ... }
+let isAdmin = false;
+let isAuthMode = "login";
 let editId = null;
 let currentImageUrl = "";
 let isDrawing = false;
-let isAdmin = false;
-const ADMIN_PW = "2026";
-
-// 뽑기판 상태
-let selectedSlots = new Set();  // 선택한 슬롯 인덱스
-let drawnSlots = new Set();     // 이미 뽑은 슬롯 인덱스
+let isBoardOpen = false;
+let selectedSlots = new Set();
+let drawnSlots = new Set();  // for current session
+let sessionDrawnCount = 0;   // how many slots used in current session
+let totalSlots = 200;
+let sessionStartSlot = 0;    // offset for current board reset cycle
+let adminMsgTargetUid = null;
+let adminMsgTargetEmail = null;
+let queueUnsub = null;
 
 // ── Auth state ──
-let currentUser = null;
-let userId = null;
-let isAuthMode = "login"; // "login" | "signup"
-
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   if (user) {
     userId = user.uid;
     document.getElementById("user-email-badge").textContent = user.email.split("@")[0];
     document.getElementById("user-email-badge").style.display = "";
+    document.getElementById("point-badge").style.display = "";
     document.getElementById("login-btn").style.display = "none";
-    document.getElementById("user-logout-btn").style.display = "";
+    // Load user profile
+    await ensureUserProfile(user);
+    await loadAll();
+    setupInboxListener();
   } else {
-    // 비로그인 시 anonymous ID
-    userId = localStorage.getItem("kuji_uid");
-    if (!userId) {
-      userId = `anon_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-      localStorage.setItem("kuji_uid", userId);
-    }
+    userId = null;
+    userProfile = null;
+    userDraws = [];
     document.getElementById("user-email-badge").style.display = "none";
+    document.getElementById("point-badge").style.display = "none";
     document.getElementById("login-btn").style.display = "";
-    document.getElementById("user-logout-btn").style.display = "none";
+    await loadAll();
   }
-  await loadAll();
   document.getElementById("loading").style.display = "none";
   renderDrawTab();
   renderCollectionTab();
+  renderMyPage();
   if (isAdmin) renderAdminTab();
   switchTab("draw");
 });
 
-// ── Zoom 방지 ──
-let lastTouchEnd = 0;
-document.addEventListener("touchend", (e) => {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) e.preventDefault();
-  lastTouchEnd = now;
-}, { passive: false });
-document.addEventListener("gesturestart", e => e.preventDefault());
-document.addEventListener("gesturechange", e => e.preventDefault());
-
-// ── Expose globals ──
-window.switchTab = switchTab;
-window.toggleTheme = toggleTheme;
-window.showAdminLogin = showAdminLogin;
-window.doAdminLogin = doAdminLogin;
-window.adminLogout = adminLogout;
-window.showLoginModal = showLoginModal;
-window.toggleAuthMode = toggleAuthMode;
-window.doAuth = doAuth;
-window.userLogout = userLogout;
-window.handleDraw = handleDraw;
-window.handleResetStock = handleResetStock;
-window.handleResetAll = handleResetAll;
-window.saveSettings = saveSettings;
-window.saveProduct = saveProduct;
-window.cancelEdit = cancelEdit;
-window.clearImage = clearImage;
-window.handleImageUpload = handleImageUpload;
-window.editProduct = editProduct;
-window.deleteProduct = deleteProduct;
-
-// ── Sound ──
-function playSound(type) {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (type === "select") {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.setValueAtTime(660, ctx.currentTime);
-      o.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.05);
-      g.gain.setValueAtTime(0.15, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-      o.start(); o.stop(ctx.currentTime + 0.12);
-    } else if (type === "deselect") {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.setValueAtTime(440, ctx.currentTime);
-      o.frequency.exponentialRampToValueAtTime(330, ctx.currentTime + 0.07);
-      g.gain.setValueAtTime(0.12, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
-      o.start(); o.stop(ctx.currentTime + 0.1);
-    } else if (type === "open") {
-      // 두근두근 효과음
-      [0, 0.08, 0.16].forEach((t, i) => {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = "sine";
-        o.frequency.setValueAtTime(300 + i * 120, ctx.currentTime + t);
-        g.gain.setValueAtTime(0.2, ctx.currentTime + t);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.12);
-        o.start(ctx.currentTime + t);
-        o.stop(ctx.currentTime + t + 0.12);
-      });
-    } else if (type === "reveal") {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.type = "sine";
-      o.frequency.setValueAtTime(500, ctx.currentTime);
-      o.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.2);
-      g.gain.setValueAtTime(0.25, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-      o.start(); o.stop(ctx.currentTime + 0.3);
-    } else if (type === "ssr") {
-      // 황금 SSR 효과음
-      [0,0.1,0.2,0.3].forEach((t,i) => {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = "sine";
-        const freqs = [523,659,784,1047];
-        o.frequency.setValueAtTime(freqs[i], ctx.currentTime + t);
-        g.gain.setValueAtTime(0.2, ctx.currentTime + t);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.15);
-        o.start(ctx.currentTime + t);
-        o.stop(ctx.currentTime + t + 0.15);
-      });
-    }
-  } catch(e) { /* 사운드 실패는 무시 */ }
+async function ensureUserProfile(user) {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      email: user.email,
+      points: 0,
+      warnings: 0,
+      createdAt: Date.now()
+    });
+    userProfile = { points: 0, warnings: 0, email: user.email };
+  } else {
+    userProfile = snap.data();
+  }
+  updatePointBadge();
 }
 
-// ── Helpers ──
-function weightedDraw(items) {
-  const pool = [];
-  items.forEach(item => {
-    const slots = item.remaining !== undefined ? item.remaining : (item.count || 1);
-    if (slots <= 0) return;
-    const w = Math.round((item.rate || 1) * 10);
-    for (let i = 0; i < w; i++) pool.push(item);
+function updatePointBadge() {
+  if (!userProfile) return;
+  document.getElementById("point-badge").textContent = `💎 ${(userProfile.points || 0).toLocaleString()}P`;
+  document.getElementById("my-points").textContent = `${(userProfile.points || 0).toLocaleString()}P`;
+}
+
+// ── Inbox listener ──
+let inboxUnsub = null;
+function setupInboxListener() {
+  if (!userId) return;
+  if (inboxUnsub) inboxUnsub();
+  const q = query(collection(db, "users", userId, "messages"), orderBy("sentAt", "desc"));
+  inboxUnsub = onSnapshot(q, (snap) => {
+    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderInbox(msgs);
   });
-  if (!pool.length) return null;
-  return pool[Math.floor(Math.random() * pool.length)];
 }
 
-// ── Load all data ──
+function renderInbox(msgs) {
+  const card = document.getElementById("inbox-card");
+  const list = document.getElementById("inbox-list");
+  if (!msgs.length) { card.style.display = "none"; return; }
+  card.style.display = "";
+  list.innerHTML = msgs.map(m => `
+    <div class="msg-row">
+      <div class="msg-row-from">📨 관리자</div>
+      <div class="msg-row-text">${escHtml(m.text)}</div>
+      <div class="msg-row-time">${new Date(m.sentAt).toLocaleString("ko-KR")}</div>
+    </div>
+  `).join("");
+}
+
+// ── Load data ──
 async function loadAll() {
   try {
-    const [pSnap, sSnap, dSnap] = await Promise.all([
+    const [pSnap, sSnap] = await Promise.all([
       getDocs(query(collection(db, "products"), orderBy("grade"))),
-      getDoc(doc(db, "settings", "global")),
-      getDocs(query(collection(db, "draws", userId, "items"), orderBy("drawnAt", "desc")))
+      getDoc(doc(db, "settings", "global"))
     ]);
     products = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     if (sSnap.exists()) Object.assign(settings, sSnap.data());
-    userDraws = dSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    if (userId) {
+      const dSnap = await getDocs(query(collection(db, "draws", userId, "items"), orderBy("drawnAt", "desc")));
+      userDraws = dSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      // Reload user profile (points may have changed)
+      const uSnap = await getDoc(doc(db, "users", userId));
+      if (uSnap.exists()) { userProfile = uSnap.data(); updatePointBadge(); }
+    }
+    // Load session state (drawnSlots persisted per session in Firestore)
+    if (userId) await loadSessionState();
   } catch(e) {
     console.error("loadAll error:", e);
-    alert("데이터를 불러오지 못했어요.\n사유: " + (e && e.message ? e.message : e));
   }
+}
+
+// ── Session state ──
+async function loadSessionState() {
+  try {
+    const sRef = doc(db, "sessions", "global");
+    const sSnap = await getDoc(sRef);
+    if (sSnap.exists()) {
+      const d = sSnap.data();
+      const drawn = d.drawnSlots || [];
+      drawnSlots = new Set(drawn);
+      // If all 200 slots drawn → reset
+      if (drawnSlots.size >= totalSlots) {
+        await resetSession();
+      }
+    } else {
+      // Init session
+      await setDoc(sRef, { drawnSlots: [], sessionNum: 1 });
+      drawnSlots = new Set();
+    }
+  } catch(e) { console.warn("session load err", e); }
+}
+
+async function saveSessionState() {
+  try {
+    const sRef = doc(db, "sessions", "global");
+    await updateDoc(sRef, { drawnSlots: [...drawnSlots] });
+  } catch(e) {}
+}
+
+async function resetSession() {
+  const sRef = doc(db, "sessions", "global");
+  const snap = await getDoc(sRef);
+  const num = snap.exists() ? (snap.data().sessionNum || 1) + 1 : 1;
+  await setDoc(sRef, { drawnSlots: [], sessionNum: num });
+  drawnSlots = new Set();
+  selectedSlots = new Set();
+  // Reset remaining stock to full
+  const pDocs = await getDocs(collection(db, "products"));
+  const batch = writeBatch(db);
+  pDocs.docs.forEach(d => batch.update(doc(db, "products", d.id), { remaining: d.data().count }));
+  await batch.commit();
+  await loadAll();
+}
+
+async function getSessionNum() {
+  try {
+    const snap = await getDoc(doc(db, "sessions", "global"));
+    return snap.exists() ? (snap.data().sessionNum || 1) : 1;
+  } catch { return 1; }
+}
+
+// ── Queue system ──
+async function checkQueue() {
+  // Check if someone else is currently "active"
+  try {
+    const qSnap = await getDoc(doc(db, "queue", "state"));
+    if (!qSnap.exists()) return { active: false };
+    const d = qSnap.data();
+    const now = Date.now();
+    // If activeUntil is in future and not current user
+    if (d.activeUid && d.activeUid !== userId && d.activeUntil > now) {
+      return { active: true, activeUid: d.activeUid };
+    }
+    return { active: false };
+  } catch { return { active: false }; }
+}
+
+async function claimSession() {
+  // Claim 30 minutes of active time
+  const until = Date.now() + 30 * 60 * 1000;
+  await setDoc(doc(db, "queue", "state"), { activeUid: userId, activeUntil: until });
+}
+
+async function requestQueue() {
+  if (!userId) { alert("로그인이 필요해요"); return; }
+  try {
+    await addDoc(collection(db, "queue", "list", "entries"), {
+      uid: userId,
+      email: currentUser.email,
+      requestedAt: Date.now()
+    });
+    alert("대기 신청이 완료됐어요!\n차례가 되면 알려드릴게요 😊");
+  } catch(e) { alert("대기 신청 실패: " + e.message); }
 }
 
 // ── Theme ──
@@ -795,125 +936,48 @@ function toggleTheme() {
   document.body.className = isDark ? "" : "light";
   document.getElementById("theme-btn").textContent = isDark ? "☀️" : "🌙";
 }
+window.toggleTheme = toggleTheme;
 
 // ── Tab switch ──
 function switchTab(name) {
-  ["draw","collection","admin"].forEach(t => {
-    document.getElementById(`tab-${t}`).style.display = "none";
+  ["draw","collection","mypage","admin"].forEach(t => {
+    const el = document.getElementById(`tab-${t}`);
+    if (el) el.style.display = "none";
     const nb = document.getElementById(`nav-${t}`);
     if (nb) nb.className = "nav-btn";
   });
-  document.getElementById(`tab-${name}`).style.display = "block";
+  const tabEl = document.getElementById(`tab-${name}`);
+  if (tabEl) tabEl.style.display = "block";
   const nb = document.getElementById(`nav-${name}`);
   if (nb) nb.className = name === "admin" ? "nav-btn admin-active" : "nav-btn active";
   if (name === "collection") renderCollectionTab();
+  if (name === "mypage") renderMyPage();
   if (name === "admin") renderAdminTab();
 }
-
-// ── User Auth ──
-function showLoginModal() {
-  isAuthMode = "login";
-  updateAuthModal();
-  document.getElementById("auth-modal").style.display = "flex";
-  document.getElementById("auth-error").textContent = "";
-  setTimeout(() => document.getElementById("auth-email").focus(), 100);
-}
-function updateAuthModal() {
-  const isLogin = isAuthMode === "login";
-  document.getElementById("auth-modal-title").textContent = isLogin ? "로그인" : "회원가입";
-  document.getElementById("auth-modal-sub").textContent = isLogin ? "이메일과 비밀번호로 로그인하세요" : "새 계정을 만들어보세요";
-  document.getElementById("auth-submit-btn").textContent = isLogin ? "로그인" : "가입하기";
-  document.getElementById("auth-toggle-btn").textContent = isLogin ? "회원가입" : "이미 계정이 있어요";
-  document.getElementById("auth-pw2").style.display = isLogin ? "none" : "";
-  document.getElementById("auth-pw").autocomplete = isLogin ? "current-password" : "new-password";
-}
-function toggleAuthMode() {
-  isAuthMode = isAuthMode === "login" ? "signup" : "login";
-  updateAuthModal();
-  document.getElementById("auth-error").textContent = "";
-}
-async function doAuth() {
-  const email = document.getElementById("auth-email").value.trim();
-  const pw = document.getElementById("auth-pw").value;
-  const pw2 = document.getElementById("auth-pw2").value;
-  const errEl = document.getElementById("auth-error");
-  errEl.textContent = "";
-  if (!email || !pw) { errEl.textContent = "이메일과 비밀번호를 입력하세요"; return; }
-  if (isAuthMode === "signup" && pw !== pw2) { errEl.textContent = "비밀번호가 일치하지 않아요"; return; }
-  if (isAuthMode === "signup" && pw.length < 6) { errEl.textContent = "비밀번호는 6자 이상이어야 해요"; return; }
-  const btn = document.getElementById("auth-submit-btn");
-  btn.disabled = true; btn.textContent = "처리 중...";
-  try {
-    if (isAuthMode === "login") {
-      await signInWithEmailAndPassword(auth, email, pw);
-    } else {
-      await createUserWithEmailAndPassword(auth, email, pw);
-    }
-    document.getElementById("auth-modal").style.display = "none";
-    document.getElementById("auth-email").value = "";
-    document.getElementById("auth-pw").value = "";
-    document.getElementById("auth-pw2").value = "";
-  } catch(e) {
-    const msgs = {
-      "auth/user-not-found": "존재하지 않는 계정이에요",
-      "auth/wrong-password": "비밀번호가 틀렸어요",
-      "auth/email-already-in-use": "이미 사용 중인 이메일이에요",
-      "auth/invalid-email": "올바른 이메일 형식이 아니에요",
-      "auth/weak-password": "비밀번호가 너무 약해요",
-      "auth/invalid-credential": "이메일 또는 비밀번호가 올바르지 않아요",
-    };
-    errEl.textContent = msgs[e.code] || e.message;
-  }
-  btn.disabled = false;
-  btn.textContent = isAuthMode === "login" ? "로그인" : "가입하기";
-}
-async function userLogout() {
-  await signOut(auth);
-}
-
-// ── Admin Auth ──
-function showAdminLogin() {
-  document.getElementById("admin-modal").style.display = "flex";
-  setTimeout(() => document.getElementById("admin-pw-input").focus(), 100);
-}
-function doAdminLogin() {
-  const pw = document.getElementById("admin-pw-input").value;
-  if (pw === ADMIN_PW) {
-    isAdmin = true;
-    document.getElementById("admin-modal").style.display = "none";
-    document.getElementById("admin-pw-input").value = "";
-    document.getElementById("nav-admin").style.display = "";
-    document.getElementById("admin-login-btn").style.display = "none";
-    document.getElementById("admin-logout-btn").style.display = "";
-    renderAdminTab();
-    switchTab("admin");
-  } else { alert("비밀번호가 틀렸어요"); }
-}
-function adminLogout() {
-  isAdmin = false;
-  document.getElementById("nav-admin").style.display = "none";
-  document.getElementById("admin-login-btn").style.display = "";
-  document.getElementById("admin-logout-btn").style.display = "none";
-  const adminVisible = document.getElementById("tab-admin").style.display !== "none";
-  if (adminVisible) switchTab("draw");
-}
+window.switchTab = switchTab;
 
 // ── Render draw tab ──
-function renderDrawTab() {
+async function renderDrawTab() {
   document.getElementById("kuji-title").textContent = settings.title;
   document.getElementById("kuji-subtitle").textContent = settings.subtitle;
-  document.getElementById("s-title").value = settings.title;
-  document.getElementById("s-subtitle").value = settings.subtitle;
-  document.getElementById("s-max").value = settings.maxPerUser || 0;
-  document.getElementById("s-slots").value = settings.totalSlots || 30;
+  document.getElementById("kuji-price-display").textContent = (settings.price || 0).toLocaleString();
+  if (document.getElementById("s-title")) {
+    document.getElementById("s-title").value = settings.title;
+    document.getElementById("s-subtitle").value = settings.subtitle;
+    document.getElementById("s-price").value = settings.price || 0;
+    document.getElementById("s-queue-max").value = settings.queueMax || 10;
+  }
 
-  const badge = document.getElementById("draw-limit-badge");
-  if (settings.maxPerUser > 0) {
-    badge.style.display = "";
-    document.getElementById("drawn-count").textContent = userDraws.length;
-    document.getElementById("max-draws").textContent = settings.maxPerUser;
-  } else badge.style.display = "none";
+  // Notice
+  const noticeBanner = document.getElementById("global-notice");
+  if (settings.notice) {
+    noticeBanner.style.display = "flex";
+    document.getElementById("global-notice-text").textContent = settings.notice;
+  } else {
+    noticeBanner.style.display = "none";
+  }
 
+  // Grade grid
   const gg = document.getElementById("grade-grid");
   gg.innerHTML = "";
   Object.entries(GRADE_META).forEach(([g, m]) => {
@@ -926,31 +990,132 @@ function renderDrawTab() {
     gg.appendChild(el);
   });
 
+  // Products preview
+  const pg = document.getElementById("products-preview");
+  pg.innerHTML = "";
+  const sortedProducts = [...products].sort((a,b) => (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9));
+  sortedProducts.forEach(p => {
+    const meta = GRADE_META[p.grade] || GRADE_META.N;
+    const remaining = p.remaining ?? p.count;
+    const el = document.createElement("div");
+    el.className = "prod-card";
+    el.style.border = `1px solid ${meta.color}33`;
+    const imgHtml = p.imageUrl
+      ? `<img class="prod-card-img" src="${p.imageUrl}" alt="${p.name}" loading="lazy"/>`
+      : `<div class="prod-card-no-img" style="background:${meta.color}11">🎁</div>`;
+    el.innerHTML = `
+      <div class="prod-card-img-wrap">${imgHtml}</div>
+      ${remaining <= 0 ? `<div class="prod-sold-badge">SOLD OUT</div>` : ""}
+      <div class="prod-card-body">
+        <div class="prod-card-grade" style="color:${meta.color}">${p.grade}</div>
+        <div class="prod-card-name">${p.name}</div>
+        <div class="prod-card-remain">재고 ${remaining}/${p.count}</div>
+      </div>
+    `;
+    pg.appendChild(el);
+  });
+
+  // Session info
+  const remain = totalSlots - drawnSlots.size;
+  document.getElementById("remain-slots-main").textContent = remain;
+  const sNum = await getSessionNum();
+  document.getElementById("session-num-display").textContent = sNum;
+
+  // Enter button
+  const btn = document.getElementById("enter-board-btn");
+  const hint = document.getElementById("enter-btn-hint");
+  if (!userId) {
+    btn.disabled = true;
+    hint.textContent = "로그인 후 이용 가능합니다";
+  } else {
+    btn.disabled = false;
+    hint.textContent = `현재 ${remain}개 슬롯 남음`;
+  }
+
+  // Board if open
+  if (isBoardOpen) renderKujiBoard();
+}
+
+// ── Enter / exit board ──
+async function enterBoard() {
+  if (!userId) { showLoginModal(); return; }
+
+  // Check queue
+  const qState = await checkQueue();
+  if (qState.active) {
+    document.getElementById("queue-banner").style.display = "block";
+    document.getElementById("queue-banner-sub").textContent = "현재 다른 분이 진행 중입니다. 대기를 신청하면 순서가 되면 알려드려요.";
+    return;
+  }
+  // Claim session
+  await claimSession();
+
+  isBoardOpen = true;
+  document.getElementById("board-view").style.display = "block";
+  document.getElementById("enter-board-btn").style.display = "none";
+  document.querySelector(".enter-board-wrap > div").style.display = "none";
+  document.getElementById("results-area").style.display = "none";
+  selectedSlots = new Set();
   renderKujiBoard();
 }
 
-// ── 뽑기판 렌더 ──
-function renderKujiBoard() {
-  const total = settings.totalSlots || 30;
+async function exitBoard() {
+  isBoardOpen = false;
+  document.getElementById("board-view").style.display = "none";
+  document.getElementById("enter-board-btn").style.display = "";
+  document.querySelector(".enter-board-wrap > div").style.display = "";
+  selectedSlots = new Set();
+}
+window.exitBoard = exitBoard;
+window.enterBoard = enterBoard;
+
+// ── Render board ──
+async function renderKujiBoard() {
+  const remain = totalSlots - drawnSlots.size;
+  document.getElementById("board-remain-slots").textContent = remain;
+  const sNum = await getSessionNum();
+  document.getElementById("board-session-num").textContent = sNum;
+
+  // Queue max limit warn
+  const hasQueue = await checkQueueHasOthers();
+  const limitWarn = document.getElementById("board-limit-warn");
+  const qMax = settings.queueMax || 10;
+  if (hasQueue) {
+    limitWarn.style.display = "";
+    limitWarn.textContent = `대기 있음: 최대 ${qMax}판`;
+  } else {
+    limitWarn.style.display = "none";
+  }
+
   const grid = document.getElementById("kujiboard-grid");
   grid.innerHTML = "";
-  for (let i = 0; i < total; i++) {
+  for (let i = 0; i < totalSlots; i++) {
     const slot = document.createElement("div");
-    slot.className = "slot" + (drawnSlots.has(i) ? " drawn" : selectedSlots.has(i) ? " selected" : "");
+    const isDrawn = drawnSlots.has(i);
+    const isSel = selectedSlots.has(i);
+    slot.className = "slot" + (isDrawn ? " drawn" : isSel ? " selected" : "");
     slot.dataset.idx = i;
-    slot.innerHTML = `<span class="slot-num">${String(i+1).padStart(2,"0")}</span>`;
-    if (!drawnSlots.has(i)) {
-      slot.onclick = () => toggleSlot(i);
-    }
+    slot.innerHTML = `<span class="slot-num">${String(i+1).padStart(3,"0")}</span>`;
+    if (!isDrawn) slot.onclick = () => toggleSlot(i);
     grid.appendChild(slot);
   }
   updateOpenBtn();
+}
+
+async function checkQueueHasOthers() {
+  try {
+    const snap = await getDocs(collection(db, "queue", "list", "entries"));
+    return snap.docs.some(d => d.data().uid !== userId);
+  } catch { return false; }
 }
 
 function toggleSlot(idx) {
   if (drawnSlots.has(idx)) return;
   const avail = products.filter(p => (p.remaining ?? p.count) > 0);
   if (!avail.length) { alert("남은 상품이 없어요!"); return; }
+
+  // Check queue max limit
+  // (only enforce at purchase time in handleDraw)
   if (selectedSlots.has(idx)) {
     selectedSlots.delete(idx);
     playSound("deselect");
@@ -958,10 +1123,8 @@ function toggleSlot(idx) {
     selectedSlots.add(idx);
     playSound("select");
   }
-  const slotEl = document.querySelector(`.slot[data-idx="${idx}"]`);
-  if (slotEl) {
-    slotEl.className = "slot" + (selectedSlots.has(idx) ? " selected" : "");
-  }
+  const slotEl = document.querySelector(`#kujiboard-grid .slot[data-idx="${idx}"]`);
+  if (slotEl) slotEl.className = "slot" + (selectedSlots.has(idx) ? " selected" : "");
   updateOpenBtn();
 }
 
@@ -969,27 +1132,42 @@ function updateOpenBtn() {
   const cnt = selectedSlots.size;
   const btn = document.getElementById("open-btn");
   const label = document.getElementById("open-btn-label");
-  const selLabel = document.getElementById("selected-count-label");
-  selLabel.textContent = cnt;
+  document.getElementById("selected-count-label").textContent = cnt;
+  const price = (settings.price || 0) * cnt;
   if (cnt === 0) {
     btn.disabled = true;
     label.textContent = "슬롯을 선택해주세요";
+    document.getElementById("open-btn-hint").textContent = "원하는 슬롯을 선택하세요";
   } else {
     btn.disabled = false;
-    label.textContent = `${cnt}개 오픈하기`;
+    label.textContent = `${cnt}개 오픈 · ${price.toLocaleString()}P`;
+    document.getElementById("open-btn-hint").textContent = `포인트 ${price.toLocaleString()}P 차감됩니다`;
   }
 }
 
 // ── Draw ──
 async function handleDraw() {
-  if (isDrawing) return;
+  if (isDrawing || !userId) return;
   const drawCount = selectedSlots.size;
   if (drawCount === 0) return;
 
-  if (settings.maxPerUser > 0 && userDraws.length + drawCount > settings.maxPerUser) {
-    alert(`최대 ${settings.maxPerUser}번 뽑을 수 있어요. 남은 횟수: ${settings.maxPerUser - userDraws.length}`);
+  // Points check
+  const cost = (settings.price || 0) * drawCount;
+  const pts = userProfile?.points || 0;
+  if (pts < cost) {
+    alert(`포인트가 부족해요!\n필요: ${cost.toLocaleString()}P · 보유: ${pts.toLocaleString()}P\n\n포인트를 충전해주세요.`);
+    showPointModal();
     return;
   }
+
+  // Queue limit check
+  const hasQueue = await checkQueueHasOthers();
+  const qMax = settings.queueMax || 10;
+  if (hasQueue && drawCount > qMax) {
+    alert(`대기가 있을 때는 최대 ${qMax}개까지만 선택할 수 있어요.`);
+    return;
+  }
+
   const avail = products.filter(p => (p.remaining ?? p.count) > 0);
   if (!avail.length) { alert("남은 상품이 없어요!"); return; }
 
@@ -998,13 +1176,11 @@ async function handleDraw() {
   btn.disabled = true;
   btn.innerHTML = `<span class="spinner"></span> 오픈 중...`;
   document.getElementById("results-area").style.display = "none";
-
   playSound("open");
 
-  // 슬롯 spinning 효과
   const slotsToOpen = [...selectedSlots];
   slotsToOpen.forEach(idx => {
-    const el = document.querySelector(`.slot[data-idx="${idx}"]`);
+    const el = document.querySelector(`#kujiboard-grid .slot[data-idx="${idx}"]`);
     if (el) el.className = "slot spinning";
   });
 
@@ -1025,13 +1201,18 @@ async function handleDraw() {
     used[pick.id] = (used[pick.id] || 0) + 1;
   }
 
-  // Update Firestore
-  await Promise.all(Object.entries(used).map(([id, cnt]) => {
+  // Update Firestore: products stock
+  const batch = writeBatch(db);
+  Object.entries(used).forEach(([id, cnt]) => {
     const p = products.find(x => x.id === id);
     const rem = (p.remaining ?? p.count) - cnt;
-    return updateDoc(doc(db, "products", id), { remaining: rem });
-  }));
+    batch.update(doc(db, "products", id), { remaining: Math.max(0, rem) });
+  });
+  // Deduct points
+  batch.update(doc(db, "users", userId), { points: increment(-cost) });
+  await batch.commit();
 
+  // Save draws
   await Promise.all(drawn.map(item =>
     addDoc(collection(db, "draws", userId, "items"), {
       productId: item.id, name: item.name, grade: item.grade,
@@ -1040,11 +1221,26 @@ async function handleDraw() {
     })
   ));
 
-  // 뽑은 슬롯으로 표시
+  // Save point history
+  await addDoc(collection(db, "users", userId, "pointHistory"), {
+    amount: -cost, reason: `쿠지 ${drawCount}개 뽑기`, at: Date.now()
+  });
+
+  // Mark slots as drawn (global session)
   slotsToOpen.forEach(idx => drawnSlots.add(idx));
   selectedSlots.clear();
+  await saveSessionState();
 
-  currentResults = drawn;
+  // Auto new round if all drawn
+  if (drawnSlots.size >= totalSlots) {
+    setTimeout(async () => {
+      alert("🎉 200개 슬롯이 모두 소진됐어요! 새 판이 시작됩니다.");
+      await resetSession();
+      await loadAll();
+      renderDrawTab();
+    }, 2000);
+  }
+
   isDrawing = false;
   btn.innerHTML = `✦ <span id="open-btn-label">슬롯을 선택해주세요</span>`;
   btn.disabled = true;
@@ -1060,6 +1256,7 @@ async function handleDraw() {
   else if (hasRare) launchConfetti();
   else playSound("reveal");
 }
+window.handleDraw = handleDraw;
 
 function renderGradeGrid() {
   const gg = document.getElementById("grade-grid");
@@ -1083,7 +1280,7 @@ function renderResults(items) {
   grid.innerHTML = "";
 
   const n = items.length;
-  const cols = n <= 2 ? n : n <= 4 ? 2 : n <= 6 ? 3 : n <= 9 ? 3 : 4;
+  const cols = n <= 2 ? n : n <= 4 ? 2 : n <= 6 ? 3 : 4;
   grid.style.display = "grid";
   grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   grid.style.gap = "10px";
@@ -1094,35 +1291,31 @@ function renderResults(items) {
     const wrap = document.createElement("div");
     wrap.className = `kuji-card-wrap ${meta.glow}`;
 
-    // 카드 앞면 (relative sizer)
     const front = document.createElement("div");
-    front.className = "kuji-card-front-sizer";
-    front.style.background = `linear-gradient(160deg, ${meta.color}18, ${meta.bg})`;
+    front.className = "kuji-card-front";
+    front.style.background = `linear-gradient(160deg,${meta.color}18,${meta.bg})`;
     front.style.border = `1.5px solid ${meta.color}`;
     front.style.borderRadius = "14px";
     front.style.opacity = "0";
     front.style.transform = "scale(.9)";
-    front.style.transition = "opacity .3s ease, transform .3s ease";
+    front.style.transition = "opacity .3s ease,transform .3s ease";
+    front.style.position = "relative";
 
     const imgHtml = item.imageUrl
       ? `<img class="kuji-img" src="${item.imageUrl}" alt="${item.name}" loading="lazy"/>`
       : `<div class="kuji-no-img" style="background:rgba(0,0,0,.2)">🎁</div>`;
 
     front.innerHTML = `
-      <div style="position:relative">
-        <div class="grade-badge" style="background:${meta.color};color:#000">${item.grade}</div>
-        ${imgHtml}
-      </div>
+      <div class="grade-badge" style="background:${meta.color};color:#000">${item.grade}</div>
+      <div class="kuji-img-wrap">${imgHtml}</div>
       <div class="kuji-card-info" style="background:linear-gradient(160deg,${meta.color}18,${meta.bg})">
-        <div class="kuji-card-name" style="color:${meta.color}">${item.name}</div>
-        ${item.description ? `<div class="kuji-card-desc">${item.description}</div>` : ""}
+        <div class="kuji-card-name" style="color:${meta.color}">${escHtml(item.name)}</div>
+        ${item.description ? `<div class="kuji-card-desc">${escHtml(item.description)}</div>` : ""}
       </div>
     `;
-
     wrap.appendChild(front);
     grid.appendChild(wrap);
 
-    // 순차적 등장
     setTimeout(() => {
       front.style.opacity = "1";
       front.style.transform = "scale(1)";
@@ -1130,7 +1323,6 @@ function renderResults(items) {
     }, i * 150);
   });
 
-  // 요약
   const tagEl = document.getElementById("result-tags");
   tagEl.innerHTML = "";
   const counts = {};
@@ -1139,8 +1331,7 @@ function renderResults(items) {
     const m = GRADE_META[g] || GRADE_META.N;
     const t = document.createElement("div");
     t.className = "result-tag";
-    t.style.background = m.bg;
-    t.style.color = m.color;
+    t.style.background = m.bg; t.style.color = m.color;
     t.style.border = `1px solid ${m.color}44`;
     t.textContent = `${g} ×${c}`;
     tagEl.appendChild(t);
@@ -1151,6 +1342,15 @@ function renderResults(items) {
 
 // ── Collection ──
 function renderCollectionTab() {
+  if (!userId) {
+    document.getElementById("col-login-notice").style.display = "";
+    document.getElementById("col-empty").style.display = "none";
+    document.getElementById("col-content").style.display = "none";
+    document.getElementById("col-count").textContent = "";
+    return;
+  }
+  document.getElementById("col-login-notice").style.display = "none";
+
   if (!userDraws.length) {
     document.getElementById("col-empty").style.display = "";
     document.getElementById("col-content").style.display = "none";
@@ -1161,7 +1361,7 @@ function renderCollectionTab() {
   document.getElementById("col-content").style.display = "";
   document.getElementById("col-count").textContent = `총 ${userDraws.length}개 보유`;
 
-  // 등급 통계
+  // Stats
   const stats = document.getElementById("col-stats");
   stats.innerHTML = "";
   const counts = {};
@@ -1170,195 +1370,334 @@ function renderCollectionTab() {
     if (!counts[g]) return;
     const t = document.createElement("div");
     t.className = "col-stat-tag";
-    t.style.background = m.bg;
-    t.style.color = m.color;
+    t.style.background = m.bg; t.style.color = m.color;
     t.style.border = `1px solid ${m.color}44`;
     t.textContent = `${g} ×${counts[g]}`;
     stats.appendChild(t);
   });
 
-  // 아이템 묶음 (같은 productId끼리 카운트)
+  // Group by productId
   const grouped = {};
   userDraws.forEach(d => {
     const key = d.productId || d.name;
-    if (!grouped[key]) {
-      grouped[key] = { ...d, qty: 0 };
-    }
+    if (!grouped[key]) grouped[key] = { ...d, qty: 0, firstAt: d.drawnAt };
     grouped[key].qty++;
+    if (d.drawnAt > grouped[key].drawnAt) grouped[key].drawnAt = d.drawnAt;
+    if (d.drawnAt < grouped[key].firstAt) grouped[key].firstAt = d.drawnAt;
   });
+
+  const sortKey = document.getElementById("col-sort").value;
+  let arr = Object.values(grouped);
+  if (sortKey === "grade-asc") arr.sort((a,b) => (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9));
+  else if (sortKey === "grade-desc") arr.sort((a,b) => (GRADE_ORDER[b.grade]??9)-(GRADE_ORDER[a.grade]??9));
+  else if (sortKey === "date-desc") arr.sort((a,b) => b.drawnAt-a.drawnAt);
+  else if (sortKey === "date-asc") arr.sort((a,b) => a.firstAt-b.firstAt);
+  else if (sortKey === "name-asc") arr.sort((a,b) => a.name.localeCompare(b.name,"ko"));
+  else if (sortKey === "count-desc") arr.sort((a,b) => b.qty-a.qty);
 
   const grid = document.getElementById("col-grid");
   grid.innerHTML = "";
-  // 등급 우선 정렬
-  const gradeOrder = { SSR:0, SR:1, R:2, N:3 };
-  Object.values(grouped)
-    .sort((a,b) => (gradeOrder[a.grade]??9) - (gradeOrder[b.grade]??9))
-    .forEach(item => {
-      const meta = GRADE_META[item.grade] || GRADE_META.N;
-      const el = document.createElement("div");
-      el.className = "col-item";
-      el.style.border = `1px solid ${meta.color}44`;
-      const imgHtml = item.imageUrl
-        ? `<img class="col-item-img" src="${item.imageUrl}" alt="${item.name}" loading="lazy"/>`
-        : `<div class="col-item-no-img" style="background:${meta.color}18">🎁</div>`;
-      el.innerHTML = `
-        ${imgHtml}
-        ${item.qty > 1 ? `<div class="col-count-badge">×${item.qty}</div>` : ""}
-        <div class="col-item-body">
-          <div class="col-item-grade" style="color:${meta.color}">${item.grade}</div>
-          <div class="col-item-name">${item.name}</div>
-        </div>
-      `;
-      grid.appendChild(el);
+  arr.forEach(item => {
+    const meta = GRADE_META[item.grade] || GRADE_META.N;
+    const el = document.createElement("div");
+    el.className = "col-item";
+    el.style.border = `1px solid ${meta.color}44`;
+    const imgHtml = item.imageUrl
+      ? `<img class="col-item-img" src="${item.imageUrl}" alt="${item.name}" loading="lazy"/>`
+      : `<div class="col-item-no-img" style="background:${meta.color}18">🎁</div>`;
+    const dateStr = item.drawnAt ? new Date(item.drawnAt).toLocaleDateString("ko-KR") : "";
+    el.innerHTML = `
+      <div class="col-item-img-wrap">${imgHtml}</div>
+      ${item.qty > 1 ? `<div class="col-count-badge">×${item.qty}</div>` : ""}
+      <div class="col-item-body">
+        <div class="col-item-grade" style="color:${meta.color}">${item.grade}</div>
+        <div class="col-item-name">${escHtml(item.name)}</div>
+        <div class="col-item-date">${dateStr}</div>
+      </div>
+    `;
+    grid.appendChild(el);
+  });
+}
+window.renderCollectionTab = renderCollectionTab;
+
+// ── My Page ──
+function renderMyPage() {
+  if (!userId) {
+    document.getElementById("mypage-login-notice").style.display = "";
+    document.getElementById("mypage-content").style.display = "none";
+    return;
+  }
+  document.getElementById("mypage-login-notice").style.display = "none";
+  document.getElementById("mypage-content").style.display = "";
+  document.getElementById("my-email").textContent = currentUser?.email || "-";
+  document.getElementById("my-points").textContent = `${(userProfile?.points || 0).toLocaleString()}P`;
+  const warns = userProfile?.warnings || 0;
+  document.getElementById("my-warn").innerHTML = warns > 0
+    ? `${warns}회 <span class="warn-badge">경고</span>`
+    : "없음";
+  document.getElementById("my-draws").textContent = `${userDraws.length}회`;
+}
+
+// ── Point modal ──
+function showPointModal() {
+  if (!userId) { showLoginModal(); return; }
+  document.getElementById("point-modal-balance").textContent = `보유: ${(userProfile?.points || 0).toLocaleString()}P`;
+  document.getElementById("point-error").textContent = "";
+  document.getElementById("point-success").textContent = "";
+  document.getElementById("point-amount").value = "";
+  loadPointHistory();
+  document.getElementById("point-modal").style.display = "flex";
+}
+window.showPointModal = showPointModal;
+
+async function loadPointHistory() {
+  const hist = document.getElementById("point-history");
+  hist.innerHTML = '<div style="color:var(--sub);font-size:.78rem;text-align:center">로딩 중...</div>';
+  try {
+    const snap = await getDocs(query(
+      collection(db, "users", userId, "pointHistory"),
+      orderBy("at", "desc")
+    ));
+    const items = snap.docs.map(d => d.data());
+    if (!items.length) { hist.innerHTML = '<div style="color:var(--sub);font-size:.78rem;text-align:center">내역 없음</div>'; return; }
+    hist.innerHTML = items.slice(0, 20).map(i => `
+      <div class="point-item">
+        <span>${escHtml(i.reason || "-")}</span>
+        <span class="${i.amount > 0 ? 'point-plus' : 'point-minus'}">${i.amount > 0 ? '+' : ''}${i.amount.toLocaleString()}P</span>
+      </div>
+    `).join("");
+  } catch { hist.innerHTML = ""; }
+}
+
+async function doChargePoint() {
+  const amt = parseInt(document.getElementById("point-amount").value);
+  const errEl = document.getElementById("point-error");
+  const sucEl = document.getElementById("point-success");
+  errEl.textContent = ""; sucEl.textContent = "";
+  if (!amt || amt < 1000) { errEl.textContent = "최소 1,000원 이상 입력해주세요"; return; }
+
+  // In a real system this would go through a payment gateway.
+  // For demo purposes, we credit directly.
+  try {
+    const batch = writeBatch(db);
+    batch.update(doc(db, "users", userId), { points: increment(amt) });
+    await batch.commit();
+    await addDoc(collection(db, "users", userId, "pointHistory"), {
+      amount: amt, reason: `포인트 충전`, at: Date.now()
     });
+    userProfile.points = (userProfile.points || 0) + amt;
+    updatePointBadge();
+    sucEl.textContent = `${amt.toLocaleString()}P 충전 완료!`;
+    document.getElementById("point-modal-balance").textContent = `보유: ${(userProfile.points).toLocaleString()}P`;
+    document.getElementById("point-amount").value = "";
+    loadPointHistory();
+    renderMyPage();
+  } catch(e) { errEl.textContent = "충전 실패: " + e.message; }
 }
+window.doChargePoint = doChargePoint;
 
-// ── Reset (재고만) ──
-async function handleResetStock() {
-  if (!confirm("재고만 초기화할까요? 뽑기 기록은 유지돼요.")) return;
+// ── Auth ──
+function showLoginModal() {
+  isAuthMode = "login";
+  updateAuthModal();
+  document.getElementById("auth-modal").style.display = "flex";
+  document.getElementById("auth-error").textContent = "";
+  setTimeout(() => document.getElementById("auth-email").focus(), 100);
+}
+window.showLoginModal = showLoginModal;
+
+function updateAuthModal() {
+  const isLogin = isAuthMode === "login";
+  document.getElementById("auth-modal-title").textContent = isLogin ? "로그인" : "회원가입";
+  document.getElementById("auth-modal-sub").textContent = isLogin ? "이메일과 비밀번호로 로그인하세요" : "새 계정을 만들어보세요";
+  document.getElementById("auth-submit-btn").textContent = isLogin ? "로그인" : "가입하기";
+  document.getElementById("auth-toggle-btn").textContent = isLogin ? "회원가입" : "이미 계정이 있어요";
+  document.getElementById("auth-pw2").style.display = isLogin ? "none" : "";
+  document.getElementById("remember-row").style.display = isLogin ? "" : "none";
+}
+function toggleAuthMode() {
+  isAuthMode = isAuthMode === "login" ? "signup" : "login";
+  updateAuthModal();
+  document.getElementById("auth-error").textContent = "";
+}
+window.toggleAuthMode = toggleAuthMode;
+
+async function doAuth() {
+  const email = document.getElementById("auth-email").value.trim();
+  const pw = document.getElementById("auth-pw").value;
+  const pw2 = document.getElementById("auth-pw2").value;
+  const remember = document.getElementById("auth-remember").checked;
+  const errEl = document.getElementById("auth-error");
+  errEl.textContent = "";
+  if (!email || !pw) { errEl.textContent = "이메일과 비밀번호를 입력하세요"; return; }
+  if (isAuthMode === "signup" && pw !== pw2) { errEl.textContent = "비밀번호가 일치하지 않아요"; return; }
+  if (isAuthMode === "signup" && pw.length < 6) { errEl.textContent = "비밀번호는 6자 이상이어야 해요"; return; }
+
+  const btn = document.getElementById("auth-submit-btn");
+  btn.disabled = true; btn.textContent = "처리 중...";
+
   try {
-    const pDocs = await getDocs(collection(db, "products"));
-    await Promise.all(pDocs.docs.map(d => updateDoc(doc(db, "products", d.id), { remaining: d.data().count })));
-    drawnSlots.clear(); selectedSlots.clear();
-    await loadAll();
-    renderDrawTab();
-    document.getElementById("results-area").style.display = "none";
-    alert("재고가 초기화됐어요! 뽑기 기록은 유지됩니다.");
-  } catch(e) { alert("실패: " + e.message); }
+    const persistence = remember ? browserLocalPersistence : browserSessionPersistence;
+    await setPersistence(auth, persistence);
+    if (isAuthMode === "login") {
+      await signInWithEmailAndPassword(auth, email, pw);
+    } else {
+      await createUserWithEmailAndPassword(auth, email, pw);
+    }
+    document.getElementById("auth-modal").style.display = "none";
+    ["auth-email","auth-pw","auth-pw2"].forEach(id => document.getElementById(id).value = "");
+  } catch(e) {
+    const msgs = {
+      "auth/user-not-found": "존재하지 않는 계정이에요",
+      "auth/wrong-password": "비밀번호가 틀렸어요",
+      "auth/email-already-in-use": "이미 사용 중인 이메일이에요",
+      "auth/invalid-email": "올바른 이메일 형식이 아니에요",
+      "auth/weak-password": "비밀번호가 너무 약해요",
+      "auth/invalid-credential": "이메일 또는 비밀번호가 올바르지 않아요",
+    };
+    errEl.textContent = msgs[e.code] || e.message;
+  }
+  btn.disabled = false;
+  btn.textContent = isAuthMode === "login" ? "로그인" : "가입하기";
 }
+window.doAuth = doAuth;
 
-// ── Reset (전체) ──
-async function handleResetAll() {
-  if (!confirm("정말 전체 초기화할까요?\n재고 + 뽑기 기록이 모두 삭제돼요.")) return;
+async function userLogout() {
+  if (!confirm("로그아웃 할까요?")) return;
+  await signOut(auth);
+  isBoardOpen = false;
+  document.getElementById("board-view").style.display = "none";
+  document.getElementById("enter-board-btn").style.display = "";
+}
+window.userLogout = userLogout;
+
+function showDeleteAccount() {
+  document.getElementById("delete-error").textContent = "";
+  document.getElementById("delete-pw").value = "";
+  document.getElementById("delete-account-modal").style.display = "flex";
+}
+window.showDeleteAccount = showDeleteAccount;
+
+async function doDeleteAccount() {
+  const pw = document.getElementById("delete-pw").value;
+  const errEl = document.getElementById("delete-error");
+  errEl.textContent = "";
+  if (!pw) { errEl.textContent = "비밀번호를 입력해주세요"; return; }
   try {
-    const pDocs = await getDocs(collection(db, "products"));
-    await Promise.all(pDocs.docs.map(d => updateDoc(doc(db, "products", d.id), { remaining: d.data().count })));
-    const uItems = await getDocs(collection(db, "draws", userId, "items"));
-    await Promise.all(uItems.docs.map(d => deleteDoc(doc(db, "draws", userId, "items", d.id))));
-    drawnSlots.clear(); selectedSlots.clear();
-    await loadAll();
-    renderDrawTab();
-    renderCollectionTab();
-    document.getElementById("results-area").style.display = "none";
-    alert("전체 초기화 완료!");
-  } catch(e) { alert("실패: " + e.message); }
+    const cred = EmailAuthProvider.credential(currentUser.email, pw);
+    await reauthenticateWithCredential(currentUser, cred);
+    // Delete user draws
+    const drawSnap = await getDocs(collection(db, "draws", userId, "items"));
+    const batch = writeBatch(db);
+    drawSnap.docs.forEach(d => batch.delete(d.ref));
+    // Delete user doc
+    batch.delete(doc(db, "users", userId));
+    await batch.commit();
+    await deleteUser(currentUser);
+    document.getElementById("delete-account-modal").style.display = "none";
+    alert("계정이 삭제됐습니다. 이용해주셔서 감사합니다.");
+  } catch(e) {
+    const msgs = {
+      "auth/wrong-password": "비밀번호가 틀렸어요",
+      "auth/invalid-credential": "비밀번호가 올바르지 않아요",
+    };
+    errEl.textContent = msgs[e.code] || e.message;
+  }
 }
+window.doDeleteAccount = doDeleteAccount;
 
-// ── Settings ──
+// ── Admin Auth ──
+function showAdminLogin() {
+  document.getElementById("admin-modal").style.display = "flex";
+  setTimeout(() => document.getElementById("admin-pw-input").focus(), 100);
+}
+window.showAdminLogin = showAdminLogin;
+
+function doAdminLogin() {
+  const pw = document.getElementById("admin-pw-input").value;
+  if (pw === ADMIN_PW) {
+    isAdmin = true;
+    document.getElementById("admin-modal").style.display = "none";
+    document.getElementById("admin-pw-input").value = "";
+    document.getElementById("nav-admin").style.display = "";
+    document.getElementById("admin-login-btn").style.display = "none";
+    document.getElementById("admin-logout-btn").style.display = "";
+    renderAdminTab();
+    switchTab("admin");
+  } else { alert("비밀번호가 틀렸어요"); }
+}
+window.doAdminLogin = doAdminLogin;
+
+function adminLogout() {
+  isAdmin = false;
+  document.getElementById("nav-admin").style.display = "none";
+  document.getElementById("admin-login-btn").style.display = "";
+  document.getElementById("admin-logout-btn").style.display = "none";
+  if (document.getElementById("tab-admin").style.display !== "none") switchTab("draw");
+}
+window.adminLogout = adminLogout;
+
+// ── Admin functions ──
+async function saveNotice() {
+  const text = document.getElementById("notice-input").value.trim();
+  await setDoc(doc(db, "settings", "global"), { notice: text }, { merge: true });
+  settings.notice = text;
+  renderDrawTab();
+  alert(text ? "공지가 전송됐어요!" : "공지가 숨겨졌어요");
+}
+window.saveNotice = saveNotice;
+
 async function saveSettings() {
   settings.title = document.getElementById("s-title").value;
   settings.subtitle = document.getElementById("s-subtitle").value;
-  settings.maxPerUser = parseInt(document.getElementById("s-max").value) || 0;
-  settings.totalSlots = parseInt(document.getElementById("s-slots").value) || 30;
+  settings.price = parseInt(document.getElementById("s-price").value) || 0;
+  settings.queueMax = parseInt(document.getElementById("s-queue-max").value) || 10;
   try {
-    await setDoc(doc(db, "settings", "global"), settings);
-    drawnSlots.clear(); selectedSlots.clear();
+    await setDoc(doc(db, "settings", "global"), settings, { merge: true });
     renderDrawTab();
     alert("저장됐어요!");
   } catch(e) { alert("저장 실패: " + e.message); }
 }
+window.saveSettings = saveSettings;
 
-// ── Image upload ──
-async function handleImageUpload(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const btn = document.getElementById("upload-btn");
-  btn.textContent = "업로드 중..."; btn.disabled = true;
+async function handleResetStock() {
+  if (!isAdmin) { alert("관리자만 가능합니다"); return; }
+  if (!confirm("재고만 초기화할까요? 뽑기 기록은 유지돼요.")) return;
   try {
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("upload_preset", PRESET);
-    const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, { method: "POST", body: fd });
-    const d = await r.json();
-    currentImageUrl = d.secure_url;
-    const preview = document.getElementById("img-preview");
-    preview.src = currentImageUrl;
-    preview.style.display = "";
-    document.getElementById("del-img-btn").style.display = "";
-  } catch { alert("업로드 실패"); }
-  btn.textContent = "이미지 선택"; btn.disabled = false;
-}
-function clearImage() {
-  currentImageUrl = "";
-  document.getElementById("img-preview").style.display = "none";
-  document.getElementById("del-img-btn").style.display = "none";
-  document.getElementById("file-input").value = "";
-}
-
-// ── Save product ──
-async function saveProduct() {
-  const name = document.getElementById("f-name").value.trim();
-  if (!name) { alert("상품명을 입력하세요"); return; }
-  const data = {
-    name,
-    grade: document.getElementById("f-grade").value,
-    rate: Number(document.getElementById("f-rate").value) || 10,
-    count: Number(document.getElementById("f-count").value) || 100,
-    description: document.getElementById("f-desc").value,
-    imageUrl: currentImageUrl
-  };
-  const saveBtn = document.getElementById("save-product-btn");
-  saveBtn.disabled = true; saveBtn.textContent = "저장 중...";
-  try {
-    if (editId) {
-      await updateDoc(doc(db, "products", editId), data);
-    } else {
-      await addDoc(collection(db, "products"), { ...data, remaining: data.count });
-    }
-    cancelEdit();
+    const pDocs = await getDocs(collection(db, "products"));
+    const batch = writeBatch(db);
+    pDocs.docs.forEach(d => batch.update(d.ref, { remaining: d.data().count }));
+    await batch.commit();
+    drawnSlots.clear(); selectedSlots.clear();
+    await saveSessionState();
     await loadAll();
-    renderAdminTab();
     renderDrawTab();
-  } catch(e) {
-    alert("저장 실패: " + (e.message || e) + "\n\nFirestore 보안 규칙을 확인해주세요.");
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = editId ? "수정 완료" : "상품 추가";
-  }
+    alert("재고가 초기화됐어요!");
+  } catch(e) { alert("실패: " + e.message); }
 }
+window.handleResetStock = handleResetStock;
 
-function cancelEdit() {
-  editId = null; currentImageUrl = "";
-  ["f-name","f-desc"].forEach(id => document.getElementById(id).value = "");
-  document.getElementById("f-grade").value = "R";
-  document.getElementById("f-rate").value = "10";
-  document.getElementById("f-count").value = "100";
-  document.getElementById("img-preview").style.display = "none";
-  document.getElementById("del-img-btn").style.display = "none";
-  document.getElementById("file-input").value = "";
-  document.getElementById("form-title").textContent = "➕ 상품 추가";
-  document.getElementById("save-product-btn").textContent = "상품 추가";
-  document.getElementById("cancel-edit-btn").style.display = "none";
-}
-
-function editProduct(id) {
-  const p = products.find(x => x.id === id); if (!p) return;
-  editId = id; currentImageUrl = p.imageUrl || "";
-  document.getElementById("f-name").value = p.name;
-  document.getElementById("f-grade").value = p.grade;
-  document.getElementById("f-rate").value = p.rate;
-  document.getElementById("f-count").value = p.count;
-  document.getElementById("f-desc").value = p.description || "";
-  const preview = document.getElementById("img-preview");
-  if (p.imageUrl) { preview.src = p.imageUrl; preview.style.display = ""; document.getElementById("del-img-btn").style.display = ""; }
-  else { preview.style.display = "none"; document.getElementById("del-img-btn").style.display = "none"; }
-  document.getElementById("form-title").textContent = "✏️ 상품 수정";
-  document.getElementById("save-product-btn").textContent = "수정 완료";
-  document.getElementById("cancel-edit-btn").style.display = "";
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-async function deleteProduct(id) {
-  if (!confirm("삭제할까요?")) return;
+async function handleResetAll() {
+  if (!isAdmin) { alert("관리자만 가능합니다"); return; }
+  if (!confirm("정말 전체 초기화할까요?\n재고 + 세션이 리셋됩니다.")) return;
   try {
-    await deleteDoc(doc(db, "products", id));
+    await resetSession();
+    drawnSlots.clear(); selectedSlots.clear();
     await loadAll();
-    renderAdminTab();
     renderDrawTab();
-  } catch(e) { alert("삭제 실패: " + e.message); }
+    alert("전체 초기화 완료!");
+  } catch(e) { alert("실패: " + e.message); }
+}
+window.handleResetAll = handleResetAll;
+
+async function renderAdminTab() {
+  // Products
+  renderAdminProducts();
+  // Users
+  await loadAdminUsers();
 }
 
-// ── Render admin ──
-function renderAdminTab() {
+function renderAdminProducts() {
   const list = document.getElementById("product-list");
   document.getElementById("product-count").textContent = products.length;
   if (!products.length) {
@@ -1379,7 +1718,7 @@ function renderAdminTab() {
       <div class="product-info">
         <div class="product-name-row">
           <span class="product-grade-badge" style="color:${meta.color};background:${meta.color}22">${p.grade}</span>
-          <span class="product-name">${p.name}</span>
+          <span class="product-name">${escHtml(p.name)}</span>
         </div>
         <div class="product-meta">가중치 ${p.rate} · 재고 ${p.remaining ?? p.count}/${p.count}</div>
       </div>
@@ -1392,6 +1731,262 @@ function renderAdminTab() {
   });
 }
 
+async function loadAdminUsers() {
+  const list = document.getElementById("user-list");
+  list.innerHTML = '<div style="color:var(--sub);text-align:center;padding:20px">로딩 중...</div>';
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    const users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (!users.length) { list.innerHTML = '<div style="color:var(--sub);text-align:center;padding:20px">회원 없음</div>'; return; }
+    list.innerHTML = "";
+    users.forEach(u => {
+      const el = document.createElement("div");
+      el.className = "user-row";
+      el.innerHTML = `
+        <div style="flex:1;min-width:0;">
+          <div class="user-row-email">${escHtml(u.email || u.id)}${u.warnings > 0 ? `<span class="warn-badge">경고 ${u.warnings}</span>` : ""}</div>
+          <div class="user-row-meta">포인트 ${(u.points||0).toLocaleString()}P · 가입 ${u.createdAt ? new Date(u.createdAt).toLocaleDateString("ko-KR") : "-"}</div>
+        </div>
+        <div class="user-actions">
+          <button class="warn-btn" onclick="doWarnUser('${u.id}')">경고</button>
+          <button class="msg-btn" onclick="showAdminMsg('${u.id}','${escHtml(u.email||"")}')">메시지</button>
+          <button class="kick-btn" onclick="doKickUser('${u.id}')">탈퇴</button>
+        </div>
+      `;
+      list.appendChild(el);
+    });
+  } catch(e) {
+    list.innerHTML = `<div style="color:#FF6B6B;text-align:center;padding:20px">로드 실패: ${e.message}</div>`;
+  }
+}
+
+async function doWarnUser(uid) {
+  if (!confirm("이 유저에게 경고를 줄까요?")) return;
+  try {
+    await updateDoc(doc(db, "users", uid), { warnings: increment(1) });
+    await addDoc(collection(db, "users", uid, "messages"), {
+      text: "⚠️ 운영 정책 위반으로 경고가 부여됐습니다.",
+      sentAt: Date.now()
+    });
+    alert("경고가 부여됐어요.");
+    await loadAdminUsers();
+  } catch(e) { alert("실패: " + e.message); }
+}
+window.doWarnUser = doWarnUser;
+
+async function doKickUser(uid) {
+  if (!confirm("이 유저를 강제 탈퇴시킬까요?\n포인트와 데이터가 삭제됩니다.")) return;
+  try {
+    // Delete user doc (Firebase Auth delete requires server-side SDK or user re-auth)
+    await deleteDoc(doc(db, "users", uid));
+    const drawSnap = await getDocs(collection(db, "draws", uid, "items"));
+    const batch = writeBatch(db);
+    drawSnap.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    alert("탈퇴 처리됐습니다.\n(Firebase Auth 계정 삭제는 서버 SDK가 필요합니다)");
+    await loadAdminUsers();
+  } catch(e) { alert("실패: " + e.message); }
+}
+window.doKickUser = doKickUser;
+
+function showAdminMsg(uid, email) {
+  adminMsgTargetUid = uid;
+  adminMsgTargetEmail = email;
+  document.getElementById("admin-msg-target").textContent = `받는 사람: ${email || uid}`;
+  document.getElementById("admin-msg-text").value = "";
+  document.getElementById("admin-msg-modal").style.display = "flex";
+}
+window.showAdminMsg = showAdminMsg;
+
+async function doSendAdminMsg() {
+  const text = document.getElementById("admin-msg-text").value.trim();
+  if (!text) { alert("메시지를 입력해주세요"); return; }
+  try {
+    await addDoc(collection(db, "users", adminMsgTargetUid, "messages"), {
+      text, sentAt: Date.now(), from: "admin"
+    });
+    document.getElementById("admin-msg-modal").style.display = "none";
+    alert("메시지를 전송했어요!");
+  } catch(e) { alert("전송 실패: " + e.message); }
+}
+window.doSendAdminMsg = doSendAdminMsg;
+
+// ── Image upload ──
+async function handleImageUpload(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const btn = document.getElementById("upload-btn");
+  btn.textContent = "업로드 중..."; btn.disabled = true;
+  try {
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("upload_preset", PRESET);
+    const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, { method: "POST", body: fd });
+    const d = await r.json();
+    currentImageUrl = d.secure_url;
+    const preview = document.getElementById("img-preview");
+    preview.src = currentImageUrl;
+    preview.style.display = "";
+    document.getElementById("del-img-btn").style.display = "";
+  } catch { alert("업로드 실패"); }
+  btn.textContent = "이미지 선택"; btn.disabled = false;
+}
+window.handleImageUpload = handleImageUpload;
+
+function clearImage() {
+  currentImageUrl = "";
+  document.getElementById("img-preview").style.display = "none";
+  document.getElementById("del-img-btn").style.display = "none";
+  document.getElementById("file-input").value = "";
+}
+window.clearImage = clearImage;
+
+async function saveProduct() {
+  const name = document.getElementById("f-name").value.trim();
+  if (!name) { alert("상품명을 입력하세요"); return; }
+  const data = {
+    name,
+    grade: document.getElementById("f-grade").value,
+    rate: Number(document.getElementById("f-rate").value) || 10,
+    count: Number(document.getElementById("f-count").value) || 2,
+    description: document.getElementById("f-desc").value,
+    imageUrl: currentImageUrl
+  };
+  if (data.count < 2) { alert("재고는 최소 2개 이상이어야 해요"); return; }
+  const btn = document.getElementById("save-product-btn");
+  btn.disabled = true; btn.textContent = "저장 중...";
+  try {
+    if (editId) {
+      await updateDoc(doc(db, "products", editId), data);
+    } else {
+      await addDoc(collection(db, "products"), { ...data, remaining: data.count });
+    }
+    cancelEdit();
+    await loadAll();
+    renderAdminProducts();
+    renderDrawTab();
+  } catch(e) { alert("저장 실패: " + e.message); }
+  finally { btn.disabled = false; btn.textContent = editId ? "수정 완료" : "상품 추가"; }
+}
+window.saveProduct = saveProduct;
+
+function cancelEdit() {
+  editId = null; currentImageUrl = "";
+  ["f-name","f-desc"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("f-grade").value = "R";
+  document.getElementById("f-rate").value = "10";
+  document.getElementById("f-count").value = "2";
+  document.getElementById("img-preview").style.display = "none";
+  document.getElementById("del-img-btn").style.display = "none";
+  document.getElementById("file-input").value = "";
+  document.getElementById("form-title").textContent = "➕ 상품 추가";
+  document.getElementById("save-product-btn").textContent = "상품 추가";
+  document.getElementById("cancel-edit-btn").style.display = "none";
+}
+window.cancelEdit = cancelEdit;
+
+function editProduct(id) {
+  const p = products.find(x => x.id === id); if (!p) return;
+  editId = id; currentImageUrl = p.imageUrl || "";
+  document.getElementById("f-name").value = p.name;
+  document.getElementById("f-grade").value = p.grade;
+  document.getElementById("f-rate").value = p.rate;
+  document.getElementById("f-count").value = p.count;
+  document.getElementById("f-desc").value = p.description || "";
+  const preview = document.getElementById("img-preview");
+  if (p.imageUrl) { preview.src = p.imageUrl; preview.style.display = ""; document.getElementById("del-img-btn").style.display = ""; }
+  else { preview.style.display = "none"; document.getElementById("del-img-btn").style.display = "none"; }
+  document.getElementById("form-title").textContent = "✏️ 상품 수정";
+  document.getElementById("save-product-btn").textContent = "수정 완료";
+  document.getElementById("cancel-edit-btn").style.display = "";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+window.editProduct = editProduct;
+
+async function deleteProduct(id) {
+  if (!confirm("삭제할까요?")) return;
+  try {
+    await deleteDoc(doc(db, "products", id));
+    await loadAll();
+    renderAdminProducts();
+    renderDrawTab();
+  } catch(e) { alert("삭제 실패: " + e.message); }
+}
+window.deleteProduct = deleteProduct;
+
+// ── Queue request (exposed) ──
+window.requestQueue = requestQueue;
+
+// ── Helpers ──
+function weightedDraw(items) {
+  const pool = [];
+  items.forEach(item => {
+    const slots = item.remaining !== undefined ? item.remaining : (item.count || 1);
+    if (slots <= 0) return;
+    const w = Math.round((item.rate || 1) * 10);
+    for (let i = 0; i < w; i++) pool.push(item);
+  });
+  if (!pool.length) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ── Sound ──
+function playSound(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (type === "select") {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(660, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.05);
+      g.gain.setValueAtTime(0.15, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+      o.start(); o.stop(ctx.currentTime + 0.12);
+    } else if (type === "deselect") {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(440, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(330, ctx.currentTime + 0.07);
+      g.gain.setValueAtTime(0.12, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      o.start(); o.stop(ctx.currentTime + 0.1);
+    } else if (type === "open") {
+      [0, 0.08, 0.16].forEach((t, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine";
+        o.frequency.setValueAtTime(300 + i * 120, ctx.currentTime + t);
+        g.gain.setValueAtTime(0.2, ctx.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.12);
+        o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.12);
+      });
+    } else if (type === "reveal") {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = "sine";
+      o.frequency.setValueAtTime(500, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.2);
+      g.gain.setValueAtTime(0.25, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      o.start(); o.stop(ctx.currentTime + 0.3);
+    } else if (type === "ssr") {
+      [0,0.1,0.2,0.3].forEach((t,i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine";
+        const freqs = [523,659,784,1047];
+        o.frequency.setValueAtTime(freqs[i], ctx.currentTime + t);
+        g.gain.setValueAtTime(0.2, ctx.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.15);
+        o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.15);
+      });
+    }
+  } catch(e) {}
+}
+
 // ── Confetti ──
 function launchConfetti() {
   const container = document.getElementById("confetti-container");
@@ -1400,16 +1995,22 @@ function launchConfetti() {
   for (let i = 0; i < 60; i++) {
     const el = document.createElement("div");
     const size = 6 + Math.random() * 8;
-    el.style.cssText = `
-      position:absolute;left:${Math.random()*100}%;top:-10px;
-      width:${size}px;height:${size}px;border-radius:${Math.random()>0.5?'50%':'2px'};
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      animation:confettiFall ${1.5+Math.random()}s ${Math.random()*1.5}s ease-in forwards;
-    `;
+    el.style.cssText = `position:absolute;left:${Math.random()*100}%;top:-10px;width:${size}px;height:${size}px;border-radius:${Math.random()>.5?'50%':'2px'};background:${colors[Math.floor(Math.random()*colors.length)]};animation:confettiFall ${1.5+Math.random()}s ${Math.random()*1.5}s ease-in forwards;`;
     container.appendChild(el);
   }
   setTimeout(() => { container.innerHTML = ""; }, 4500);
 }
+
+// ── Zoom prevention ──
+let lastTouchEnd = 0;
+document.addEventListener("touchend", (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
+document.addEventListener("gesturestart", e => e.preventDefault());
+document.addEventListener("gesturechange", e => e.preventDefault());
+
 </script>
 </body>
 </html>

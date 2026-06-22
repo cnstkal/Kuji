@@ -4,8 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
 <title>✦ IDOL KUJI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"/>
+<link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -19,7 +19,7 @@ body.light{
   --accent2:#0891B2;--btn-grad:linear-gradient(135deg,#0284C7,#0891B2);
 }
 html{touch-action:pan-y;overflow-x:hidden}
-body{background:var(--bg);color:var(--text);font-family:'Outfit','Noto Sans KR',sans-serif;min-height:100vh;transition:background .3s,color .3s;overflow-x:hidden;overscroll-behavior-x:none}
+body{background:var(--bg);color:var(--text);font-family:'Pretendard','Noto Sans KR',sans-serif;min-height:100vh;transition:background .3s,color .3s;overflow-x:hidden;overscroll-behavior-x:none;letter-spacing:-0.02em}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
@@ -105,7 +105,7 @@ nav{display:flex;gap:4px}
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
 .prod-card{background:var(--card);border-radius:14px;overflow:hidden;cursor:default;position:relative;border:1px solid var(--border);}
 .prod-card-img-wrap{width:100%;aspect-ratio:1;overflow:hidden;background:var(--bg2);}
-.prod-card-img{width:100%;height:100%;object-fit:contain;}
+.prod-card-img{width:100%;height:100%;object-fit:cover;}
 .prod-card-no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;}
 .prod-card-body{padding:8px 10px;}
 .prod-card-grade{font-size:.58rem;font-weight:700;margin-bottom:2px;}
@@ -174,7 +174,7 @@ nav{display:flex;gap:4px}
   display:flex;flex-direction:column;
 }
 .kuji-img-wrap{width:100%;aspect-ratio:1;overflow:hidden;background:rgba(0,0,0,.15);}
-.kuji-img{width:100%;height:100%;object-fit:contain;display:block;}
+.kuji-img{width:100%;height:100%;object-fit:cover;display:block;}
 .kuji-no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:3rem;}
 .grade-badge{position:absolute;top:8px;right:8px;font-size:.6rem;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:20px;color:#000;z-index:1;}
 .kuji-card-info{padding:8px 10px 10px;display:flex;flex-direction:column;gap:2px;}
@@ -195,7 +195,7 @@ nav{display:flex;gap:4px}
 .col-item{background:var(--card);border-radius:14px;overflow:hidden;transition:transform .2s;cursor:default;position:relative;}
 .col-item:hover{transform:translateY(-3px);}
 .col-item-img-wrap{width:100%;aspect-ratio:1;overflow:hidden;background:rgba(0,0,0,.1);}
-.col-item-img{width:100%;height:100%;object-fit:contain;display:block;}
+.col-item-img{width:100%;height:100%;object-fit:cover;display:block;}
 .col-item-no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;}
 .col-item-body{padding:8px 10px;}
 .col-item-grade{font-size:.58rem;font-weight:700;letter-spacing:.1em;margin-bottom:3px;}
@@ -295,8 +295,44 @@ select.field-input{cursor:pointer;}
 .msg-row-text{font-size:.82rem;line-height:1.5;}
 .msg-row-time{font-size:.65rem;color:var(--sub);margin-top:4px;}
 
+/* ── Kuji type selector ── */
+.kuji-type-section{margin-bottom:20px;}
+.kuji-type-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.kuji-type-scroll::-webkit-scrollbar{display:none;}
+.kuji-type-card{flex-shrink:0;min-width:120px;padding:12px 16px;border-radius:14px;background:var(--card);border:2px solid var(--border);cursor:pointer;transition:all .2s;text-align:center;}
+.kuji-type-card.active{border-color:var(--accent);background:var(--accent)18;}
+.kuji-type-card-name{font-size:.85rem;font-weight:700;margin-bottom:4px;}
+.kuji-type-card-desc{font-size:.65rem;color:var(--sub);}
+.kuji-type-card-price{font-size:.7rem;color:#FFD700;font-weight:700;margin-top:4px;}
+.kuji-type-empty{text-align:center;padding:20px;color:var(--sub);font-size:.85rem;}
+
 /* ── Warning badge ── */
 .warn-badge{display:inline-block;background:#FFD70022;color:#FFD700;border:1px solid #FFD70044;border-radius:20px;padding:2px 8px;font-size:.65rem;font-weight:700;margin-left:6px;}
+
+/* ── Mobile responsive ── */
+@media(max-width:480px){
+  .col-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
+  .products-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));}
+  .kujiboard-grid{grid-template-columns:repeat(auto-fill,minmax(46px,1fr));}
+  .main{padding:16px 12px;}
+  .kuji-title{font-size:1.8rem;}
+  header{padding:0 12px;}
+  .admin-card{padding:16px;}
+  .form-grid{grid-template-columns:1fr;}
+  .header-right{gap:4px;}
+  .user-badge{max-width:70px;}
+}
+@media(min-width:768px){
+  .main{max-width:800px;}
+  .products-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+  .col-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+  .kujiboard-grid{grid-template-columns:repeat(auto-fill,minmax(60px,1fr));}
+}
+@media(min-width:1024px){
+  .main{max-width:960px;}
+  header{padding:0 32px;}
+  .products-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));}
+}
 </style>
 </head>
 <body>
@@ -352,15 +388,70 @@ select.field-input{cursor:pointer;}
 
 <!-- Point Modal -->
 <div class="modal-overlay" id="point-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:380px;">
     <div class="modal-title">💎 포인트 충전</div>
     <div class="modal-sub" id="point-modal-balance">보유: 0P</div>
     <div class="modal-error" id="point-error"></div>
     <div class="modal-success" id="point-success"></div>
-    <input type="number" class="modal-input" id="point-amount" placeholder="충전할 금액 (원)" min="1000" step="1000"/>
-    <div style="font-size:.72rem;color:var(--sub);margin-bottom:10px;text-align:center;">1원 = 1포인트 · 최소 1,000원</div>
-    <button class="modal-btn" onclick="doChargePoint()">충전하기</button>
-    <div class="point-history" id="point-history"></div>
+
+    <!-- Package select -->
+    <div id="point-step-1">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+        <div class="point-pkg" onclick="selectPkg(3000)" data-amt="3000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
+          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">3,000P</div>
+          <div style="font-size:.72rem;color:var(--sub);">₩3,000</div>
+        </div>
+        <div class="point-pkg" onclick="selectPkg(5000)" data-amt="5000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
+          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">5,000P</div>
+          <div style="font-size:.72rem;color:var(--sub);">₩5,000</div>
+        </div>
+        <div class="point-pkg" onclick="selectPkg(10000)" data-amt="10000" style="padding:12px;border-radius:12px;border:2px solid var(--accent);cursor:pointer;text-align:center;background:var(--accent)18;position:relative;">
+          <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;">인기</div>
+          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">10,000P</div>
+          <div style="font-size:.72rem;color:var(--sub);">₩10,000</div>
+        </div>
+        <div class="point-pkg" onclick="selectPkg(30000)" data-amt="30000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
+          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">30,000P</div>
+          <div style="font-size:.72rem;color:var(--sub);">₩30,000</div>
+        </div>
+      </div>
+      <div style="font-size:.72rem;color:var(--sub);margin-bottom:8px;text-align:center;">또는 직접 입력</div>
+      <input type="number" class="modal-input" id="point-amount" placeholder="충전할 금액 (원)" min="1000" step="1000"/>
+      <div style="font-size:.72rem;color:var(--sub);margin-bottom:10px;text-align:center;">1원 = 1포인트 · 최소 1,000원</div>
+      <button class="modal-btn" onclick="goPayStep()">결제하기 →</button>
+    </div>
+
+    <!-- Payment step -->
+    <div id="point-step-2" style="display:none;">
+      <div style="background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:.78rem;color:var(--sub);margin-bottom:6px;">결제 금액</div>
+        <div style="font-size:1.4rem;font-weight:800;color:#FFD700;" id="pay-amount-display">0원</div>
+      </div>
+      <div style="font-size:.78rem;color:var(--sub);margin-bottom:8px;">결제 수단 선택</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+        <label style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;background:var(--card);">
+          <input type="radio" name="pay-method" value="card" checked style="accent-color:var(--accent)"/> 💳 신용/체크카드
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;background:var(--card);">
+          <input type="radio" name="pay-method" value="kakao" style="accent-color:var(--accent)"/> 💛 카카오페이
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;background:var(--card);">
+          <input type="radio" name="pay-method" value="naver" style="accent-color:var(--accent)"/> 🟢 네이버페이
+        </label>
+      </div>
+      <button class="modal-btn" onclick="doPayment()" id="pay-confirm-btn">결제 완료</button>
+      <button class="modal-btn secondary" onclick="backToStep1()" style="margin-top:6px;">← 돌아가기</button>
+    </div>
+
+    <!-- Processing -->
+    <div id="point-step-3" style="display:none;text-align:center;padding:20px 0;">
+      <div class="loading-spinner" style="margin:0 auto 14px;"></div>
+      <div style="font-weight:700;margin-bottom:4px;">결제 처리 중...</div>
+      <div style="font-size:.78rem;color:var(--sub);">잠시만 기다려주세요</div>
+    </div>
+
+    <div class="point-history" id="point-history" style="margin-top:10px;"></div>
+    <button class="modal-btn secondary" onclick="document.getElementById('point-modal').style.display='none'" style="margin-top:8px;">닫기</button>
   </div>
 </div>
 
@@ -384,6 +475,21 @@ select.field-input{cursor:pointer;}
     <input type="password" class="modal-input" id="delete-pw" placeholder="현재 비밀번호"/>
     <button class="modal-btn danger" onclick="doDeleteAccount()">탈퇴하기</button>
     <button class="modal-btn secondary" onclick="document.getElementById('delete-account-modal').style.display='none'">취소</button>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="change-pw-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">🔑 비밀번호 변경</div>
+    <div class="modal-sub">현재 비밀번호 확인 후 변경됩니다</div>
+    <div class="modal-error" id="change-pw-error"></div>
+    <div class="modal-success" id="change-pw-success"></div>
+    <input type="password" class="modal-input" id="change-pw-current" placeholder="현재 비밀번호"/>
+    <input type="password" class="modal-input" id="change-pw-new" placeholder="새 비밀번호 (6자 이상)"/>
+    <input type="password" class="modal-input" id="change-pw-new2" placeholder="새 비밀번호 확인"/>
+    <button class="modal-btn" onclick="doChangePw()">변경하기</button>
+    <button class="modal-btn secondary" onclick="document.getElementById('change-pw-modal').style.display='none'">취소</button>
   </div>
 </div>
 
@@ -413,6 +519,14 @@ select.field-input{cursor:pointer;}
       <button class="modal-btn" style="width:auto;display:inline-block;margin-top:10px;padding:8px 20px;" onclick="requestQueue()">대기 신청</button>
     </div>
 
+    <!-- Kuji type selector -->
+    <div class="kuji-type-section" id="kuji-type-section">
+      <div class="section-title">쿠지 종류</div>
+      <div class="kuji-type-scroll" id="kuji-type-list">
+        <div class="kuji-type-empty">쿠지 종류를 불러오는 중...</div>
+      </div>
+    </div>
+
     <!-- Hero -->
     <div class="kuji-hero">
       <div class="kuji-eyebrow" id="kuji-subtitle">당신의 운명을 뽑아보세요</div>
@@ -424,8 +538,8 @@ select.field-input{cursor:pointer;}
       </div>
     </div>
 
-    <!-- Grade summary -->
-    <div class="grade-grid" id="grade-grid"></div>
+    <!-- Grade summary (hidden per request) -->
+    <div class="grade-grid" id="grade-grid" style="display:none"></div>
 
     <!-- Products preview -->
     <div class="products-section">
@@ -453,6 +567,7 @@ select.field-input{cursor:pointer;}
 
       <div class="kujiboard-label">
         원하는 슬롯을 선택하세요 · <strong id="selected-count-label">0</strong>개 선택
+        <button onclick="randomSelectSlots()" style="margin-left:10px;padding:4px 12px;border-radius:20px;border:1px solid var(--accent);background:var(--accent)22;color:var(--accent);cursor:pointer;font-size:.72rem;font-weight:700;font-family:inherit;">🎲 랜덤 10개</button>
       </div>
       <div class="kujiboard-grid" id="kujiboard-grid"></div>
 
@@ -555,6 +670,7 @@ select.field-input{cursor:pointer;}
       <div class="admin-card">
         <div class="admin-card-title">⚙️ 계정 설정</div>
         <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="reset-btn" onclick="showChangePw()">🔑 비밀번호 변경</button>
           <button class="reset-btn" onclick="userLogout()">🚪 로그아웃</button>
           <button class="reset-btn danger" onclick="showDeleteAccount()">🗑️ 회원 탈퇴</button>
         </div>
@@ -568,12 +684,51 @@ select.field-input{cursor:pointer;}
   <div class="main fade-in" style="max-width:800px">
     <div class="admin-title">⚡ 관리자 패널</div>
 
+    <!-- Admin password change -->
+    <div class="admin-card">
+      <div class="admin-card-title">🔐 관리자 비밀번호 변경</div>
+      <div class="form-grid">
+        <div>
+          <div class="field-label">새 비밀번호</div>
+          <input type="password" class="field-input" id="new-admin-pw" placeholder="새 비밀번호"/>
+        </div>
+        <div>
+          <div class="field-label">비밀번호 확인</div>
+          <input type="password" class="field-input" id="new-admin-pw2" placeholder="비밀번호 재입력"/>
+        </div>
+      </div>
+      <button class="save-btn" onclick="changeAdminPw()">비밀번호 변경</button>
+    </div>
+
     <!-- Notice -->
     <div class="admin-card">
       <div class="admin-card-title">📢 전체 공지</div>
       <div class="admin-notice-area">
         <input class="admin-notice-input" id="notice-input" placeholder="공지 내용 입력 (비워두면 공지 숨김)"/>
         <button class="admin-notice-btn" onclick="saveNotice()">전송</button>
+      </div>
+    </div>
+
+    <!-- Kuji types management -->
+    <div class="admin-card">
+      <div class="admin-card-title">🎴 쿠지 종류 관리</div>
+      <div class="form-grid" style="margin-bottom:10px;">
+        <div>
+          <div class="field-label">쿠지 이름 (예: 원피스 쿠지)</div>
+          <input class="field-input" id="kt-name" placeholder="쿠지 이름"/>
+        </div>
+        <div>
+          <div class="field-label">설명</div>
+          <input class="field-input" id="kt-desc" placeholder="간단한 설명"/>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+        <button class="save-btn" id="kt-save-btn" onclick="saveKujiType()">추가</button>
+        <button class="cancel-btn" id="kt-cancel-btn" style="display:none" onclick="cancelKujiTypeEdit()">취소</button>
+        <input type="hidden" id="kt-edit-id"/>
+      </div>
+      <div class="product-list" id="kuji-type-admin-list">
+        <div style="color:var(--sub);text-align:center;padding:20px">쿠지 종류를 추가해주세요</div>
       </div>
     </div>
 
@@ -606,6 +761,12 @@ select.field-input{cursor:pointer;}
     <!-- Product form -->
     <div class="admin-card">
       <div class="admin-card-title" id="form-title">➕ 상품 추가</div>
+      <div class="form-field">
+        <div class="field-label">쿠지 종류</div>
+        <select class="field-input" id="f-kuji-id">
+          <option value="">-- 쿠지 종류 선택 --</option>
+        </select>
+      </div>
       <div class="form-grid">
         <div>
           <div class="field-label">상품명</div>
@@ -703,7 +864,7 @@ const CLOUD = "dbljkloal";
 const PRESET = "Everything";
 
 // ── Admin password ──
-const ADMIN_PW = "2026";
+let ADMIN_PW = localStorage.getItem("kuji_admin_pw") || "2026";
 
 // ── Grade meta ──
 const GRADE_META = {
@@ -716,6 +877,8 @@ const GRADE_ORDER = { SSR:0, SR:1, R:2, N:3 };
 
 // ── State ──
 let products = [];
+let kujiTypes = []; // list of { id, name, desc, price, active }
+let currentKujiId = null; // selected kuji type id
 let settings = {
   title: "IDOL KUJI",
   subtitle: "당신의 운명을 뽑아보세요",
@@ -765,11 +928,13 @@ onAuthStateChanged(auth, async (user) => {
     await loadAll();
   }
   document.getElementById("loading").style.display = "none";
+  // Show tabs (they are hidden by default)
+  document.getElementById("tab-draw").style.display = "block";
+  document.getElementById("nav-draw").className = "nav-btn active";
   renderDrawTab();
   renderCollectionTab();
   renderMyPage();
   if (isAdmin) renderAdminTab();
-  switchTab("draw");
 });
 
 async function ensureUserProfile(user) {
@@ -824,11 +989,19 @@ function renderInbox(msgs) {
 // ── Load data ──
 async function loadAll() {
   try {
-    const [pSnap, sSnap] = await Promise.all([
+    const [pSnap, sSnap, kSnap] = await Promise.all([
       getDocs(query(collection(db, "products"), orderBy("grade"))),
-      getDoc(doc(db, "settings", "global"))
+      getDoc(doc(db, "settings", "global")),
+      getDocs(collection(db, "kujiTypes"))
     ]);
-    products = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const allProducts = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    kujiTypes = kSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Filter products by current kuji type
+    if (currentKujiId) {
+      products = allProducts.filter(p => p.kujiId === currentKujiId);
+    } else {
+      products = allProducts;
+    }
     if (sSnap.exists()) Object.assign(settings, sSnap.data());
 
     if (userId) {
@@ -961,6 +1134,7 @@ async function renderDrawTab() {
   document.getElementById("kuji-title").textContent = settings.title;
   document.getElementById("kuji-subtitle").textContent = settings.subtitle;
   document.getElementById("kuji-price-display").textContent = (settings.price || 0).toLocaleString();
+  renderKujiTypeSelector();
   if (document.getElementById("s-title")) {
     document.getElementById("s-title").value = settings.title;
     document.getElementById("s-subtitle").value = settings.subtitle;
@@ -1027,9 +1201,11 @@ async function renderDrawTab() {
   if (!userId) {
     btn.disabled = true;
     hint.textContent = "로그인 후 이용 가능합니다";
+    hint.style.display = "";
   } else {
     btn.disabled = false;
     hint.textContent = `현재 ${remain}개 슬롯 남음`;
+    hint.style.display = "";
   }
 
   // Board if open
@@ -1109,7 +1285,36 @@ async function checkQueueHasOthers() {
   } catch { return false; }
 }
 
-function toggleSlot(idx) {
+function randomSelectSlots() {
+  // Clear current selection
+  selectedSlots.forEach(idx => {
+    const el = document.querySelector(`#kujiboard-grid .slot[data-idx="${idx}"]`);
+    if (el) el.className = "slot";
+  });
+  selectedSlots.clear();
+
+  // Pick up to 10 available slots randomly
+  const available = [];
+  for (let i = 0; i < totalSlots; i++) {
+    if (!drawnSlots.has(i)) available.push(i);
+  }
+  // Shuffle
+  for (let i = available.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [available[i], available[j]] = [available[j], available[i]];
+  }
+  const picks = available.slice(0, 10);
+  picks.forEach(idx => {
+    selectedSlots.add(idx);
+    const el = document.querySelector(`#kujiboard-grid .slot[data-idx="${idx}"]`);
+    if (el) el.className = "slot selected";
+  });
+  playSound("select");
+  updateOpenBtn();
+}
+window.randomSelectSlots = randomSelectSlots;
+
+
   if (drawnSlots.has(idx)) return;
   const avail = products.filter(p => (p.remaining ?? p.count) > 0);
   if (!avail.length) { alert("남은 상품이 없어요!"); return; }
@@ -1439,16 +1644,56 @@ function renderMyPage() {
 }
 
 // ── Point modal ──
+let payAmount = 0;
 function showPointModal() {
   if (!userId) { showLoginModal(); return; }
   document.getElementById("point-modal-balance").textContent = `보유: ${(userProfile?.points || 0).toLocaleString()}P`;
   document.getElementById("point-error").textContent = "";
   document.getElementById("point-success").textContent = "";
   document.getElementById("point-amount").value = "";
+  document.getElementById("point-step-1").style.display = "";
+  document.getElementById("point-step-2").style.display = "none";
+  document.getElementById("point-step-3").style.display = "none";
   loadPointHistory();
   document.getElementById("point-modal").style.display = "flex";
 }
 window.showPointModal = showPointModal;
+
+function selectPkg(amt) {
+  document.getElementById("point-amount").value = amt;
+  document.querySelectorAll(".point-pkg").forEach(el => {
+    el.style.border = el.dataset.amt == amt ? "2px solid var(--accent)" : "2px solid var(--border)";
+  });
+}
+window.selectPkg = selectPkg;
+
+function goPayStep() {
+  const amt = parseInt(document.getElementById("point-amount").value);
+  const errEl = document.getElementById("point-error");
+  errEl.textContent = "";
+  if (!amt || amt < 1000) { errEl.textContent = "최소 1,000원 이상 입력해주세요"; return; }
+  payAmount = amt;
+  document.getElementById("pay-amount-display").textContent = `${amt.toLocaleString()}원`;
+  document.getElementById("point-step-1").style.display = "none";
+  document.getElementById("point-step-2").style.display = "";
+}
+window.goPayStep = goPayStep;
+
+function backToStep1() {
+  document.getElementById("point-step-1").style.display = "";
+  document.getElementById("point-step-2").style.display = "none";
+}
+window.backToStep1 = backToStep1;
+
+async function doPayment() {
+  const method = document.querySelector("input[name='pay-method']:checked")?.value || "card";
+  document.getElementById("point-step-2").style.display = "none";
+  document.getElementById("point-step-3").style.display = "";
+  // Simulate payment processing
+  await new Promise(r => setTimeout(r, 1800));
+  await doChargePoint(payAmount);
+}
+window.doPayment = doPayment;
 
 async function loadPointHistory() {
   const hist = document.getElementById("point-history");
@@ -1469,15 +1714,13 @@ async function loadPointHistory() {
   } catch { hist.innerHTML = ""; }
 }
 
-async function doChargePoint() {
-  const amt = parseInt(document.getElementById("point-amount").value);
+async function doChargePoint(amt) {
+  if (amt === undefined) amt = parseInt(document.getElementById("point-amount").value);
   const errEl = document.getElementById("point-error");
   const sucEl = document.getElementById("point-success");
   errEl.textContent = ""; sucEl.textContent = "";
   if (!amt || amt < 1000) { errEl.textContent = "최소 1,000원 이상 입력해주세요"; return; }
 
-  // In a real system this would go through a payment gateway.
-  // For demo purposes, we credit directly.
   try {
     const batch = writeBatch(db);
     batch.update(doc(db, "users", userId), { points: increment(amt) });
@@ -1487,12 +1730,19 @@ async function doChargePoint() {
     });
     userProfile.points = (userProfile.points || 0) + amt;
     updatePointBadge();
-    sucEl.textContent = `${amt.toLocaleString()}P 충전 완료!`;
+    // Show success
+    document.getElementById("point-step-3").style.display = "none";
+    document.getElementById("point-step-1").style.display = "";
+    sucEl.textContent = `${amt.toLocaleString()}P 충전 완료! 🎉`;
     document.getElementById("point-modal-balance").textContent = `보유: ${(userProfile.points).toLocaleString()}P`;
     document.getElementById("point-amount").value = "";
     loadPointHistory();
     renderMyPage();
-  } catch(e) { errEl.textContent = "충전 실패: " + e.message; }
+  } catch(e) {
+    document.getElementById("point-step-3").style.display = "none";
+    document.getElementById("point-step-1").style.display = "";
+    errEl.textContent = "충전 실패: " + e.message;
+  }
 }
 window.doChargePoint = doChargePoint;
 
@@ -1578,7 +1828,39 @@ function showDeleteAccount() {
 }
 window.showDeleteAccount = showDeleteAccount;
 
-async function doDeleteAccount() {
+function showChangePw() {
+  document.getElementById("change-pw-error").textContent = "";
+  document.getElementById("change-pw-success").textContent = "";
+  ["change-pw-current","change-pw-new","change-pw-new2"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("change-pw-modal").style.display = "flex";
+}
+window.showChangePw = showChangePw;
+
+async function doChangePw() {
+  const cur = document.getElementById("change-pw-current").value;
+  const np = document.getElementById("change-pw-new").value;
+  const np2 = document.getElementById("change-pw-new2").value;
+  const errEl = document.getElementById("change-pw-error");
+  const sucEl = document.getElementById("change-pw-success");
+  errEl.textContent = ""; sucEl.textContent = "";
+  if (!cur || !np || !np2) { errEl.textContent = "모든 항목을 입력해주세요"; return; }
+  if (np !== np2) { errEl.textContent = "새 비밀번호가 일치하지 않아요"; return; }
+  if (np.length < 6) { errEl.textContent = "비밀번호는 6자 이상이어야 해요"; return; }
+  try {
+    const { updatePassword } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
+    const cred = EmailAuthProvider.credential(currentUser.email, cur);
+    await reauthenticateWithCredential(currentUser, cred);
+    await updatePassword(currentUser, np);
+    sucEl.textContent = "비밀번호가 변경됐어요!";
+    setTimeout(() => { document.getElementById("change-pw-modal").style.display = "none"; }, 1500);
+  } catch(e) {
+    const msgs = { "auth/wrong-password": "현재 비밀번호가 틀렸어요", "auth/invalid-credential": "현재 비밀번호가 틀렸어요" };
+    errEl.textContent = msgs[e.code] || e.message;
+  }
+}
+window.doChangePw = doChangePw;
+
+
   const pw = document.getElementById("delete-pw").value;
   const errEl = document.getElementById("delete-error");
   errEl.textContent = "";
@@ -1628,7 +1910,136 @@ function doAdminLogin() {
 }
 window.doAdminLogin = doAdminLogin;
 
-function adminLogout() {
+// ── Kuji Type functions ──
+async function saveKujiType() {
+  const name = document.getElementById("kt-name").value.trim();
+  const desc = document.getElementById("kt-desc").value.trim();
+  const editId = document.getElementById("kt-edit-id").value;
+  if (!name) { alert("쿠지 이름을 입력하세요"); return; }
+  const btn = document.getElementById("kt-save-btn");
+  btn.disabled = true;
+  try {
+    if (editId) {
+      await updateDoc(doc(db, "kujiTypes", editId), { name, desc });
+    } else {
+      await addDoc(collection(db, "kujiTypes"), { name, desc, createdAt: Date.now() });
+    }
+    cancelKujiTypeEdit();
+    await loadAll();
+    renderAdminTab();
+    renderKujiTypeSelector();
+  } catch(e) { alert("저장 실패: " + e.message); }
+  btn.disabled = false;
+}
+window.saveKujiType = saveKujiType;
+
+function cancelKujiTypeEdit() {
+  document.getElementById("kt-name").value = "";
+  document.getElementById("kt-desc").value = "";
+  document.getElementById("kt-edit-id").value = "";
+  document.getElementById("kt-save-btn").textContent = "추가";
+  document.getElementById("kt-cancel-btn").style.display = "none";
+}
+window.cancelKujiTypeEdit = cancelKujiTypeEdit;
+
+function editKujiType(id) {
+  const kt = kujiTypes.find(k => k.id === id); if (!kt) return;
+  document.getElementById("kt-name").value = kt.name;
+  document.getElementById("kt-desc").value = kt.desc || "";
+  document.getElementById("kt-edit-id").value = id;
+  document.getElementById("kt-save-btn").textContent = "수정 완료";
+  document.getElementById("kt-cancel-btn").style.display = "";
+}
+window.editKujiType = editKujiType;
+
+async function deleteKujiType(id) {
+  if (!confirm("이 쿠지 종류를 삭제할까요?\n연결된 상품들은 쿠지 종류가 해제됩니다.")) return;
+  try {
+    await deleteDoc(doc(db, "kujiTypes", id));
+    if (currentKujiId === id) currentKujiId = null;
+    await loadAll();
+    renderAdminTab();
+    renderKujiTypeSelector();
+    renderDrawTab();
+  } catch(e) { alert("삭제 실패: " + e.message); }
+}
+window.deleteKujiType = deleteKujiType;
+
+function renderAdminKujiTypes() {
+  const list = document.getElementById("kuji-type-admin-list");
+  if (!list) return;
+  if (!kujiTypes.length) {
+    list.innerHTML = '<div style="color:var(--sub);text-align:center;padding:20px">쿠지 종류를 추가해주세요</div>';
+    return;
+  }
+  list.innerHTML = "";
+  kujiTypes.forEach(kt => {
+    const el = document.createElement("div");
+    el.className = "product-item";
+    el.innerHTML = `
+      <div class="product-info">
+        <div class="product-name-row">
+          <span class="product-name" style="font-size:.9rem">${escHtml(kt.name)}</span>
+        </div>
+        <div class="product-meta">${escHtml(kt.desc || "")}</div>
+      </div>
+      <div class="product-actions">
+        <button class="edit-btn" onclick="editKujiType('${kt.id}')">수정</button>
+        <button class="del-btn" onclick="deleteKujiType('${kt.id}')">삭제</button>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+  // Update kuji type select in product form
+  const sel = document.getElementById("f-kuji-id");
+  if (sel) {
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">-- 쿠지 종류 선택 --</option>' +
+      kujiTypes.map(k => `<option value="${k.id}" ${cur===k.id?'selected':''}>${escHtml(k.name)}</option>`).join("");
+  }
+}
+
+// Render kuji type cards on draw tab
+function renderKujiTypeSelector() {
+  const list = document.getElementById("kuji-type-list");
+  const section = document.getElementById("kuji-type-section");
+  if (!list) return;
+  if (!kujiTypes.length) {
+    section.style.display = "none";
+    return;
+  }
+  section.style.display = "";
+  list.innerHTML = kujiTypes.map(kt => `
+    <div class="kuji-type-card ${currentKujiId === kt.id ? 'active' : ''}" onclick="selectKujiType('${kt.id}')">
+      <div class="kuji-type-card-name">${escHtml(kt.name)}</div>
+      <div class="kuji-type-card-desc">${escHtml(kt.desc || "")}</div>
+    </div>
+  `).join("");
+}
+
+async function selectKujiType(id) {
+  currentKujiId = currentKujiId === id ? null : id; // toggle
+  await loadAll();
+  renderKujiTypeSelector();
+  renderDrawTab();
+}
+window.selectKujiType = selectKujiType;
+
+
+  const np = document.getElementById("new-admin-pw").value;
+  const np2 = document.getElementById("new-admin-pw2").value;
+  if (!np) { alert("새 비밀번호를 입력하세요"); return; }
+  if (np !== np2) { alert("비밀번호가 일치하지 않아요"); return; }
+  if (np.length < 4) { alert("비밀번호는 4자 이상이어야 해요"); return; }
+  ADMIN_PW = np;
+  localStorage.setItem("kuji_admin_pw", np);
+  document.getElementById("new-admin-pw").value = "";
+  document.getElementById("new-admin-pw2").value = "";
+  alert("비밀번호가 변경됐어요!");
+}
+window.changeAdminPw = changeAdminPw;
+
+
   isAdmin = false;
   document.getElementById("nav-admin").style.display = "none";
   document.getElementById("admin-login-btn").style.display = "";
@@ -1693,6 +2104,8 @@ window.handleResetAll = handleResetAll;
 async function renderAdminTab() {
   // Products
   renderAdminProducts();
+  // Kuji types
+  renderAdminKujiTypes();
   // Users
   await loadAdminUsers();
 }
@@ -1737,7 +2150,7 @@ async function loadAdminUsers() {
   try {
     const snap = await getDocs(collection(db, "users"));
     const users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    if (!users.length) { list.innerHTML = '<div style="color:var(--sub);text-align:center;padding:20px">회원 없음</div>'; return; }
+    if (!users.length) { list.innerHTML = '<div style="color:var(--sub);text-align:center;padding:20px">가입한 회원이 없어요</div>'; return; }
     list.innerHTML = "";
     users.forEach(u => {
       const el = document.createElement("div");
@@ -1756,7 +2169,17 @@ async function loadAdminUsers() {
       list.appendChild(el);
     });
   } catch(e) {
-    list.innerHTML = `<div style="color:#FF6B6B;text-align:center;padding:20px">로드 실패: ${e.message}</div>`;
+    list.innerHTML = `
+      <div style="color:#FF6B6B;text-align:center;padding:20px">
+        <div style="font-weight:700;margin-bottom:8px;">회원 목록 로드 실패</div>
+        <div style="font-size:.78rem;color:var(--sub);margin-bottom:12px;">${e.message}</div>
+        <div style="font-size:.75rem;color:var(--sub);background:var(--bg2);padding:12px;border-radius:10px;text-align:left;line-height:1.8;">
+          <strong>Firebase Firestore 보안 규칙에서</strong><br>
+          <code style="color:var(--accent)">match /users/{uid} { allow read: if request.auth != null; }</code><br>
+          위 규칙을 추가하면 관리자가 회원 목록을 볼 수 있어요.
+        </div>
+      </div>
+    `;
   }
 }
 
@@ -1843,13 +2266,15 @@ window.clearImage = clearImage;
 async function saveProduct() {
   const name = document.getElementById("f-name").value.trim();
   if (!name) { alert("상품명을 입력하세요"); return; }
+  const kujiId = document.getElementById("f-kuji-id").value;
   const data = {
     name,
     grade: document.getElementById("f-grade").value,
     rate: Number(document.getElementById("f-rate").value) || 10,
     count: Number(document.getElementById("f-count").value) || 2,
     description: document.getElementById("f-desc").value,
-    imageUrl: currentImageUrl
+    imageUrl: currentImageUrl,
+    kujiId: kujiId || null
   };
   if (data.count < 2) { alert("재고는 최소 2개 이상이어야 해요"); return; }
   const btn = document.getElementById("save-product-btn");

@@ -905,36 +905,61 @@ let adminMsgTargetUid = null;
 let adminMsgTargetEmail = null;
 let queueUnsub = null;
 
+// ── Failsafe: if Firebase never responds (blocked network, etc), force-hide loading ──
+setTimeout(() => {
+  const el = document.getElementById("loading");
+  if (el && el.style.display !== "none") {
+    console.warn("Firebase 응답 지연 - 강제로 로딩 화면을 닫습니다.");
+    el.style.display = "none";
+    document.getElementById("tab-draw").style.display = "block";
+    document.getElementById("nav-draw").className = "nav-btn active";
+    try { renderDrawTab(); } catch(e) { console.error(e); }
+  }
+}, 8000);
+
 // ── Auth state ──
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
-  if (user) {
-    userId = user.uid;
-    document.getElementById("user-email-badge").textContent = user.email.split("@")[0];
-    document.getElementById("user-email-badge").style.display = "";
-    document.getElementById("point-badge").style.display = "";
-    document.getElementById("login-btn").style.display = "none";
-    // Load user profile
-    await ensureUserProfile(user);
-    await loadAll();
-    setupInboxListener();
-  } else {
-    userId = null;
-    userProfile = null;
-    userDraws = [];
-    document.getElementById("user-email-badge").style.display = "none";
-    document.getElementById("point-badge").style.display = "none";
-    document.getElementById("login-btn").style.display = "";
-    await loadAll();
+  try {
+    if (user) {
+      userId = user.uid;
+      document.getElementById("user-email-badge").textContent = user.email.split("@")[0];
+      document.getElementById("user-email-badge").style.display = "";
+      document.getElementById("point-badge").style.display = "";
+      document.getElementById("login-btn").style.display = "none";
+      // Load user profile
+      try {
+        await ensureUserProfile(user);
+      } catch(e) {
+        console.error("ensureUserProfile error:", e);
+      }
+      await loadAll();
+      try {
+        setupInboxListener();
+      } catch(e) {
+        console.error("setupInboxListener error:", e);
+      }
+    } else {
+      userId = null;
+      userProfile = null;
+      userDraws = [];
+      document.getElementById("user-email-badge").style.display = "none";
+      document.getElementById("point-badge").style.display = "none";
+      document.getElementById("login-btn").style.display = "";
+      await loadAll();
+    }
+  } catch(e) {
+    console.error("onAuthStateChanged error:", e);
+  } finally {
+    document.getElementById("loading").style.display = "none";
+    // Show tabs (they are hidden by default)
+    document.getElementById("tab-draw").style.display = "block";
+    document.getElementById("nav-draw").className = "nav-btn active";
+    try { renderDrawTab(); } catch(e) { console.error("renderDrawTab error:", e); }
+    try { renderCollectionTab(); } catch(e) { console.error("renderCollectionTab error:", e); }
+    try { renderMyPage(); } catch(e) { console.error("renderMyPage error:", e); }
+    if (isAdmin) { try { renderAdminTab(); } catch(e) { console.error("renderAdminTab error:", e); } }
   }
-  document.getElementById("loading").style.display = "none";
-  // Show tabs (they are hidden by default)
-  document.getElementById("tab-draw").style.display = "block";
-  document.getElementById("nav-draw").className = "nav-btn active";
-  renderDrawTab();
-  renderCollectionTab();
-  renderMyPage();
-  if (isAdmin) renderAdminTab();
 });
 
 async function ensureUserProfile(user) {

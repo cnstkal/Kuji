@@ -1340,6 +1340,7 @@ function randomSelectSlots() {
 window.randomSelectSlots = randomSelectSlots;
 
 
+function toggleSlot(idx) {
   if (drawnSlots.has(idx)) return;
   const avail = products.filter(p => (p.remaining ?? p.count) > 0);
   if (!avail.length) { alert("남은 상품이 없어요!"); return; }
@@ -1357,6 +1358,7 @@ window.randomSelectSlots = randomSelectSlots;
   if (slotEl) slotEl.className = "slot" + (selectedSlots.has(idx) ? " selected" : "");
   updateOpenBtn();
 }
+window.toggleSlot = toggleSlot;
 
 function updateOpenBtn() {
   const cnt = selectedSlots.size;
@@ -1886,6 +1888,7 @@ async function doChangePw() {
 window.doChangePw = doChangePw;
 
 
+async function doDeleteAccount() {
   const pw = document.getElementById("delete-pw").value;
   const errEl = document.getElementById("delete-error");
   errEl.textContent = "";
@@ -2051,6 +2054,7 @@ async function selectKujiType(id) {
 window.selectKujiType = selectKujiType;
 
 
+function changeAdminPw() {
   const np = document.getElementById("new-admin-pw").value;
   const np2 = document.getElementById("new-admin-pw2").value;
   if (!np) { alert("새 비밀번호를 입력하세요"); return; }
@@ -2065,6 +2069,7 @@ window.selectKujiType = selectKujiType;
 window.changeAdminPw = changeAdminPw;
 
 
+function adminLogout() {
   isAdmin = false;
   document.getElementById("nav-admin").style.display = "none";
   document.getElementById("admin-login-btn").style.display = "";

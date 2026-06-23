@@ -2733,25 +2733,20 @@ function renderAdminProducts() {
   }
 
   // Event delegation for edit/delete buttons (fixes mobile tap issues)
-  list.ontouchstart = null;
-  list.onclick = null;
-  const handleProductAction = (e) => {
-    const btn = e.target.closest("[data-action]");
-    if (!btn) return;
-    e.preventDefault();
-    const id = btn.dataset.id;
-    if (btn.dataset.action === "edit") editProduct(id);
-    else if (btn.dataset.action === "del") deleteProduct(id);
-  };
-  list.addEventListener("touchend", (e) => {
-    const btn = e.target.closest("[data-action]");
-    if (!btn) return;
-    e.preventDefault();
-    const id = btn.dataset.id;
-    if (btn.dataset.action === "edit") editProduct(id);
-    else if (btn.dataset.action === "del") deleteProduct(id);
-  }, { passive: false });
-  list.addEventListener("click", handleProductAction);
+  // Only attach once — re-attaching on every render was stacking duplicate listeners
+  if (!list._delegationAttached) {
+    list._delegationAttached = true;
+    const handleProductAction = (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+      e.preventDefault();
+      const id = btn.dataset.id;
+      if (btn.dataset.action === "edit") editProduct(id);
+      else if (btn.dataset.action === "del") deleteProduct(id);
+    };
+    list.addEventListener("touchend", handleProductAction, { passive: false });
+    list.addEventListener("click", handleProductAction);
+  }
 }
 
 async function loadAdminUsers() {
@@ -2954,28 +2949,36 @@ function cancelEdit() {
   document.getElementById("f-grade").value = "R";
   document.getElementById("f-rate").value = "10";
   document.getElementById("f-count").value = "2";
+  const ktSelect = document.getElementById("f-kuji-id");
+  if (ktSelect) ktSelect.value = "";
   document.getElementById("img-preview").style.display = "none";
   document.getElementById("del-img-btn").style.display = "none";
   document.getElementById("file-input").value = "";
   document.getElementById("form-title").textContent = "➕ 상품 추가";
   document.getElementById("save-product-btn").textContent = "상품 추가";
+  document.getElementById("save-product-btn").disabled = false;
   document.getElementById("cancel-edit-btn").style.display = "none";
 }
 window.cancelEdit = cancelEdit;
 
 function editProduct(id) {
-  const p = products.find(x => x.id === id); if (!p) return;
+  const allProductsForAdmin = window._allProductsAdmin || products;
+  const p = allProductsForAdmin.find(x => x.id === id);
+  if (!p) { alert("상품 정보를 찾을 수 없어요. 새로고침 후 다시 시도해주세요."); return; }
   editId = id; currentImageUrl = p.imageUrl || "";
   document.getElementById("f-name").value = p.name;
   document.getElementById("f-grade").value = p.grade;
   document.getElementById("f-rate").value = p.rate;
   document.getElementById("f-count").value = p.count;
   document.getElementById("f-desc").value = p.description || "";
+  const ktSelect = document.getElementById("f-kuji-id");
+  if (ktSelect) ktSelect.value = p.kujiId || "";
   const preview = document.getElementById("img-preview");
   if (p.imageUrl) { preview.src = p.imageUrl; preview.style.display = ""; document.getElementById("del-img-btn").style.display = ""; }
   else { preview.style.display = "none"; document.getElementById("del-img-btn").style.display = "none"; }
   document.getElementById("form-title").textContent = "✏️ 상품 수정";
   document.getElementById("save-product-btn").textContent = "수정 완료";
+  document.getElementById("save-product-btn").disabled = false;
   document.getElementById("cancel-edit-btn").style.display = "";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }

@@ -2861,7 +2861,7 @@ function renderAdminProducts() {
           <span class="product-grade-badge" style="color:${meta.color};background:${meta.color}22">${p.grade}</span>
           <span class="product-name">${escHtml(p.name)}</span>
         </div>
-        <div class="product-meta">가중치 ${p.rate} · 재고 ${p.remaining ?? p.count}/${p.count}</div>
+        <div class="product-meta">재고 ${p.remaining ?? p.count}/${p.count}</div>
       </div>
       <div class="product-actions">
         <button class="edit-btn" data-action="edit" data-id="${p.id}" style="touch-action:manipulation">수정</button>
@@ -3161,12 +3161,10 @@ window.requestQueue = requestQueue;
 
 // ── Helpers ──
 function weightedDraw(items) {
-  const pool = [];
-  items.forEach(item => {
+  // 완전 랜덤: 재고가 남은 상품 중에서 확률 가중치 없이 균등 랜덤 선택
+  const pool = items.filter(item => {
     const slots = item.remaining !== undefined ? item.remaining : (item.count || 1);
-    if (slots <= 0) return;
-    const w = Math.round((item.rate || 1) * 10);
-    for (let i = 0; i < w; i++) pool.push(item);
+    return slots > 0;
   });
   if (!pool.length) return null;
   return pool[Math.floor(Math.random() * pool.length)];

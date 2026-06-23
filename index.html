@@ -353,19 +353,17 @@ select.field-input{cursor:pointer;}
 
 <!-- Header -->
 <header>
-  <div class="logo">✦ KUJI</div>
+  <div class="logo" id="logo-btn" onclick="handleLogoClick()" style="cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;">✦ KUJI</div>
   <nav>
     <button class="nav-btn active" id="nav-draw" onclick="switchTab('draw')">뽑기</button>
     <button class="nav-btn" id="nav-collection" onclick="switchTab('collection')">컬렉션</button>
-    <button class="nav-btn" id="nav-mypage" onclick="switchTab('mypage')">MY</button>
     <button class="nav-btn" id="nav-admin" style="display:none" onclick="switchTab('admin')">관리자</button>
   </nav>
   <div class="header-right">
     <button class="icon-btn" onclick="toggleTheme()" id="theme-btn">☀️</button>
-    <span class="user-badge" id="user-email-badge" style="display:none" onclick="switchTab('mypage')" style="cursor:pointer"></span>
+    <span class="user-badge" id="user-email-badge" style="display:none;cursor:pointer" onclick="switchTab('mypage')"></span>
     <span class="point-badge" id="point-badge" style="display:none" onclick="showPointModal()">💎 0P</span>
     <button class="text-btn" id="login-btn" onclick="showLoginModal()">로그인</button>
-    <button class="text-btn" id="admin-login-btn" onclick="showAdminLogin()">관리자</button>
     <button class="logout-btn" id="admin-logout-btn" style="display:none" onclick="adminLogout()">관리자 로그아웃</button>
   </div>
 </header>
@@ -987,6 +985,11 @@ setTimeout(() => {
   }
 }, 8000);
 
+// ── Restore admin session on reload ──
+if (localStorage.getItem("kuji_admin_session") === "true") {
+  isAdmin = true;
+}
+
 // ── Auth state ──
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
@@ -1028,7 +1031,11 @@ onAuthStateChanged(auth, async (user) => {
     try { renderDrawTab(); } catch(e) { console.error("renderDrawTab error:", e); }
     try { renderCollectionTab(); } catch(e) { console.error("renderCollectionTab error:", e); }
     try { renderMyPage(); } catch(e) { console.error("renderMyPage error:", e); }
-    if (isAdmin) { try { renderAdminTab(); } catch(e) { console.error("renderAdminTab error:", e); } }
+    if (isAdmin) {
+      document.getElementById("nav-admin").style.display = "";
+      document.getElementById("admin-logout-btn").style.display = "";
+      try { renderAdminTab(); } catch(e) { console.error("renderAdminTab error:", e); }
+    }
   }
 });
 
@@ -1286,15 +1293,20 @@ async function renderDrawTab() {
     gg.appendChild(el);
   });
 
-  // Products preview - sorted by grade then name
+  // Products preview - only for selected kuji type
   const pg = document.getElementById("products-preview");
+  const productsSection = pg.closest(".products-section");
   pg.innerHTML = "";
-  const sortedProducts = [...products].sort((a,b) => {
-    const gd = (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9);
-    if (gd !== 0) return gd;
-    return (a.name||"").localeCompare(b.name||"", "ko");
-  });
-  sortedProducts.forEach(p => {
+  if (!currentKujiId) {
+    productsSection.style.display = "none";
+  } else {
+    productsSection.style.display = "";
+    const sortedProducts = [...products].sort((a,b) => {
+      const gd = (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9);
+      if (gd !== 0) return gd;
+      return (a.name||"").localeCompare(b.name||"", "ko");
+    });
+    sortedProducts.forEach(p => {
     const meta = GRADE_META[p.grade] || GRADE_META.N;
     const remaining = p.remaining ?? p.count;
     const el = document.createElement("div");
@@ -1312,8 +1324,9 @@ async function renderDrawTab() {
         <div class="prod-card-remain">재고 ${remaining}/${p.count}</div>
       </div>
     `;
-    pg.appendChild(el);
-  });
+      pg.appendChild(el);
+    });
+  }
 
   // Session info
   const kt2 = kujiTypes.find(k => k.id === currentKujiId);
@@ -1525,7 +1538,11 @@ async function handleDraw() {
   const btn = document.getElementById("open-btn");
   btn.disabled = true;
   btn.innerHTML = `<span class="spinner"></span> 오픈 중...`;
-  document.getElementById("results-area").style.display = "none";
+  // Clear previous results completely before new draw
+  const resultsArea = document.getElementById("results-area");
+  resultsArea.style.display = "none";
+  document.getElementById("results-grid").innerHTML = "";
+  document.getElementById("result-tags").innerHTML = "";
   playSound("open");
 
   const slotsToOpen = [...selectedSlots];
@@ -2045,16 +2062,32 @@ function doAdminLogin() {
   const pw = document.getElementById("admin-pw-input").value;
   if (pw === ADMIN_PW) {
     isAdmin = true;
+    localStorage.setItem("kuji_admin_session", "true");
     document.getElementById("admin-modal").style.display = "none";
     document.getElementById("admin-pw-input").value = "";
     document.getElementById("nav-admin").style.display = "";
-    document.getElementById("admin-login-btn").style.display = "none";
     document.getElementById("admin-logout-btn").style.display = "";
     renderAdminTab();
     switchTab("admin");
   } else { alert("비밀번호가 틀렸어요"); }
 }
 window.doAdminLogin = doAdminLogin;
+
+// ── Logo secret tap (5 taps within 3 seconds) ──
+let logoTapCount = 0;
+let logoTapTimer = null;
+function handleLogoClick() {
+  logoTapCount++;
+  if (logoTapTimer) clearTimeout(logoTapTimer);
+  if (logoTapCount >= 5) {
+    logoTapCount = 0;
+    if (isAdmin) { switchTab("admin"); }
+    else { showAdminLogin(); }
+    return;
+  }
+  logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 3000);
+}
+window.handleLogoClick = handleLogoClick;
 
 // ── Kuji Type functions ──
 async function saveKujiType() {
@@ -2165,14 +2198,26 @@ function renderKujiTypeSelector() {
   section.style.display = "";
   list.innerHTML = kujiTypes.map(kt => `
     <div class="kuji-type-card ${currentKujiId === kt.id ? 'active' : ''}"
-         onclick="selectKujiType('${kt.id}')"
-         ontouchstart=""
+         data-kujitypeid="${kt.id}"
          style="cursor:pointer">
       <div class="kuji-type-card-name">${escHtml(kt.name)}</div>
       ${kt.desc ? `<div class="kuji-type-card-desc">${escHtml(kt.desc)}</div>` : ""}
       <div class="kuji-type-card-price">${(kt.price||0).toLocaleString()}P / 판</div>
     </div>
   `).join("");
+  // Attach touch/click listeners directly (avoids mobile tap delay)
+  list.querySelectorAll(".kuji-type-card").forEach(card => {
+    let tapped = false;
+    card.addEventListener("touchstart", (e) => {
+      tapped = true;
+      e.preventDefault();
+      selectKujiType(card.dataset.kujitypeid);
+    }, { passive: false });
+    card.addEventListener("click", () => {
+      if (!tapped) selectKujiType(card.dataset.kujitypeid);
+      tapped = false;
+    });
+  });
 }
 
 async function selectKujiType(id) {
@@ -2208,8 +2253,8 @@ window.changeAdminPw = changeAdminPw;
 
 function adminLogout() {
   isAdmin = false;
+  localStorage.removeItem("kuji_admin_session");
   document.getElementById("nav-admin").style.display = "none";
-  document.getElementById("admin-login-btn").style.display = "";
   document.getElementById("admin-logout-btn").style.display = "none";
   if (document.getElementById("tab-admin").style.display !== "none") switchTab("draw");
 }
@@ -2367,13 +2412,13 @@ window.handleResetStock = handleResetStock;
 
 async function handleResetAll() {
   if (!isAdmin) { alert("관리자만 가능합니다"); return; }
-  if (!confirm("정말 전체 초기화할까요?\n재고 + 세션이 리셋됩니다.")) return;
+  if (!confirm("전체 초기화를 할까요?\n\n✅ 초기화되는 것: 재고 + 슬롯 세션\n❌ 유지되는 것: 유저 컬렉션(뽑기 기록)\n\n계속하시겠어요?")) return;
   try {
     await resetSession();
     drawnSlots.clear(); selectedSlots.clear();
     await loadAll();
     renderDrawTab();
-    alert("전체 초기화 완료!");
+    alert("전체 초기화 완료!\n(유저 컬렉션은 유지됩니다)");
   } catch(e) { alert("실패: " + e.message); }
 }
 window.handleResetAll = handleResetAll;
@@ -2429,8 +2474,8 @@ function renderAdminProducts() {
         <div class="product-meta">가중치 ${p.rate} · 재고 ${p.remaining ?? p.count}/${p.count}</div>
       </div>
       <div class="product-actions">
-        <button class="edit-btn" onclick="editProduct('${p.id}')">수정</button>
-        <button class="del-btn" onclick="deleteProduct('${p.id}')">삭제</button>
+        <button class="edit-btn" data-action="edit" data-id="${p.id}" style="touch-action:manipulation">수정</button>
+        <button class="del-btn" data-action="del" data-id="${p.id}" style="touch-action:manipulation">삭제</button>
       </div>
     `;
     list.appendChild(el);
@@ -2464,6 +2509,27 @@ function renderAdminProducts() {
       return (a.name||"").localeCompare(b.name||"","ko");
     }).forEach(renderItem);
   }
+
+  // Event delegation for edit/delete buttons (fixes mobile tap issues)
+  list.ontouchstart = null;
+  list.onclick = null;
+  const handleProductAction = (e) => {
+    const btn = e.target.closest("[data-action]");
+    if (!btn) return;
+    e.preventDefault();
+    const id = btn.dataset.id;
+    if (btn.dataset.action === "edit") editProduct(id);
+    else if (btn.dataset.action === "del") deleteProduct(id);
+  };
+  list.addEventListener("touchend", (e) => {
+    const btn = e.target.closest("[data-action]");
+    if (!btn) return;
+    e.preventDefault();
+    const id = btn.dataset.id;
+    if (btn.dataset.action === "edit") editProduct(id);
+    else if (btn.dataset.action === "del") deleteProduct(id);
+  }, { passive: false });
+  list.addEventListener("click", handleProductAction);
 }
 
 async function loadAdminUsers() {
@@ -2556,16 +2622,40 @@ async function doSendAdminMsg() {
 }
 window.doSendAdminMsg = doSendAdminMsg;
 
+// ── Image resize helper ──
+function resizeImageFile(file, maxPx = 800, quality = 0.82) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxPx || height > maxPx) {
+        if (width > height) { height = Math.round(height * maxPx / width); width = maxPx; }
+        else { width = Math.round(width * maxPx / height); height = maxPx; }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width; canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => resolve(blob || file), "image/jpeg", quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
 // ── Image upload ──
 async function handleImageUpload(e) {
   const file = e.target.files[0]; if (!file) return;
   const btn = document.getElementById("upload-btn");
   btn.textContent = "업로드 중..."; btn.disabled = true;
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 20000); // 20초 타임아웃 — 영원히 멈추는 것 방지
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
   try {
+    // Resize before upload for speed
+    const resized = await resizeImageFile(file, 800, 0.82);
     const fd = new FormData();
-    fd.append("file", file);
+    fd.append("file", resized, "image.jpg");
     fd.append("upload_preset", PRESET);
     const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, { method: "POST", body: fd, signal: controller.signal });
     if (!r.ok) {
@@ -2582,7 +2672,7 @@ async function handleImageUpload(e) {
   } catch(err) {
     console.error("handleImageUpload error:", err);
     if (err.name === "AbortError") {
-      alert("이미지 업로드가 20초 넘게 응답이 없어서 중단했어요. 네트워크 상태나 Cloudinary 설정(cloud name / upload preset)을 확인해주세요.");
+      alert("이미지 업로드가 응답이 없어서 중단했어요.\nCloudinary 설정(cloud name / upload preset)을 확인해주세요.");
     } else {
       alert("업로드 실패: " + (err.message || err));
     }
@@ -2632,6 +2722,7 @@ async function saveProduct() {
     alert("저장 실패: " + (e.message || e.code || e));
   }
   finally { btn.disabled = false; btn.textContent = editId ? "수정 완료" : "상품 추가"; }
+  // Note: cancelEdit() is called inside try block, which clears editId
 }
 window.saveProduct = saveProduct;
 
@@ -2767,15 +2858,20 @@ function launchConfetti() {
   setTimeout(() => { container.innerHTML = ""; }, 4500);
 }
 
-// ── Zoom prevention ──
+// ── Zoom prevention (only block multi-touch zoom, not single taps) ──
+document.addEventListener("gesturestart", e => e.preventDefault());
+document.addEventListener("gesturechange", e => e.preventDefault());
+// Prevent double-tap zoom only on non-interactive backgrounds
 let lastTouchEnd = 0;
 document.addEventListener("touchend", (e) => {
+  const tag = e.target.tagName;
+  const isInteractive = ["BUTTON","INPUT","SELECT","TEXTAREA","A","LABEL"].includes(tag)
+    || e.target.closest("button,input,select,textarea,a,[onclick],[data-action]");
+  if (isInteractive) return; // don't block button taps
   const now = Date.now();
   if (now - lastTouchEnd <= 300) e.preventDefault();
   lastTouchEnd = now;
 }, { passive: false });
-document.addEventListener("gesturestart", e => e.preventDefault());
-document.addEventListener("gesturechange", e => e.preventDefault());
 
 </script>
 </body>

@@ -364,7 +364,6 @@ select.field-input{cursor:pointer;}
     <span class="user-badge" id="user-email-badge" style="display:none;cursor:pointer" onclick="switchTab('mypage')"></span>
     <span class="point-badge" id="point-badge" style="display:none" onclick="showPointModal()">💎 0P</span>
     <button class="text-btn" id="login-btn" onclick="showLoginModal()">로그인</button>
-    <button class="logout-btn" id="admin-logout-btn" style="display:none" onclick="adminLogout()">관리자 로그아웃</button>
   </div>
 </header>
 
@@ -409,27 +408,52 @@ select.field-input{cursor:pointer;}
     <!-- Package select -->
     <div id="point-step-1">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-        <div class="point-pkg" onclick="selectPkg(3000)" data-amt="3000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
-          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">3,000P</div>
-          <div style="font-size:.72rem;color:var(--sub);">₩3,000</div>
-        </div>
-        <div class="point-pkg" onclick="selectPkg(5000)" data-amt="5000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
-          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">5,000P</div>
-          <div style="font-size:.72rem;color:var(--sub);">₩5,000</div>
-        </div>
-        <div class="point-pkg" onclick="selectPkg(10000)" data-amt="10000" style="padding:12px;border-radius:12px;border:2px solid var(--accent);cursor:pointer;text-align:center;background:var(--accent)18;position:relative;">
-          <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;">인기</div>
+        <div class="point-pkg" onclick="selectPkg(10000)" data-amt="10000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
           <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">10,000P</div>
           <div style="font-size:.72rem;color:var(--sub);">₩10,000</div>
         </div>
-        <div class="point-pkg" onclick="selectPkg(30000)" data-amt="30000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
+        <div class="point-pkg" onclick="selectPkg(30000)" data-amt="30000" style="padding:12px;border-radius:12px;border:2px solid var(--accent);cursor:pointer;text-align:center;background:var(--accent)18;position:relative;">
+          <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;">인기</div>
           <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">30,000P</div>
           <div style="font-size:.72rem;color:var(--sub);">₩30,000</div>
         </div>
+        <div class="point-pkg" onclick="selectPkg(50000)" data-amt="50000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
+          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">50,000P</div>
+          <div style="font-size:.72rem;color:var(--sub);">₩50,000</div>
+        </div>
+        <div class="point-pkg" onclick="selectPkg(100000)" data-amt="100000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
+          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">100,000P</div>
+          <div style="font-size:.72rem;color:var(--sub);">₩100,000</div>
+        </div>
       </div>
-      <div style="font-size:.72rem;color:var(--sub);margin-bottom:8px;text-align:center;">또는 직접 입력</div>
-      <input type="number" class="modal-input" id="point-amount" placeholder="충전할 금액 (원)" min="1000" step="1000"/>
-      <div style="font-size:.72rem;color:var(--sub);margin-bottom:10px;text-align:center;">1원 = 1포인트 · 최소 1,000원</div>
+      <!-- 자동 충전 설정 -->
+      <div id="auto-charge-section" style="background:var(--bg2);border-radius:12px;padding:12px;margin-bottom:12px;border:1px solid var(--border);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="font-size:.82rem;font-weight:700;">⚡ 자동 충전</div>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" id="auto-charge-toggle" onchange="toggleAutoCharge(this.checked)" style="accent-color:var(--accent);width:16px;height:16px;"/>
+            <span style="font-size:.75rem;color:var(--sub)">활성화</span>
+          </label>
+        </div>
+        <div id="auto-charge-config" style="display:none;">
+          <div style="font-size:.72rem;color:var(--sub);margin-bottom:6px;">포인트가 이 값 이하로 떨어지면 자동 충전</div>
+          <div style="display:flex;gap:8px;margin-bottom:6px;">
+            <select id="auto-charge-threshold" class="field-input" style="flex:1;padding:8px 10px;font-size:.82rem;">
+              <option value="5000">5,000P 이하</option>
+              <option value="10000" selected>10,000P 이하</option>
+              <option value="20000">20,000P 이하</option>
+              <option value="30000">30,000P 이하</option>
+            </select>
+            <select id="auto-charge-amount" class="field-input" style="flex:1;padding:8px 10px;font-size:.82rem;">
+              <option value="10000">10,000P 충전</option>
+              <option value="30000" selected>30,000P 충전</option>
+              <option value="50000">50,000P 충전</option>
+              <option value="100000">100,000P 충전</option>
+            </select>
+          </div>
+          <div style="font-size:.68rem;color:var(--accent);">⚡ 포인트 부족 시 자동으로 결제됩니다</div>
+        </div>
+      </div>
       <button class="modal-btn" onclick="goPayStep()">결제하기 →</button>
     </div>
 
@@ -641,7 +665,15 @@ select.field-input{cursor:pointer;}
         <option value="name-asc">이름 ㄱ-ㅎ</option>
         <option value="count-desc">보유수 많은순</option>
       </select>
-      <button class="text-btn" style="margin-left:6px;color:#FF6B6B;border-color:#FF6B6B44;" onclick="resetMyCollection()">🗑️ 초기화</button>
+    </div>
+    <!-- Grade filter + reset row -->
+    <div id="col-filter-row" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+      <button class="col-grade-filter active" data-grade="ALL" onclick="setColGradeFilter('ALL')" style="padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--text);font-size:.75rem;font-weight:700;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;">전체</button>
+      <button class="col-grade-filter" data-grade="SSR" onclick="setColGradeFilter('SSR')" style="padding:5px 12px;border-radius:20px;border:1.5px solid #FFD70044;background:#FFD70011;color:#FFD700;font-size:.75rem;font-weight:700;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;">SSR</button>
+      <button class="col-grade-filter" data-grade="SR" onclick="setColGradeFilter('SR')" style="padding:5px 12px;border-radius:20px;border:1.5px solid #C084FC44;background:#C084FC11;color:#C084FC;font-size:.75rem;font-weight:700;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;">SR</button>
+      <button class="col-grade-filter" data-grade="R" onclick="setColGradeFilter('R')" style="padding:5px 12px;border-radius:20px;border:1.5px solid #60A5FA44;background:#60A5FA11;color:#60A5FA;font-size:.75rem;font-weight:700;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;">R</button>
+      <button class="col-grade-filter" data-grade="N" onclick="setColGradeFilter('N')" style="padding:5px 12px;border-radius:20px;border:1.5px solid #94A3B844;background:#94A3B811;color:#94A3B8;font-size:.75rem;font-weight:700;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;">N</button>
+      <button class="text-btn" style="margin-left:auto;color:#FF6B6B;border-color:#FF6B6B44;" onclick="resetMyCollection()">🗑️ 초기화</button>
     </div>
     <div id="col-login-notice" style="display:none" class="col-empty">
       <div class="col-empty-icon">🔒</div>
@@ -746,7 +778,10 @@ select.field-input{cursor:pointer;}
 <!-- ══════════════════ ADMIN TAB ══════════════════ -->
 <div class="tab" id="tab-admin" style="display:none">
   <div class="main fade-in" style="max-width:800px">
-    <div class="admin-title">⚡ 관리자 패널</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div class="admin-title" style="margin-bottom:0">⚡ 관리자 패널</div>
+      <button id="admin-logout-btn" class="logout-btn" style="display:none" onclick="adminLogout()">로그아웃</button>
+    </div>
 
     <!-- Admin password change -->
     <div class="admin-card">
@@ -883,13 +918,10 @@ select.field-input{cursor:pointer;}
           </select>
         </div>
         <div>
-          <div class="field-label">확률 가중치</div>
-          <input type="number" min="1" class="field-input" id="f-rate" value="10"/>
-        </div>
-        <div>
           <div class="field-label">재고 수량</div>
-          <input type="number" min="1" class="field-input" id="f-count" value="2"/>
+          <input type="number" min="1" class="field-input" id="f-count" value="1"/>
         </div>
+        <input type="hidden" id="f-rate" value="10"/>
       </div>
       <div class="form-field">
         <div class="field-label">상품 설명</div>
@@ -1666,6 +1698,8 @@ async function handleDraw() {
       ...userDraws
     ];
     updatePointBadge();
+    // 자동충전 체크 (비동기, UI 블로킹 없음)
+    setTimeout(() => checkAutoCharge().catch(() => {}), 500);
 
     clearTimeout(watchdog);
     isDrawing = false;
@@ -1905,6 +1939,7 @@ function renderCollectionTab() {
 
   const sortKey = document.getElementById("col-sort").value;
   let arr = Object.values(grouped);
+  if (colGradeFilter !== "ALL") arr = arr.filter(item => item.grade === colGradeFilter);
   if (sortKey === "grade-asc") arr.sort((a,b) => (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9));
   else if (sortKey === "grade-desc") arr.sort((a,b) => (GRADE_ORDER[b.grade]??9)-(GRADE_ORDER[a.grade]??9));
   else if (sortKey === "date-desc") arr.sort((a,b) => b.drawnAt-a.drawnAt);
@@ -1980,34 +2015,88 @@ async function renderMyPage() {
 
 // ── Point modal ──
 let payAmount = 0;
+let autoChargeEnabled = false;
+let autoChargeThreshold = 10000;
+let autoChargeAmount = 30000;
+
 function showPointModal() {
   if (!userId) { showLoginModal(); return; }
   document.getElementById("point-modal-balance").textContent = `보유: ${(userProfile?.points || 0).toLocaleString()}P`;
   document.getElementById("point-error").textContent = "";
   document.getElementById("point-success").textContent = "";
-  document.getElementById("point-amount").value = "";
   document.getElementById("point-step-1").style.display = "";
   document.getElementById("point-step-2").style.display = "none";
   document.getElementById("point-step-3").style.display = "none";
+  // restore auto-charge settings UI
+  const toggle = document.getElementById("auto-charge-toggle");
+  if (toggle) {
+    toggle.checked = autoChargeEnabled;
+    document.getElementById("auto-charge-config").style.display = autoChargeEnabled ? "" : "none";
+    document.getElementById("auto-charge-threshold").value = autoChargeThreshold;
+    document.getElementById("auto-charge-amount").value = autoChargeAmount;
+  }
   loadPointHistory();
   document.getElementById("point-modal").style.display = "flex";
 }
 window.showPointModal = showPointModal;
 
+function toggleAutoCharge(enabled) {
+  autoChargeEnabled = enabled;
+  document.getElementById("auto-charge-config").style.display = enabled ? "" : "none";
+  if (enabled) {
+    autoChargeThreshold = parseInt(document.getElementById("auto-charge-threshold").value) || 10000;
+    autoChargeAmount = parseInt(document.getElementById("auto-charge-amount").value) || 30000;
+  }
+}
+window.toggleAutoCharge = toggleAutoCharge;
+
+async function checkAutoCharge() {
+  if (!autoChargeEnabled || !userId) return;
+  const th = parseInt(document.getElementById("auto-charge-threshold")?.value) || autoChargeThreshold;
+  const amt = parseInt(document.getElementById("auto-charge-amount")?.value) || autoChargeAmount;
+  const pts = userProfile?.points || 0;
+  if (pts <= th) {
+    // Auto charge
+    try {
+      await doChargePoint(amt);
+      // Show toast
+      const toast = document.createElement("div");
+      toast.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22D3EE;color:#000;padding:10px 20px;border-radius:20px;font-weight:700;font-size:.82rem;z-index:9999;pointer-events:none;";
+      toast.textContent = `⚡ 자동 충전 ${amt.toLocaleString()}P 완료!`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    } catch(e) { console.warn("자동충전 실패:", e); }
+  }
+}
+
 function selectPkg(amt) {
-  document.getElementById("point-amount").value = amt;
   document.querySelectorAll(".point-pkg").forEach(el => {
-    el.style.border = el.dataset.amt == amt ? "2px solid var(--accent)" : "2px solid var(--border)";
+    const isSelected = el.dataset.amt == amt;
+    el.style.border = isSelected ? "2px solid var(--accent)" : "2px solid var(--border)";
+    el.style.background = isSelected ? "var(--accent)18" : "var(--card)";
   });
+  payAmount = amt;
 }
 window.selectPkg = selectPkg;
 
+// ── Collection grade filter ──
+let colGradeFilter = "ALL";
+function setColGradeFilter(grade) {
+  colGradeFilter = grade;
+  document.querySelectorAll(".col-grade-filter").forEach(btn => {
+    const isActive = btn.dataset.grade === grade;
+    btn.style.opacity = isActive ? "1" : "0.5";
+    btn.style.transform = isActive ? "scale(1.05)" : "scale(1)";
+  });
+  renderCollectionTab();
+}
+window.setColGradeFilter = setColGradeFilter;
+
 function goPayStep() {
-  const amt = parseInt(document.getElementById("point-amount").value);
   const errEl = document.getElementById("point-error");
   errEl.textContent = "";
-  if (!amt || amt < 1000) { errEl.textContent = "최소 1,000원 이상 입력해주세요"; return; }
-  payAmount = amt;
+  if (!payAmount || payAmount < 1000) { errEl.textContent = "충전할 금액을 선택해주세요"; return; }
+  const amt = payAmount;
   document.getElementById("pay-amount-display").textContent = `${amt.toLocaleString()}원`;
   document.getElementById("point-step-1").style.display = "none";
   document.getElementById("point-step-2").style.display = "";
@@ -2921,7 +3010,7 @@ async function saveProduct() {
     imageUrl: currentImageUrl,
     kujiId: kujiId || null
   };
-  if (data.count < 2) { alert("재고는 최소 2개 이상이어야 해요"); return; }
+  if (data.count < 1) { alert("재고는 최소 1개 이상이어야 해요"); return; }
   const btn = document.getElementById("save-product-btn");
   btn.disabled = true; btn.textContent = "저장 중...";
   try {
@@ -2947,8 +3036,7 @@ function cancelEdit() {
   editId = null; currentImageUrl = "";
   ["f-name","f-desc"].forEach(id => document.getElementById(id).value = "");
   document.getElementById("f-grade").value = "R";
-  document.getElementById("f-rate").value = "10";
-  document.getElementById("f-count").value = "2";
+  document.getElementById("f-count").value = "1";
   const ktSelect = document.getElementById("f-kuji-id");
   if (ktSelect) ktSelect.value = "";
   document.getElementById("img-preview").style.display = "none";
@@ -2980,7 +3068,9 @@ function editProduct(id) {
   document.getElementById("save-product-btn").textContent = "수정 완료";
   document.getElementById("save-product-btn").disabled = false;
   document.getElementById("cancel-edit-btn").style.display = "";
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  // 폼 위치로 스크롤 (맨 위가 아닌 폼 카드로)
+  const formCard = document.getElementById("form-title")?.closest(".admin-card");
+  if (formCard) formCard.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 window.editProduct = editProduct;
 

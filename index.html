@@ -364,7 +364,7 @@ select.field-input{cursor:pointer;}
     <span class="user-badge" id="user-email-badge" style="display:none;cursor:pointer" onclick="switchTab('mypage')"></span>
     <span class="point-badge" id="point-badge" style="display:none" onclick="showPointModal()">💎 0P</span>
     <button class="text-btn" id="login-btn" onclick="showLoginModal()">로그인</button>
-    <span id="admin-logout-btn" style="display:none"></span>
+    <button class="logout-btn" id="admin-logout-btn" style="display:none" onclick="adminLogout()">관리자 로그아웃</button>
   </div>
 </header>
 
@@ -409,7 +409,16 @@ select.field-input{cursor:pointer;}
     <!-- Package select -->
     <div id="point-step-1">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-        <div class="point-pkg" onclick="selectPkg(10000)" data-amt="10000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
+        <div class="point-pkg" onclick="selectPkg(3000)" data-amt="3000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
+          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">3,000P</div>
+          <div style="font-size:.72rem;color:var(--sub);">₩3,000</div>
+        </div>
+        <div class="point-pkg" onclick="selectPkg(5000)" data-amt="5000" style="padding:12px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;background:var(--card);">
+          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">5,000P</div>
+          <div style="font-size:.72rem;color:var(--sub);">₩5,000</div>
+        </div>
+        <div class="point-pkg" onclick="selectPkg(10000)" data-amt="10000" style="padding:12px;border-radius:12px;border:2px solid var(--accent);cursor:pointer;text-align:center;background:var(--accent)18;position:relative;">
+          <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;">인기</div>
           <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">10,000P</div>
           <div style="font-size:.72rem;color:var(--sub);">₩10,000</div>
         </div>
@@ -417,46 +426,11 @@ select.field-input{cursor:pointer;}
           <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">30,000P</div>
           <div style="font-size:.72rem;color:var(--sub);">₩30,000</div>
         </div>
-        <div class="point-pkg" onclick="selectPkg(50000)" data-amt="50000" style="padding:12px;border-radius:12px;border:2px solid var(--accent);cursor:pointer;text-align:center;background:var(--accent)18;position:relative;">
-          <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;">인기</div>
-          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">50,000P</div>
-          <div style="font-size:.72rem;color:var(--sub);">₩50,000</div>
-        </div>
-        <div class="point-pkg" onclick="selectPkg(100000)" data-amt="100000" style="padding:12px;border-radius:12px;border:2px solid #FFD70044;cursor:pointer;text-align:center;background:#FFD70011;">
-          <div style="font-weight:800;font-size:1.1rem;color:#FFD700;">100,000P</div>
-          <div style="font-size:.72rem;color:var(--sub);">₩100,000</div>
-        </div>
       </div>
       <div style="font-size:.72rem;color:var(--sub);margin-bottom:8px;text-align:center;">또는 직접 입력</div>
-      <input type="number" class="modal-input" id="point-amount" placeholder="충전할 금액 (원)" min="10000" step="10000"/>
-      <div style="font-size:.72rem;color:var(--sub);margin-bottom:10px;text-align:center;">1원 = 1포인트 · 최소 10,000원</div>
-
-      <!-- 자동충전 설정 -->
-      <div style="background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:14px;">
-        <div style="font-size:.8rem;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
-          ⚡ 자동충전 설정
-          <span style="font-size:.68rem;color:var(--sub);font-weight:400;">포인트 부족 시 자동으로 충전</span>
-        </div>
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:10px;">
-          <input type="checkbox" id="auto-charge-toggle" style="accent-color:var(--accent);width:16px;height:16px;" onchange="toggleAutoChargeSettings()"/>
-          <span style="font-size:.82rem;">자동충전 활성화</span>
-        </label>
-        <div id="auto-charge-settings" style="display:none;">
-          <div style="font-size:.75rem;color:var(--sub);margin-bottom:6px;">자동충전 금액</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
-            <button class="auto-charge-amt-btn" data-amt="10000" onclick="selectAutoChargeAmt(10000)" style="padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.75rem;font-family:inherit;">1만원</button>
-            <button class="auto-charge-amt-btn" data-amt="30000" onclick="selectAutoChargeAmt(30000)" style="padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.75rem;font-family:inherit;">3만원</button>
-            <button class="auto-charge-amt-btn" data-amt="50000" onclick="selectAutoChargeAmt(50000)" style="padding:6px 12px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent)22;color:var(--accent);cursor:pointer;font-size:.75rem;font-family:inherit;font-weight:700;">5만원</button>
-            <button class="auto-charge-amt-btn" data-amt="100000" onclick="selectAutoChargeAmt(100000)" style="padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.75rem;font-family:inherit;">10만원</button>
-          </div>
-          <input type="hidden" id="auto-charge-amt" value="50000"/>
-          <div style="font-size:.72rem;color:var(--sub);">포인트가 0이 되면 선택한 금액으로 자동 충전됩니다.</div>
-        </div>
-        <div id="auto-charge-status" style="font-size:.75rem;color:var(--sub);margin-top:6px;display:none;"></div>
-      </div>
-
+      <input type="number" class="modal-input" id="point-amount" placeholder="충전할 금액 (원)" min="1000" step="1000"/>
+      <div style="font-size:.72rem;color:var(--sub);margin-bottom:10px;text-align:center;">1원 = 1포인트 · 최소 1,000원</div>
       <button class="modal-btn" onclick="goPayStep()">결제하기 →</button>
-      <button class="modal-btn secondary" id="save-auto-charge-btn" onclick="saveAutoChargeSettings()" style="margin-top:6px;display:none;">자동충전 설정 저장</button>
     </div>
 
     <!-- Payment step -->
@@ -602,18 +576,18 @@ select.field-input{cursor:pointer;}
     <!-- Grade summary (hidden per request) -->
     <div class="grade-grid" id="grade-grid" style="display:none"></div>
 
+    <!-- Products preview -->
+    <div class="products-section">
+      <div class="section-title">상품 목록</div>
+      <div class="products-grid" id="products-preview"></div>
+    </div>
+
     <!-- Enter board -->
     <div class="enter-board-wrap">
       <button class="enter-board-btn" id="enter-board-btn" onclick="enterBoard()">
         🎫 쿠지 고르기
       </button>
       <div style="font-size:.75rem;color:var(--sub);margin-top:8px;" id="enter-btn-hint">로그인 후 이용 가능합니다</div>
-    </div>
-
-    <!-- Products preview -->
-    <div class="products-section">
-      <div class="section-title">상품 목록</div>
-      <div class="products-grid" id="products-preview"></div>
     </div>
 
     <!-- ── Board view ── -->
@@ -667,6 +641,7 @@ select.field-input{cursor:pointer;}
         <option value="name-asc">이름 ㄱ-ㅎ</option>
         <option value="count-desc">보유수 많은순</option>
       </select>
+      <button class="text-btn" style="margin-left:6px;color:#FF6B6B;border-color:#FF6B6B44;" onclick="resetMyCollection()">🗑️ 초기화</button>
     </div>
     <div id="col-login-notice" style="display:none" class="col-empty">
       <div class="col-empty-icon">🔒</div>
@@ -725,6 +700,34 @@ select.field-input{cursor:pointer;}
           <div class="profile-label">총 뽑기 횟수</div>
           <div class="profile-value" id="my-draws">0회</div>
         </div>
+        <div class="profile-section">
+          <div class="profile-label">총 결제 금액</div>
+          <div class="profile-value" style="color:#FFD700;" id="my-total-spent">0원</div>
+        </div>
+      </div>
+
+      <!-- Shipping Info -->
+      <div class="admin-card">
+        <div class="admin-card-title">📦 배송 정보</div>
+        <div class="form-grid">
+          <div>
+            <div class="field-label">이름</div>
+            <input type="text" class="field-input" id="my-name-input" placeholder="홍길동"/>
+          </div>
+          <div>
+            <div class="field-label">전화번호</div>
+            <input type="text" class="field-input" id="my-phone-input" placeholder="010-1234-5678"/>
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="field-label">이메일</div>
+          <input type="text" class="field-input" id="my-shipping-email-input" placeholder="example@email.com" disabled value=""/>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="field-label">주소</div>
+          <input type="text" class="field-input" id="my-address-input" placeholder="배송받을 주소를 입력하세요"/>
+        </div>
+        <button class="save-btn" style="margin-top:12px;" onclick="saveShippingInfo()">배송 정보 저장</button>
       </div>
 
       <!-- Settings -->
@@ -743,10 +746,7 @@ select.field-input{cursor:pointer;}
 <!-- ══════════════════ ADMIN TAB ══════════════════ -->
 <div class="tab" id="tab-admin" style="display:none">
   <div class="main fade-in" style="max-width:800px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-      <div class="admin-title" style="margin-bottom:0">⚡ 관리자 패널</div>
-      <button class="logout-btn" style="padding:8px 18px;font-size:.82rem;" onclick="adminLogout()">🔓 관리자 로그아웃</button>
-    </div>
+    <div class="admin-title">⚡ 관리자 패널</div>
 
     <!-- Admin password change -->
     <div class="admin-card">
@@ -762,6 +762,10 @@ select.field-input{cursor:pointer;}
         </div>
       </div>
       <button class="save-btn" onclick="changeAdminPw()">비밀번호 변경</button>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:.8rem;color:var(--sub);cursor:pointer;">
+        <input type="checkbox" id="admin-pw-disable-toggle" onchange="toggleAdminPwDisabled(this.checked)"/>
+        비밀번호 비활성화 (관리자 버튼을 누르면 바로 입장돼요)
+      </label>
     </div>
 
     <!-- Notice -->
@@ -962,6 +966,7 @@ const PRESET = "Everything";
 
 // ── Admin password ──
 let ADMIN_PW = localStorage.getItem("kuji_admin_pw") || "2026";
+let ADMIN_PW_DISABLED = localStorage.getItem("kuji_admin_pw_disabled") === "true";
 
 // ── Grade meta ──
 const GRADE_META = {
@@ -1002,26 +1007,17 @@ let adminMsgTargetUid = null;
 let adminMsgTargetEmail = null;
 let queueUnsub = null;
 
-// ── 로딩 화면 즉시 숨기기 (Firebase 응답 전에도) ──
-// tab-draw를 바로 보여주고, Firebase 데이터 로드되면 렌더 갱신
-(function() {
-  const el = document.getElementById("loading");
-  if (el) el.style.display = "none";
-  const tabDraw = document.getElementById("tab-draw");
-  if (tabDraw) tabDraw.style.display = "block";
-  const navDraw = document.getElementById("nav-draw");
-  if (navDraw) navDraw.className = "nav-btn active";
-})();
-// Failsafe (just in case)
+// ── Failsafe: if Firebase never responds (blocked network, etc), force-hide loading ──
 setTimeout(() => {
   const el = document.getElementById("loading");
   if (el && el.style.display !== "none") {
+    console.warn("Firebase 응답 지연 - 강제로 로딩 화면을 닫습니다.");
     el.style.display = "none";
     document.getElementById("tab-draw").style.display = "block";
     document.getElementById("nav-draw").className = "nav-btn active";
     try { renderDrawTab(); } catch(e) { console.error(e); }
   }
-}, 2000);
+}, 8000);
 
 // ── Restore admin session on reload ──
 if (localStorage.getItem("kuji_admin_session") === "true") {
@@ -1117,7 +1113,15 @@ function renderInbox(msgs) {
   const list = document.getElementById("inbox-list");
   if (!msgs.length) { card.style.display = "none"; return; }
   card.style.display = "";
-  list.innerHTML = msgs.map(m => `
+  const visible = msgs.slice(0, 4);
+  const overflow = msgs.slice(4);
+  if (overflow.length && userId) {
+    // Auto-delete older messages beyond the most recent 4
+    overflow.forEach(m => {
+      deleteDoc(doc(db, "users", userId, "messages", m.id)).catch(() => {});
+    });
+  }
+  list.innerHTML = visible.map(m => `
     <div class="msg-row">
       <div class="msg-row-from">📨 관리자</div>
       <div class="msg-row-text">${escHtml(m.text)}</div>
@@ -1199,8 +1203,16 @@ async function resetSession() {
   await setDoc(sRef, { drawnSlots: [], sessionNum: num });
   drawnSlots = new Set();
   selectedSlots = new Set();
-  // 재고는 리셋하지 않음 - 새 판이 시작돼도 재고는 유지됨
-  // (관리자가 직접 재고 초기화 버튼을 눌러야만 초기화됨)
+  // Reset remaining stock for this kuji type only
+  const pDocs = await getDocs(collection(db, "products"));
+  const batch = writeBatch(db);
+  pDocs.docs.forEach(d => {
+    const pd = d.data();
+    if (!currentKujiId || pd.kujiId === currentKujiId) {
+      batch.update(doc(db, "products", d.id), { remaining: pd.count });
+    }
+  });
+  await batch.commit();
   await loadAll();
 }
 
@@ -1548,24 +1560,9 @@ async function handleDraw() {
   const cost = unitPrice * drawCount;
   const pts = userProfile?.points || 0;
   if (pts < cost) {
-    // 자동충전 활성화된 경우 자동 충전 시도
-    if (autoChargeSettings.enabled) {
-      const charged = await checkAndAutoCharge(cost);
-      if (charged) {
-        // 재시도
-        const newPts = userProfile?.points || 0;
-        if (newPts < cost) {
-          alert(`포인트가 부족해요!\n필요: ${cost.toLocaleString()}P · 보유: ${newPts.toLocaleString()}P`);
-          return;
-        }
-      } else {
-        return;
-      }
-    } else {
-      alert(`포인트가 부족해요!\n필요: ${cost.toLocaleString()}P · 보유: ${pts.toLocaleString()}P\n\n포인트를 충전해주세요.`);
-      showPointModal();
-      return;
-    }
+    alert(`포인트가 부족해요!\n필요: ${cost.toLocaleString()}P · 보유: ${pts.toLocaleString()}P\n\n포인트를 충전해주세요.`);
+    showPointModal();
+    return;
   }
 
   // Queue limit check
@@ -1753,6 +1750,65 @@ function renderResults(items) {
 }
 
 // ── Collection ──
+async function saveShippingInfo() {
+  if (!userId) { showLoginModal(); return; }
+  const name = document.getElementById("my-name-input").value.trim();
+  const phone = document.getElementById("my-phone-input").value.trim();
+  const address = document.getElementById("my-address-input").value.trim();
+  if (!name || !phone || !address) { alert("이름, 전화번호, 주소를 모두 입력해주세요"); return; }
+  try {
+    const shippingInfo = { name, phone, address, email: currentUser?.email || "" };
+    await updateDoc(doc(db, "users", userId), { shippingInfo });
+    userProfile.shippingInfo = shippingInfo;
+    alert("배송 정보가 저장됐어요!");
+  } catch(e) { alert("저장 실패: " + e.message); }
+}
+window.saveShippingInfo = saveShippingInfo;
+
+// ── Shipping request for collection items ──
+async function requestShipping(drawItemId) {
+  if (!userId) { showLoginModal(); return; }
+  const item = userDraws.find(d => d.id === drawItemId);
+  if (!item) return;
+  if (item.shippingRequested) { alert("이미 배송 신청된 상품이에요"); return; }
+  const sp = userProfile?.shippingInfo;
+  if (!sp || !sp.name || !sp.phone || !sp.address) {
+    alert("배송 정보(이름, 전화번호, 주소)를 마이페이지에서 먼저 입력해주세요");
+    switchTab("mypage");
+    return;
+  }
+  if (!confirm(`"${item.name}" 상품을 아래 주소로 배송 신청할까요?\n\n받는분: ${sp.name}\n연락처: ${sp.phone}\n주소: ${sp.address}`)) return;
+  try {
+    await addDoc(collection(db, "shippingRequests"), {
+      uid: userId, email: currentUser?.email || "",
+      drawItemId: item.id, productId: item.productId || "", name: item.name, grade: item.grade,
+      shippingInfo: sp, requestedAt: Date.now(), status: "requested"
+    });
+    await updateDoc(doc(db, "draws", userId, "items", item.id), { shippingRequested: true });
+    item.shippingRequested = true;
+    renderCollectionTab();
+    alert("배송 신청이 완료됐어요!");
+  } catch(e) { alert("배송 신청 실패: " + e.message); }
+}
+window.requestShipping = requestShipping;
+
+async function resetMyCollection() {
+  if (!userId) { showLoginModal(); return; }
+  if (!userDraws.length) { alert("초기화할 컬렉션이 없어요"); return; }
+  if (!confirm("내 컬렉션을 전부 초기화할까요? 뽑은 기록이 모두 삭제되고 복구할 수 없어요.")) return;
+  try {
+    const snap = await getDocs(collection(db, "draws", userId, "items"));
+    const batch = writeBatch(db);
+    snap.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    userDraws = [];
+    renderCollectionTab();
+    renderMyPage();
+    alert("컬렉션이 초기화됐어요");
+  } catch(e) { alert("초기화 실패: " + e.message); }
+}
+window.resetMyCollection = resetMyCollection;
+
 function renderCollectionTab() {
   if (!userId) {
     document.getElementById("col-login-notice").style.display = "";
@@ -1792,8 +1848,10 @@ function renderCollectionTab() {
   const grouped = {};
   userDraws.forEach(d => {
     const key = d.productId || d.name;
-    if (!grouped[key]) grouped[key] = { ...d, qty: 0, firstAt: d.drawnAt };
+    if (!grouped[key]) grouped[key] = { ...d, qty: 0, firstAt: d.drawnAt, ids: [], shippedCount: 0 };
     grouped[key].qty++;
+    grouped[key].ids.push(d.id);
+    if (d.shippingRequested) grouped[key].shippedCount++;
     if (d.drawnAt > grouped[key].drawnAt) grouped[key].drawnAt = d.drawnAt;
     if (d.drawnAt < grouped[key].firstAt) grouped[key].firstAt = d.drawnAt;
   });
@@ -1818,6 +1876,11 @@ function renderCollectionTab() {
       ? `<img class="col-item-img" src="${item.imageUrl}" alt="${item.name}" loading="lazy"/>`
       : `<div class="col-item-no-img" style="background:${meta.color}18">🎁</div>`;
     const dateStr = item.drawnAt ? new Date(item.drawnAt).toLocaleDateString("ko-KR") : "";
+    const canShip = item.shippedCount < item.qty;
+    const unshippedId = item.ids.find(id => {
+      const d = userDraws.find(x => x.id === id);
+      return d && !d.shippingRequested;
+    });
     el.innerHTML = `
       <div class="col-item-img-wrap">${imgHtml}</div>
       ${item.qty > 1 ? `<div class="col-count-badge">×${item.qty}</div>` : ""}
@@ -1825,6 +1888,9 @@ function renderCollectionTab() {
         <div class="col-item-grade" style="color:${meta.color}">${item.grade}</div>
         <div class="col-item-name">${escHtml(item.name)}</div>
         <div class="col-item-date">${dateStr}</div>
+        ${canShip
+          ? `<button class="text-btn" style="margin-top:6px;width:100%;" onclick="requestShipping('${unshippedId}')">📦 배송 신청</button>`
+          : `<div class="col-item-date" style="color:var(--accent)">배송 신청 완료</div>`}
       </div>
     `;
     grid.appendChild(el);
@@ -1833,7 +1899,7 @@ function renderCollectionTab() {
 window.renderCollectionTab = renderCollectionTab;
 
 // ── My Page ──
-function renderMyPage() {
+async function renderMyPage() {
   if (!userId) {
     document.getElementById("mypage-login-notice").style.display = "";
     document.getElementById("mypage-content").style.display = "none";
@@ -1848,6 +1914,21 @@ function renderMyPage() {
     ? `${warns}회 <span class="warn-badge">경고</span>`
     : "없음";
   document.getElementById("my-draws").textContent = `${userDraws.length}회`;
+  // Total amount spent (sum of point charges, in 원, 1P = 1원)
+  try {
+    const hSnap = await getDocs(collection(db, "users", userId, "pointHistory"));
+    const total = hSnap.docs.reduce((sum, d) => {
+      const a = d.data().amount || 0;
+      return a > 0 ? sum + a : sum;
+    }, 0);
+    document.getElementById("my-total-spent").textContent = `${total.toLocaleString()}원`;
+  } catch(e) { document.getElementById("my-total-spent").textContent = "0원"; }
+  // Shipping profile fields
+  const sp = userProfile?.shippingInfo || {};
+  if (document.getElementById("my-name-input")) document.getElementById("my-name-input").value = sp.name || "";
+  if (document.getElementById("my-phone-input")) document.getElementById("my-phone-input").value = sp.phone || "";
+  if (document.getElementById("my-shipping-email-input")) document.getElementById("my-shipping-email-input").value = currentUser?.email || "";
+  if (document.getElementById("my-address-input")) document.getElementById("my-address-input").value = sp.address || "";
 }
 
 // ── Point modal ──
@@ -1878,7 +1959,7 @@ function goPayStep() {
   const amt = parseInt(document.getElementById("point-amount").value);
   const errEl = document.getElementById("point-error");
   errEl.textContent = "";
-  if (!amt || amt < 10000) { errEl.textContent = "최소 10,000원 이상 입력해주세요"; return; }
+  if (!amt || amt < 1000) { errEl.textContent = "최소 1,000원 이상 입력해주세요"; return; }
   payAmount = amt;
   document.getElementById("pay-amount-display").textContent = `${amt.toLocaleString()}원`;
   document.getElementById("point-step-1").style.display = "none";
@@ -1926,7 +2007,7 @@ async function doChargePoint(amt) {
   const errEl = document.getElementById("point-error");
   const sucEl = document.getElementById("point-success");
   errEl.textContent = ""; sucEl.textContent = "";
-  if (!amt || amt < 10000) { errEl.textContent = "최소 10,000원 이상 입력해주세요"; return; }
+  if (!amt || amt < 1000) { errEl.textContent = "최소 1,000원 이상 입력해주세요"; return; }
 
   try {
     const batch = writeBatch(db);
@@ -1952,91 +2033,6 @@ async function doChargePoint(amt) {
   }
 }
 window.doChargePoint = doChargePoint;
-
-// ── 자동충전 ──
-let autoChargeSettings = { enabled: false, amount: 50000 };
-
-function loadAutoChargeSettings() {
-  try {
-    const saved = localStorage.getItem("kuji_auto_charge_" + (userId || ""));
-    if (saved) autoChargeSettings = JSON.parse(saved);
-  } catch(e) {}
-}
-
-function saveAutoChargeSettings() {
-  const enabled = document.getElementById("auto-charge-toggle").checked;
-  const amt = parseInt(document.getElementById("auto-charge-amt").value) || 50000;
-  autoChargeSettings = { enabled, amount: amt };
-  try {
-    localStorage.setItem("kuji_auto_charge_" + (userId || ""), JSON.stringify(autoChargeSettings));
-  } catch(e) {}
-  updateAutoChargeStatusUI();
-  const btn = document.getElementById("save-auto-charge-btn");
-  if (btn) { btn.textContent = "✓ 저장됨"; setTimeout(() => { btn.textContent = "자동충전 설정 저장"; }, 1500); }
-}
-window.saveAutoChargeSettings = saveAutoChargeSettings;
-
-function toggleAutoChargeSettings() {
-  const enabled = document.getElementById("auto-charge-toggle").checked;
-  const settings = document.getElementById("auto-charge-settings");
-  const saveBtn = document.getElementById("save-auto-charge-btn");
-  if (settings) settings.style.display = enabled ? "" : "none";
-  if (saveBtn) saveBtn.style.display = enabled ? "" : "none";
-  updateAutoChargeStatusUI();
-}
-window.toggleAutoChargeSettings = toggleAutoChargeSettings;
-
-function selectAutoChargeAmt(amt) {
-  document.getElementById("auto-charge-amt").value = amt;
-  document.querySelectorAll(".auto-charge-amt-btn").forEach(btn => {
-    const isSelected = parseInt(btn.dataset.amt) === amt;
-    btn.style.border = isSelected ? "1.5px solid var(--accent)" : "1.5px solid var(--border)";
-    btn.style.background = isSelected ? "var(--accent)22" : "var(--card)";
-    btn.style.color = isSelected ? "var(--accent)" : "var(--text)";
-    btn.style.fontWeight = isSelected ? "700" : "400";
-  });
-}
-window.selectAutoChargeAmt = selectAutoChargeAmt;
-
-function updateAutoChargeStatusUI() {
-  const status = document.getElementById("auto-charge-status");
-  if (!status) return;
-  if (autoChargeSettings.enabled) {
-    status.style.display = "";
-    status.innerHTML = `⚡ 자동충전 ON · ${autoChargeSettings.amount.toLocaleString()}원`;
-    status.style.color = "var(--accent)";
-  } else {
-    status.style.display = "none";
-  }
-}
-
-// 포인트 부족 시 자동충전 체크
-async function checkAndAutoCharge(requiredPoints) {
-  if (!autoChargeSettings.enabled || !userId) return false;
-  const currentPts = userProfile?.points || 0;
-  if (currentPts < requiredPoints) {
-    const confirmMsg = `포인트가 부족합니다.\n자동충전 설정으로 ${autoChargeSettings.amount.toLocaleString()}원을 충전할까요?`;
-    if (!confirm(confirmMsg)) return false;
-    await doChargePoint(autoChargeSettings.amount);
-    return true;
-  }
-  return false;
-}
-
-// showPointModal에서 자동충전 UI 초기화
-const _origShowPointModal = showPointModal;
-window.showPointModal = function() {
-  _origShowPointModal();
-  loadAutoChargeSettings();
-  const toggle = document.getElementById("auto-charge-toggle");
-  const settings = document.getElementById("auto-charge-settings");
-  const saveBtn = document.getElementById("save-auto-charge-btn");
-  if (toggle) toggle.checked = autoChargeSettings.enabled;
-  if (settings) settings.style.display = autoChargeSettings.enabled ? "" : "none";
-  if (saveBtn) saveBtn.style.display = autoChargeSettings.enabled ? "" : "none";
-  selectAutoChargeAmt(autoChargeSettings.amount || 50000);
-  updateAutoChargeStatusUI();
-};
 
 // ── Auth ──
 function showLoginModal() {
@@ -2183,33 +2179,45 @@ window.doDeleteAccount = doDeleteAccount;
 
 // ── Admin Auth ──
 function showAdminLogin() {
+  if (ADMIN_PW_DISABLED) { grantAdminAccess(); return; }
   document.getElementById("admin-modal").style.display = "flex";
   setTimeout(() => document.getElementById("admin-pw-input").focus(), 100);
 }
 window.showAdminLogin = showAdminLogin;
 
+function grantAdminAccess() {
+  isAdmin = true;
+  localStorage.setItem("kuji_admin_session", "true");
+  document.getElementById("admin-modal").style.display = "none";
+  document.getElementById("admin-pw-input").value = "";
+  document.getElementById("nav-admin").style.display = "";
+  document.getElementById("admin-logout-btn").style.display = "";
+  renderAdminTab();
+  switchTab("admin");
+}
+window.grantAdminAccess = grantAdminAccess;
+
 function doAdminLogin() {
   const pw = document.getElementById("admin-pw-input").value;
-  if (pw === ADMIN_PW) {
-    isAdmin = true;
-    localStorage.setItem("kuji_admin_session", "true");
-    document.getElementById("admin-modal").style.display = "none";
-    document.getElementById("admin-pw-input").value = "";
-    document.getElementById("nav-admin").style.display = "";
-    document.getElementById("admin-logout-btn").style.display = "";
-    renderAdminTab();
-    switchTab("admin");
+  if (ADMIN_PW_DISABLED || pw === ADMIN_PW) {
+    grantAdminAccess();
   } else { alert("비밀번호가 틀렸어요"); }
 }
 window.doAdminLogin = doAdminLogin;
 
-// ── Logo secret tap (3 taps within 3 seconds) ──
+function toggleAdminPwDisabled(checked) {
+  ADMIN_PW_DISABLED = checked;
+  localStorage.setItem("kuji_admin_pw_disabled", checked ? "true" : "false");
+}
+window.toggleAdminPwDisabled = toggleAdminPwDisabled;
+
+// ── Logo secret tap (5 taps within 3 seconds) ──
 let logoTapCount = 0;
 let logoTapTimer = null;
 function handleLogoClick() {
   logoTapCount++;
   if (logoTapTimer) clearTimeout(logoTapTimer);
-  if (logoTapCount >= 3) {
+  if (logoTapCount >= 5) {
     logoTapCount = 0;
     if (isAdmin) { switchTab("admin"); }
     else { showAdminLogin(); }
@@ -2218,13 +2226,6 @@ function handleLogoClick() {
   logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 3000);
 }
 window.handleLogoClick = handleLogoClick;
-// pointerdown으로도 등록 (한번에 반응하도록)
-document.addEventListener("DOMContentLoaded", () => {
-  const logoEl = document.getElementById("logo-btn");
-  if (logoEl) {
-    logoEl.addEventListener("pointerdown", handleLogoClick, { passive: true });
-  }
-});
 
 // ── Kuji Type functions ──
 async function saveKujiType() {
@@ -2342,16 +2343,18 @@ function renderKujiTypeSelector() {
       <div class="kuji-type-card-price">${(kt.price||0).toLocaleString()}P / 판</div>
     </div>
   `).join("");
-  // Attach pointer listeners - 한번에 작동
+  // Attach touch/click listeners directly (avoids mobile tap delay)
   list.querySelectorAll(".kuji-type-card").forEach(card => {
-    let _pdown = false;
-    card.addEventListener("pointerdown", () => { _pdown = true; }, { passive: true });
-    card.addEventListener("pointerup", (e) => {
-      if (!_pdown) return;
-      _pdown = false;
+    let tapped = false;
+    card.addEventListener("touchstart", (e) => {
+      tapped = true;
+      e.preventDefault();
       selectKujiType(card.dataset.kujitypeid);
-    }, { passive: true });
-    card.addEventListener("pointercancel", () => { _pdown = false; }, { passive: true });
+    }, { passive: false });
+    card.addEventListener("click", () => {
+      if (!tapped) selectKujiType(card.dataset.kujitypeid);
+      tapped = false;
+    });
   });
 }
 
@@ -2411,8 +2414,6 @@ let fakeQueueTimer = null;
 let fakeQueuePosition = 0;
 let fakeQueueTotal = 0;
 const FAKE_NAMES = ["user_a4f2","aniha...","k_fan92","idol77","star_j","neo_99","cube88","l_pick","kpop12","misty_","wave33","sunny7","hyun_k","coco_m","jade11"];
-const FAKE_GRADES = ["SSR","SR","SR","R","R","R","N","N","N","N"];
-const FAKE_ITEMS = ["1:1 VIDEO CALL", "DRAWSTRING BAG", "LUGGAGE", "MULTI POUCH", "PHOTO CARD 8EA", "PHOTO CARD 1EA", "PHOTO CARD 3EA"];
 
 function enterFakeQueue() {
   if (!userId) { showLoginModal(); return; }
@@ -2469,27 +2470,65 @@ function addFakeDrawFeed(name, grade, item) {
   while (feed.children.length > 9) feed.removeChild(feed.lastChild);
 }
 
+// Pick a real product from the CURRENT kuji type's pool and consume real stock + a real slot,
+// so fake-queue draws behave like genuine draws on the shared board.
+async function consumeFakeDraw() {
+  const avail = products.filter(p => p.kujiId === currentKujiId && (p.remaining ?? p.count) > 0);
+  if (!avail.length) return null;
+  const pick = weightedDraw(avail);
+  if (!pick) return null;
+
+  // Decrement stock in Firestore + local cache
+  const rem = (pick.remaining ?? pick.count) - 1;
+  try { await updateDoc(doc(db, "products", pick.id), { remaining: Math.max(0, rem) }); } catch(e) {}
+  pick.remaining = Math.max(0, rem);
+  const cached = (window._allProductsAdmin || []).find(p => p.id === pick.id);
+  if (cached) cached.remaining = pick.remaining;
+
+  // Mark a random open slot as drawn on the shared board (this kuji type only)
+  const openSlots = [];
+  for (let i = 0; i < totalSlots; i++) if (!drawnSlots.has(i)) openSlots.push(i);
+  if (openSlots.length) {
+    const slotIdx = openSlots[Math.floor(Math.random() * openSlots.length)];
+    drawnSlots.add(slotIdx);
+    try { await saveSessionState(); } catch(e) {}
+    if (isBoardOpen) renderKujiBoard();
+  }
+  renderGradeGrid();
+  return pick;
+}
+
 function scheduleFakeQueueTick() {
   if (fakeQueueTimer) clearTimeout(fakeQueueTimer);
   if (fakeQueuePosition <= 1) return;
   const minMs = (settings.fakeSpeedMin || 8) * 1000;
   const maxMs = (settings.fakeSpeedMax || 25) * 1000;
   const delay = minMs + Math.random() * (maxMs - minMs);
-  fakeQueueTimer = setTimeout(() => {
+  fakeQueueTimer = setTimeout(async () => {
     fakeQueuePosition--;
-    // Add a fake draw to feed
+    // Add a fake draw to feed, using a REAL product from the current kuji type's pool
     const name = FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)];
-    const grade = FAKE_GRADES[Math.floor(Math.random() * FAKE_GRADES.length)];
-    const item = FAKE_ITEMS[Math.floor(Math.random() * FAKE_ITEMS.length)];
-    addFakeDrawFeed(name, grade, item);
+    const drawnItem = await consumeFakeDraw();
+    if (drawnItem) addFakeDrawFeed(name, drawnItem.grade, drawnItem.name);
     updateFakeQueueUI();
     if (fakeQueuePosition > 1) scheduleFakeQueueTick();
   }, delay);
 }
 
-function fakeQueueEnterBoard() {
+async function fakeQueueEnterBoard() {
+  if (fakeQueueTimer) { clearTimeout(fakeQueueTimer); fakeQueueTimer = null; }
   document.getElementById("fake-queue-room").style.display = "none";
-  enterBoard();
+  if (!userId) { showLoginModal(); return; }
+  if (!currentKujiId) { alert("뽑기 종류를 먼저 선택해주세요"); return; }
+  // Skip the fake-queue check entirely and go straight into the board
+  isBoardOpen = true;
+  document.getElementById("board-view").style.display = "block";
+  document.getElementById("enter-board-btn").style.display = "none";
+  try { document.querySelector(".enter-board-wrap > div").style.display = "none"; } catch(e) {}
+  document.getElementById("results-area").style.display = "none";
+  selectedSlots = new Set();
+  await loadAll();
+  renderKujiBoard();
 }
 window.fakeQueueEnterBoard = fakeQueueEnterBoard;
 
@@ -2559,6 +2598,8 @@ async function handleResetAll() {
 window.handleResetAll = handleResetAll;
 
 async function renderAdminTab() {
+  const pwToggle = document.getElementById("admin-pw-disable-toggle");
+  if (pwToggle) pwToggle.checked = ADMIN_PW_DISABLED;
   // Products
   renderAdminProducts();
   // Kuji types
@@ -2645,25 +2686,26 @@ function renderAdminProducts() {
     }).forEach(renderItem);
   }
 
-  // Event delegation for edit/delete buttons - 한번에 작동하도록 수정
-  // 기존 리스너 완전 제거 후 재등록
-  const newList = list.cloneNode(true);
-  list.parentNode.replaceChild(newList, list);
-  // 새 list 참조 갱신
-  const theList = document.getElementById("product-list");
-  let _pendingAction = null;
-  theList.addEventListener("pointerdown", (e) => {
+  // Event delegation for edit/delete buttons (fixes mobile tap issues)
+  list.ontouchstart = null;
+  list.onclick = null;
+  const handleProductAction = (e) => {
     const btn = e.target.closest("[data-action]");
     if (!btn) return;
-    _pendingAction = { action: btn.dataset.action, id: btn.dataset.id };
-  }, { passive: true });
-  theList.addEventListener("pointerup", (e) => {
-    if (!_pendingAction) return;
-    const { action, id } = _pendingAction;
-    _pendingAction = null;
-    if (action === "edit") editProduct(id);
-    else if (action === "del") deleteProduct(id);
-  }, { passive: true });
+    e.preventDefault();
+    const id = btn.dataset.id;
+    if (btn.dataset.action === "edit") editProduct(id);
+    else if (btn.dataset.action === "del") deleteProduct(id);
+  };
+  list.addEventListener("touchend", (e) => {
+    const btn = e.target.closest("[data-action]");
+    if (!btn) return;
+    e.preventDefault();
+    const id = btn.dataset.id;
+    if (btn.dataset.action === "edit") editProduct(id);
+    else if (btn.dataset.action === "del") deleteProduct(id);
+  }, { passive: false });
+  list.addEventListener("click", handleProductAction);
 }
 
 async function loadAdminUsers() {
@@ -2889,9 +2931,7 @@ function editProduct(id) {
   document.getElementById("form-title").textContent = "✏️ 상품 수정";
   document.getElementById("save-product-btn").textContent = "수정 완료";
   document.getElementById("cancel-edit-btn").style.display = "";
-  // 상품 수정 폼으로 스크롤 (맨 위로 가지 않음)
-  const formEl = document.getElementById("form-title");
-  if (formEl) formEl.closest(".admin-card").scrollIntoView({ behavior: "smooth", block: "start" });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 window.editProduct = editProduct;
 

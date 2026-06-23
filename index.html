@@ -1174,9 +1174,9 @@ function renderInbox(msgs) {
 async function loadAll() {
   try {
     const [pSnap, sSnap, kSnap] = await Promise.all([
-      getDocs(query(collection(db, "products"), orderBy("grade"))),
+      getDocs(query(collection(db, "products"), orderBy("createdAt", "desc"))),
       getDoc(doc(db, "settings", "global")),
-      getDocs(collection(db, "kujiTypes"))
+      getDocs(query(collection(db, "kujiTypes"), orderBy("createdAt", "desc")))
     ]);
     const allProducts = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     window._allProductsAdmin = allProducts; // keep full list for admin
@@ -2511,7 +2511,7 @@ function renderAdminKujiTypes() {
     return;
   }
   list.innerHTML = "";
-  kujiTypes.forEach(kt => {
+  [...kujiTypes].sort((a,b) => (b.createdAt||0)-(a.createdAt||0)).forEach(kt => {
     const el = document.createElement("div");
     el.className = "product-item";
     el.innerHTML = `
@@ -2869,20 +2869,16 @@ function renderAdminProducts() {
     list.appendChild(el);
   };
 
-  // Render each kuji type section
-  kujiTypes.forEach(kt => {
+  // Render each kuji type section (최신순)
+  [...kujiTypes].sort((a,b) => (b.createdAt||0)-(a.createdAt||0)).forEach(kt => {
     const items = grouped[kt.id];
     if (!items || !items.length) return;
     const header = document.createElement("div");
     header.style.cssText = "font-size:.78rem;font-weight:700;color:var(--accent);padding:10px 4px 6px;border-bottom:1px solid var(--border);margin-top:12px;margin-bottom:6px;";
     header.textContent = `✦ ${kt.name} (${items.length}개)`;
     list.appendChild(header);
-    // Sort by grade then name
-    [...items].sort((a,b) => {
-      const gd = (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9);
-      if (gd !== 0) return gd;
-      return (a.name||"").localeCompare(b.name||"","ko");
-    }).forEach(renderItem);
+    // 최신 추가순
+    [...items].sort((a,b) => (b.createdAt||0)-(a.createdAt||0)).forEach(renderItem);
   });
 
   // No-type products
@@ -2891,11 +2887,7 @@ function renderAdminProducts() {
     header.style.cssText = "font-size:.78rem;font-weight:700;color:var(--sub);padding:10px 4px 6px;border-bottom:1px solid var(--border);margin-top:12px;margin-bottom:6px;";
     header.textContent = `기타 (미분류, ${noType.length}개)`;
     list.appendChild(header);
-    noType.sort((a,b) => {
-      const gd = (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9);
-      if (gd !== 0) return gd;
-      return (a.name||"").localeCompare(b.name||"","ko");
-    }).forEach(renderItem);
+    noType.sort((a,b) => (b.createdAt||0)-(a.createdAt||0)).forEach(renderItem);
   }
 
   // Event delegation for edit/delete buttons (fixes mobile tap issues)
@@ -3094,7 +3086,7 @@ async function saveProduct() {
     if (editId) {
       await updateDoc(doc(db, "products", editId), data);
     } else {
-      await addDoc(collection(db, "products"), { ...data, remaining: data.count });
+      await addDoc(collection(db, "products"), { ...data, remaining: data.count, createdAt: Date.now() });
     }
     cancelEdit();
     await loadAll();

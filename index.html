@@ -303,10 +303,9 @@ select.field-input{cursor:pointer;}
 
 /* ── Kuji type selector ── */
 .kuji-type-section{margin-bottom:20px;}
-.kuji-type-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-.kuji-type-scroll::-webkit-scrollbar{display:none;}
+.kuji-type-scroll{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .kuji-type-card{
-  flex-shrink:0;min-width:130px;padding:14px 16px;border-radius:14px;
+  padding:12px 10px;border-radius:14px;
   background:var(--card);border:2px solid var(--border);
   cursor:pointer;transition:all .2s;text-align:center;
   -webkit-tap-highlight-color:transparent;

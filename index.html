@@ -110,8 +110,8 @@ nav{display:flex;gap:2px;flex-shrink:0;}
 .section-title::after{content:'';flex:1;height:1px;background:var(--border);}
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
 .prod-card{background:var(--card);border-radius:14px;overflow:hidden;cursor:default;position:relative;border:1px solid var(--border);}
-.prod-card-img-wrap{width:100%;aspect-ratio:1;overflow:hidden;background:var(--bg2);}
-.prod-card-img{width:100%;height:100%;object-fit:cover;}
+.prod-card-img-wrap{width:100%;aspect-ratio:1/1;overflow:hidden;background:var(--bg2);display:flex;align-items:center;justify-content:center;}
+.prod-card-img{width:100%;height:100%;object-fit:cover;display:block;}
 .prod-card-no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;}
 .prod-card-body{padding:8px 10px;}
 .prod-card-grade{font-size:.58rem;font-weight:700;margin-bottom:2px;}
@@ -799,7 +799,7 @@ select.field-input{cursor:pointer;}
         </div>
         <div>
           <div class="field-label">가짜 대기 모드</div>
-          <select class="field-input" id="s-fake-queue">
+          <select class="field-input" id="s-fake-queue" onchange="toggleFakeQueueSettings()">
             <option value="off">비활성화</option>
             <option value="on">활성화 (자동 대기줄 생성)</option>
           </select>
@@ -1090,6 +1090,7 @@ async function loadAll() {
       getDocs(collection(db, "kujiTypes"))
     ]);
     const allProducts = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    window._allProductsAdmin = allProducts; // keep full list for admin
     kujiTypes = kSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     // Filter products by current kuji type
     if (currentKujiId) {
@@ -1114,20 +1115,25 @@ async function loadAll() {
 }
 
 // ── Session state ──
+function sessionDocId() {
+  return currentKujiId ? `kuji_${currentKujiId}` : "global";
+}
+
 async function loadSessionState() {
   try {
-    const sRef = doc(db, "sessions", "global");
+    const sRef = doc(db, "sessions", sessionDocId());
     const sSnap = await getDoc(sRef);
+    // Total slots for this kuji type
+    const kt = kujiTypes.find(k => k.id === currentKujiId);
+    totalSlots = (kt && kt.slots) ? kt.slots : 200;
     if (sSnap.exists()) {
       const d = sSnap.data();
       const drawn = d.drawnSlots || [];
       drawnSlots = new Set(drawn);
-      // If all 200 slots drawn → reset
       if (drawnSlots.size >= totalSlots) {
         await resetSession();
       }
     } else {
-      // Init session
       await setDoc(sRef, { drawnSlots: [], sessionNum: 1 });
       drawnSlots = new Set();
     }
@@ -1136,29 +1142,34 @@ async function loadSessionState() {
 
 async function saveSessionState() {
   try {
-    const sRef = doc(db, "sessions", "global");
+    const sRef = doc(db, "sessions", sessionDocId());
     await updateDoc(sRef, { drawnSlots: [...drawnSlots] });
   } catch(e) {}
 }
 
 async function resetSession() {
-  const sRef = doc(db, "sessions", "global");
+  const sRef = doc(db, "sessions", sessionDocId());
   const snap = await getDoc(sRef);
   const num = snap.exists() ? (snap.data().sessionNum || 1) + 1 : 1;
   await setDoc(sRef, { drawnSlots: [], sessionNum: num });
   drawnSlots = new Set();
   selectedSlots = new Set();
-  // Reset remaining stock to full
+  // Reset remaining stock for this kuji type only
   const pDocs = await getDocs(collection(db, "products"));
   const batch = writeBatch(db);
-  pDocs.docs.forEach(d => batch.update(doc(db, "products", d.id), { remaining: d.data().count }));
+  pDocs.docs.forEach(d => {
+    const pd = d.data();
+    if (!currentKujiId || pd.kujiId === currentKujiId) {
+      batch.update(doc(db, "products", d.id), { remaining: pd.count });
+    }
+  });
   await batch.commit();
   await loadAll();
 }
 
 async function getSessionNum() {
   try {
-    const snap = await getDoc(doc(db, "sessions", "global"));
+    const snap = await getDoc(doc(db, "sessions", sessionDocId()));
     return snap.exists() ? (snap.data().sessionNum || 1) : 1;
   } catch { return 1; }
 }
@@ -1228,13 +1239,29 @@ window.switchTab = switchTab;
 async function renderDrawTab() {
   document.getElementById("kuji-title").textContent = settings.title;
   document.getElementById("kuji-subtitle").textContent = settings.subtitle;
-  document.getElementById("kuji-price-display").textContent = (settings.price || 0).toLocaleString();
+  // Price from current kuji type
+  const kt = kujiTypes.find(k => k.id === currentKujiId);
+  const curPrice = kt ? (kt.price || 0) : 0;
+  document.getElementById("kuji-price-display").textContent = curPrice.toLocaleString();
   renderKujiTypeSelector();
   if (document.getElementById("s-title")) {
     document.getElementById("s-title").value = settings.title;
     document.getElementById("s-subtitle").value = settings.subtitle;
-    document.getElementById("s-price").value = settings.price || 0;
     document.getElementById("s-queue-max").value = settings.queueMax || 10;
+    // fake queue admin fields
+    const fqSel = document.getElementById("s-fake-queue");
+    if (fqSel) {
+      fqSel.value = settings.fakeQueue || "off";
+      toggleFakeQueueSettings();
+    }
+    const fqMin = document.getElementById("s-fake-min");
+    if (fqMin) fqMin.value = settings.fakeQueueMin || 3;
+    const fqMax = document.getElementById("s-fake-max");
+    if (fqMax) fqMax.value = settings.fakeQueueMax || 15;
+    const fsMin = document.getElementById("s-fake-speed-min");
+    if (fsMin) fsMin.value = settings.fakeSpeedMin || 8;
+    const fsMax = document.getElementById("s-fake-speed-max");
+    if (fsMax) fsMax.value = settings.fakeSpeedMax || 25;
   }
 
   // Notice
@@ -1259,10 +1286,14 @@ async function renderDrawTab() {
     gg.appendChild(el);
   });
 
-  // Products preview
+  // Products preview - sorted by grade then name
   const pg = document.getElementById("products-preview");
   pg.innerHTML = "";
-  const sortedProducts = [...products].sort((a,b) => (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9));
+  const sortedProducts = [...products].sort((a,b) => {
+    const gd = (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9);
+    if (gd !== 0) return gd;
+    return (a.name||"").localeCompare(b.name||"", "ko");
+  });
   sortedProducts.forEach(p => {
     const meta = GRADE_META[p.grade] || GRADE_META.N;
     const remaining = p.remaining ?? p.count;
@@ -1285,6 +1316,8 @@ async function renderDrawTab() {
   });
 
   // Session info
+  const kt2 = kujiTypes.find(k => k.id === currentKujiId);
+  totalSlots = (kt2 && kt2.slots) ? kt2.slots : 200;
   const remain = totalSlots - drawnSlots.size;
   document.getElementById("remain-slots-main").textContent = remain;
   const sNum = await getSessionNum();
@@ -1296,6 +1329,10 @@ async function renderDrawTab() {
   if (!userId) {
     btn.disabled = true;
     hint.textContent = "로그인 후 이용 가능합니다";
+    hint.style.display = "";
+  } else if (!currentKujiId) {
+    btn.disabled = true;
+    hint.textContent = "위에서 쿠지 종류를 먼저 선택하세요";
     hint.style.display = "";
   } else {
     btn.disabled = false;
@@ -1310,6 +1347,13 @@ async function renderDrawTab() {
 // ── Enter / exit board ──
 async function enterBoard() {
   if (!userId) { showLoginModal(); return; }
+  if (!currentKujiId) { alert("뽑기 종류를 먼저 선택해주세요"); return; }
+
+  // Fake queue mode
+  if (settings.fakeQueue === "on") {
+    enterFakeQueue();
+    return;
+  }
 
   // Check queue
   const qState = await checkQueue();
@@ -1435,7 +1479,9 @@ function updateOpenBtn() {
   const btn = document.getElementById("open-btn");
   const label = document.getElementById("open-btn-label");
   document.getElementById("selected-count-label").textContent = cnt;
-  const price = (settings.price || 0) * cnt;
+  const kt = kujiTypes.find(k => k.id === currentKujiId);
+  const unitPrice = kt ? (kt.price || 0) : 0;
+  const price = unitPrice * cnt;
   if (cnt === 0) {
     btn.disabled = true;
     label.textContent = "슬롯을 선택해주세요";
@@ -1454,7 +1500,9 @@ async function handleDraw() {
   if (drawCount === 0) return;
 
   // Points check
-  const cost = (settings.price || 0) * drawCount;
+  const kt = kujiTypes.find(k => k.id === currentKujiId);
+  const unitPrice = kt ? (kt.price || 0) : 0;
+  const cost = unitPrice * drawCount;
   const pts = userProfile?.points || 0;
   if (pts < cost) {
     alert(`포인트가 부족해요!\n필요: ${cost.toLocaleString()}P · 보유: ${pts.toLocaleString()}P\n\n포인트를 충전해주세요.`);
@@ -1486,7 +1534,7 @@ async function handleDraw() {
     if (el) el.className = "slot spinning";
   });
 
-  await new Promise(r => setTimeout(r, 700));
+  await new Promise(r => setTimeout(r, 200));
 
   // Pick items
   const drawn = [];
@@ -1622,7 +1670,7 @@ function renderResults(items) {
       front.style.opacity = "1";
       front.style.transform = "scale(1)";
       playSound("reveal");
-    }, i * 150);
+    }, i * 60);
   });
 
   const tagEl = document.getElementById("result-tags");
@@ -2050,6 +2098,8 @@ function editKujiType(id) {
   const kt = kujiTypes.find(k => k.id === id); if (!kt) return;
   document.getElementById("kt-name").value = kt.name;
   document.getElementById("kt-desc").value = kt.desc || "";
+  document.getElementById("kt-price").value = kt.price || 9000;
+  document.getElementById("kt-slots").value = kt.slots || 200;
   document.getElementById("kt-edit-id").value = id;
   document.getElementById("kt-save-btn").textContent = "수정 완료";
   document.getElementById("kt-cancel-btn").style.display = "";
@@ -2085,7 +2135,7 @@ function renderAdminKujiTypes() {
         <div class="product-name-row">
           <span class="product-name" style="font-size:.9rem">${escHtml(kt.name)}</span>
         </div>
-        <div class="product-meta">${escHtml(kt.desc || "")}</div>
+        <div class="product-meta">${escHtml(kt.desc || "")} · ${(kt.price||0).toLocaleString()}P/판 · ${kt.slots||200}슬롯</div>
       </div>
       <div class="product-actions">
         <button class="edit-btn" onclick="editKujiType('${kt.id}')">수정</button>
@@ -2114,15 +2164,26 @@ function renderKujiTypeSelector() {
   }
   section.style.display = "";
   list.innerHTML = kujiTypes.map(kt => `
-    <div class="kuji-type-card ${currentKujiId === kt.id ? 'active' : ''}" onclick="selectKujiType('${kt.id}')">
+    <div class="kuji-type-card ${currentKujiId === kt.id ? 'active' : ''}"
+         onclick="selectKujiType('${kt.id}')"
+         ontouchstart=""
+         style="cursor:pointer">
       <div class="kuji-type-card-name">${escHtml(kt.name)}</div>
-      <div class="kuji-type-card-desc">${escHtml(kt.desc || "")}</div>
+      ${kt.desc ? `<div class="kuji-type-card-desc">${escHtml(kt.desc)}</div>` : ""}
+      <div class="kuji-type-card-price">${(kt.price||0).toLocaleString()}P / 판</div>
     </div>
   `).join("");
 }
 
 async function selectKujiType(id) {
-  currentKujiId = currentKujiId === id ? null : id; // toggle
+  if (currentKujiId === id) return; // 이미 선택된 경우 무시
+  currentKujiId = id;
+  drawnSlots = new Set();
+  selectedSlots = new Set();
+  isBoardOpen = false;
+  document.getElementById("board-view").style.display = "none";
+  document.getElementById("enter-board-btn").style.display = "";
+  document.getElementById("results-area").style.display = "none";
   await loadAll();
   renderKujiTypeSelector();
   renderDrawTab();
@@ -2153,6 +2214,112 @@ function adminLogout() {
   if (document.getElementById("tab-admin").style.display !== "none") switchTab("draw");
 }
 window.adminLogout = adminLogout;
+
+// ── Fake queue settings toggle ──
+function toggleFakeQueueSettings() {
+  const val = document.getElementById("s-fake-queue")?.value;
+  const show = val === "on";
+  const s1 = document.getElementById("fake-queue-settings");
+  const s2 = document.getElementById("fake-queue-speed");
+  if (s1) s1.style.display = show ? "" : "none";
+  if (s2) s2.style.display = show ? "" : "none";
+}
+window.toggleFakeQueueSettings = toggleFakeQueueSettings;
+
+// ── Fake queue system ──
+let fakeQueueTimer = null;
+let fakeQueuePosition = 0;
+let fakeQueueTotal = 0;
+const FAKE_NAMES = ["user_a4f2","aniha...","k_fan92","idol77","star_j","neo_99","cube88","l_pick","kpop12","misty_","wave33","sunny7","hyun_k","coco_m","jade11"];
+const FAKE_GRADES = ["SSR","SR","SR","R","R","R","N","N","N","N"];
+const FAKE_ITEMS = ["1:1 VIDEO CALL", "DRAWSTRING BAG", "LUGGAGE", "MULTI POUCH", "PHOTO CARD 8EA", "PHOTO CARD 1EA", "PHOTO CARD 3EA"];
+
+function enterFakeQueue() {
+  if (!userId) { showLoginModal(); return; }
+  const min = settings.fakeQueueMin || 3;
+  const max = settings.fakeQueueMax || 15;
+  fakeQueueTotal = min + Math.floor(Math.random() * (max - min + 1));
+  fakeQueuePosition = fakeQueueTotal + 1; // I'm at the back
+
+  document.getElementById("fake-queue-room").style.display = "block";
+  document.getElementById("enter-board-btn").style.display = "none";
+  try { document.querySelector(".enter-board-wrap > div").style.display = "none"; } catch(e) {}
+  document.getElementById("board-view").style.display = "none";
+  document.getElementById("results-area").style.display = "none";
+
+  updateFakeQueueUI();
+  scheduleFakeQueueTick();
+}
+window.enterFakeQueue = enterFakeQueue;
+
+function updateFakeQueueUI() {
+  const posText = document.getElementById("fq-position-text");
+  const curUser = document.getElementById("fq-current-user");
+  const curAction = document.getElementById("fq-current-action");
+  const myTurn = document.getElementById("fq-my-turn-banner");
+  const enterBtn = document.getElementById("fq-enter-btn");
+
+  if (fakeQueuePosition <= 1) {
+    posText.innerHTML = `내 대기 순서: <strong style="color:#FFD700">곧 내 차례!</strong>`;
+    curUser.textContent = "대기 완료";
+    curAction.textContent = "";
+    myTurn.style.display = "";
+    enterBtn.style.display = "";
+  } else {
+    posText.innerHTML = `내 대기 순서: <strong style="color:var(--text)">${fakeQueuePosition - 1}</strong>번째`;
+    const frontName = FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)];
+    curUser.textContent = `${frontName} 뽑기 중...`;
+    curAction.textContent = "슬롯을 선택하고 있어요";
+    myTurn.style.display = "none";
+    enterBtn.style.display = "none";
+  }
+}
+
+function addFakeDrawFeed(name, grade, item) {
+  const feed = document.getElementById("fq-draw-feed");
+  const meta = GRADE_META[grade] || GRADE_META.N;
+  const row = document.createElement("div");
+  row.style.cssText = `font-size:.72rem;padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:8px;`;
+  row.innerHTML = `
+    <span style="color:var(--sub)">${name}</span>
+    <span style="color:${meta.color};font-weight:700">[${grade}] ${item}</span>
+  `;
+  feed.insertBefore(row, feed.children[1] || null);
+  // Keep max 8 items
+  while (feed.children.length > 9) feed.removeChild(feed.lastChild);
+}
+
+function scheduleFakeQueueTick() {
+  if (fakeQueueTimer) clearTimeout(fakeQueueTimer);
+  if (fakeQueuePosition <= 1) return;
+  const minMs = (settings.fakeSpeedMin || 8) * 1000;
+  const maxMs = (settings.fakeSpeedMax || 25) * 1000;
+  const delay = minMs + Math.random() * (maxMs - minMs);
+  fakeQueueTimer = setTimeout(() => {
+    fakeQueuePosition--;
+    // Add a fake draw to feed
+    const name = FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)];
+    const grade = FAKE_GRADES[Math.floor(Math.random() * FAKE_GRADES.length)];
+    const item = FAKE_ITEMS[Math.floor(Math.random() * FAKE_ITEMS.length)];
+    addFakeDrawFeed(name, grade, item);
+    updateFakeQueueUI();
+    if (fakeQueuePosition > 1) scheduleFakeQueueTick();
+  }, delay);
+}
+
+function fakeQueueEnterBoard() {
+  document.getElementById("fake-queue-room").style.display = "none";
+  enterBoard();
+}
+window.fakeQueueEnterBoard = fakeQueueEnterBoard;
+
+function leaveFakeQueue() {
+  if (fakeQueueTimer) { clearTimeout(fakeQueueTimer); fakeQueueTimer = null; }
+  document.getElementById("fake-queue-room").style.display = "none";
+  document.getElementById("enter-board-btn").style.display = "";
+  try { document.querySelector(".enter-board-wrap > div").style.display = ""; } catch(e) {}
+}
+window.leaveFakeQueue = leaveFakeQueue;
 
 // ── Admin functions ──
 async function saveNotice() {
@@ -2222,13 +2389,29 @@ async function renderAdminTab() {
 
 function renderAdminProducts() {
   const list = document.getElementById("product-list");
-  document.getElementById("product-count").textContent = products.length;
-  if (!products.length) {
+  // Load ALL products for admin (not filtered by currentKujiId)
+  // We need to fetch all products; use a temp variable
+  const allProductsForAdmin = window._allProductsAdmin || products;
+  document.getElementById("product-count").textContent = allProductsForAdmin.length;
+  if (!allProductsForAdmin.length) {
     list.innerHTML = `<div style="color:var(--sub);text-align:center;padding:20px">상품을 추가해주세요</div>`;
     return;
   }
   list.innerHTML = "";
-  products.forEach(p => {
+
+  // Group by kuji type
+  const grouped = {};
+  const noType = [];
+  allProductsForAdmin.forEach(p => {
+    if (p.kujiId) {
+      if (!grouped[p.kujiId]) grouped[p.kujiId] = [];
+      grouped[p.kujiId].push(p);
+    } else {
+      noType.push(p);
+    }
+  });
+
+  const renderItem = (p) => {
     const meta = GRADE_META[p.grade] || GRADE_META.N;
     const el = document.createElement("div");
     el.className = "product-item";
@@ -2251,7 +2434,36 @@ function renderAdminProducts() {
       </div>
     `;
     list.appendChild(el);
+  };
+
+  // Render each kuji type section
+  kujiTypes.forEach(kt => {
+    const items = grouped[kt.id];
+    if (!items || !items.length) return;
+    const header = document.createElement("div");
+    header.style.cssText = "font-size:.78rem;font-weight:700;color:var(--accent);padding:10px 4px 6px;border-bottom:1px solid var(--border);margin-top:12px;margin-bottom:6px;";
+    header.textContent = `✦ ${kt.name} (${items.length}개)`;
+    list.appendChild(header);
+    // Sort by grade then name
+    [...items].sort((a,b) => {
+      const gd = (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9);
+      if (gd !== 0) return gd;
+      return (a.name||"").localeCompare(b.name||"","ko");
+    }).forEach(renderItem);
   });
+
+  // No-type products
+  if (noType.length) {
+    const header = document.createElement("div");
+    header.style.cssText = "font-size:.78rem;font-weight:700;color:var(--sub);padding:10px 4px 6px;border-bottom:1px solid var(--border);margin-top:12px;margin-bottom:6px;";
+    header.textContent = `기타 (미분류, ${noType.length}개)`;
+    list.appendChild(header);
+    noType.sort((a,b) => {
+      const gd = (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9);
+      if (gd !== 0) return gd;
+      return (a.name||"").localeCompare(b.name||"","ko");
+    }).forEach(renderItem);
+  }
 }
 
 async function loadAdminUsers() {

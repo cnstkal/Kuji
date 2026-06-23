@@ -1566,7 +1566,8 @@ async function handleDraw() {
   }
 
   // Queue limit check
-  const hasQueue = await checkQueueHasOthers();
+  let hasQueue = false;
+  try { hasQueue = await checkQueueHasOthers(); } catch(e) { console.warn("queue check failed", e); }
   const qMax = settings.queueMax || 10;
   if (hasQueue && drawCount > qMax) {
     alert(`대기가 있을 때는 최대 ${qMax}개까지만 선택할 수 있어요.`);
@@ -1593,77 +1594,123 @@ async function handleDraw() {
     if (el) el.className = "slot spinning";
   });
 
-  await new Promise(r => setTimeout(r, 200));
+  // Safety watchdog: never let the button stay locked for more than 15s
+  const watchdog = setTimeout(() => {
+    if (isDrawing) {
+      isDrawing = false;
+      btn.disabled = selectedSlots.size === 0;
+      btn.innerHTML = `✦ <span id="open-btn-label">슬롯을 선택해주세요</span>`;
+      alert("처리 시간이 너무 오래 걸려요. 다시 시도해주세요.");
+    }
+  }, 15000);
 
-  // Pick items
-  const drawn = [];
-  const used = {};
-  const poolSnap = avail.map(p => ({ ...p }));
+  try {
+    await new Promise(r => setTimeout(r, 200));
 
-  for (let i = 0; i < drawCount; i++) {
-    const eligible = poolSnap.map(p => ({
-      ...p, remaining: (p.remaining ?? p.count) - (used[p.id] || 0)
-    })).filter(p => p.remaining > 0);
-    const pick = weightedDraw(eligible);
-    if (!pick) break;
-    drawn.push(pick);
-    used[pick.id] = (used[pick.id] || 0) + 1;
+    // Pick items (local simulation only — no network calls)
+    const drawn = [];
+    const used = {};
+    const poolSnap = avail.map(p => ({ ...p }));
+
+    for (let i = 0; i < drawCount; i++) {
+      const eligible = poolSnap.map(p => ({
+        ...p, remaining: (p.remaining ?? p.count) - (used[p.id] || 0)
+      })).filter(p => p.remaining > 0);
+      const pick = weightedDraw(eligible);
+      if (!pick) break;
+      drawn.push(pick);
+      used[pick.id] = (used[pick.id] || 0) + 1;
+    }
+
+    if (!drawn.length) throw new Error("뽑을 수 있는 상품이 없어요");
+
+    // Single atomic batch: stock decrement (via increment, race-safe),
+    // point deduction, draw records, and point history — one round trip.
+    const batch = writeBatch(db);
+    Object.entries(used).forEach(([id, cnt]) => {
+      batch.update(doc(db, "products", id), { remaining: increment(-cnt) });
+    });
+    batch.update(doc(db, "users", userId), { points: increment(-cost) });
+    drawn.forEach(item => {
+      const ref = doc(collection(db, "draws", userId, "items"));
+      batch.set(ref, {
+        productId: item.id, name: item.name, grade: item.grade,
+        imageUrl: item.imageUrl || "", description: item.description || "",
+        drawnAt: Date.now()
+      });
+    });
+    const phRef = doc(collection(db, "users", userId, "pointHistory"));
+    batch.set(phRef, { amount: -cost, reason: `쿠지 ${drawCount}개 뽑기`, at: Date.now() });
+
+    await batch.commit();
+
+    // Mark slots as drawn (global session)
+    slotsToOpen.forEach(idx => drawnSlots.add(idx));
+    selectedSlots.clear();
+    saveSessionState(); // fire-and-forget; doesn't block result display
+
+    // Update local caches immediately so UI reflects the draw without a full reload
+    Object.entries(used).forEach(([id, cnt]) => {
+      const p = products.find(x => x.id === id);
+      if (p) p.remaining = Math.max(0, (p.remaining ?? p.count) - cnt);
+      const cached = (window._allProductsAdmin || []).find(x => x.id === id);
+      if (cached) cached.remaining = Math.max(0, (cached.remaining ?? cached.count) - cnt);
+    });
+    if (userProfile) userProfile.points = Math.max(0, (userProfile.points || 0) - cost);
+    userDraws = [
+      ...drawn.map(item => ({
+        id: `local_${Date.now()}_${Math.random()}`, productId: item.id, name: item.name,
+        grade: item.grade, imageUrl: item.imageUrl || "", description: item.description || "",
+        drawnAt: Date.now()
+      })),
+      ...userDraws
+    ];
+    updatePointBadge();
+
+    clearTimeout(watchdog);
+    isDrawing = false;
+    btn.innerHTML = `✦ <span id="open-btn-label">슬롯을 선택해주세요</span>`;
+    btn.disabled = true;
+
+    // Show results immediately — don't make the user wait on a network reload
+    renderKujiBoard();
+    renderGradeGrid();
+    renderResults(drawn);
+
+    const hasSSR = drawn.some(d => d.grade === "SSR");
+    const hasRare = drawn.some(d => d.grade === "SR");
+    if (hasSSR) { playSound("ssr"); launchConfetti(); }
+    else if (hasRare) launchConfetti();
+    else playSound("reveal");
+
+    // Auto new round if all drawn
+    if (drawnSlots.size >= totalSlots) {
+      setTimeout(async () => {
+        alert("🎉 200개 슬롯이 모두 소진됐어요! 새 판이 시작됩니다.");
+        await resetSession();
+        await loadAll();
+        renderDrawTab();
+      }, 2000);
+    } else {
+      // Quietly resync with the server in the background (no UI blocking)
+      loadAll().then(() => { renderKujiBoard(); renderGradeGrid(); }).catch(() => {});
+    }
+  } catch(err) {
+    console.error("draw failed:", err);
+    clearTimeout(watchdog);
+    slotsToOpen.forEach(idx => {
+      const el = document.querySelector(`#kujiboard-grid .slot[data-idx="${idx}"]`);
+      if (el && !drawnSlots.has(idx)) el.className = "slot selected";
+    });
+    alert("뽑기 처리 중 문제가 발생했어요. 다시 시도해주세요.\n(" + (err?.message || err) + ")");
+  } finally {
+    clearTimeout(watchdog);
+    isDrawing = false;
+    btn.disabled = selectedSlots.size === 0;
+    if (!btn.innerHTML.includes("open-btn-label")) {
+      btn.innerHTML = `✦ <span id="open-btn-label">슬롯을 선택해주세요</span>`;
+    }
   }
-
-  // Update Firestore: products stock
-  const batch = writeBatch(db);
-  Object.entries(used).forEach(([id, cnt]) => {
-    const p = products.find(x => x.id === id);
-    const rem = (p.remaining ?? p.count) - cnt;
-    batch.update(doc(db, "products", id), { remaining: Math.max(0, rem) });
-  });
-  // Deduct points
-  batch.update(doc(db, "users", userId), { points: increment(-cost) });
-  await batch.commit();
-
-  // Save draws
-  await Promise.all(drawn.map(item =>
-    addDoc(collection(db, "draws", userId, "items"), {
-      productId: item.id, name: item.name, grade: item.grade,
-      imageUrl: item.imageUrl || "", description: item.description || "",
-      drawnAt: Date.now()
-    })
-  ));
-
-  // Save point history
-  await addDoc(collection(db, "users", userId, "pointHistory"), {
-    amount: -cost, reason: `쿠지 ${drawCount}개 뽑기`, at: Date.now()
-  });
-
-  // Mark slots as drawn (global session)
-  slotsToOpen.forEach(idx => drawnSlots.add(idx));
-  selectedSlots.clear();
-  await saveSessionState();
-
-  // Auto new round if all drawn
-  if (drawnSlots.size >= totalSlots) {
-    setTimeout(async () => {
-      alert("🎉 200개 슬롯이 모두 소진됐어요! 새 판이 시작됩니다.");
-      await resetSession();
-      await loadAll();
-      renderDrawTab();
-    }, 2000);
-  }
-
-  isDrawing = false;
-  btn.innerHTML = `✦ <span id="open-btn-label">슬롯을 선택해주세요</span>`;
-  btn.disabled = true;
-
-  await loadAll();
-  renderKujiBoard();
-  renderGradeGrid();
-  renderResults(drawn);
-
-  const hasSSR = drawn.some(d => d.grade === "SSR");
-  const hasRare = drawn.some(d => d.grade === "SR");
-  if (hasSSR) { playSound("ssr"); launchConfetti(); }
-  else if (hasRare) launchConfetti();
-  else playSound("reveal");
 }
 window.handleDraw = handleDraw;
 
@@ -2478,12 +2525,11 @@ async function consumeFakeDraw() {
   const pick = weightedDraw(avail);
   if (!pick) return null;
 
-  // Decrement stock in Firestore + local cache
-  const rem = (pick.remaining ?? pick.count) - 1;
-  try { await updateDoc(doc(db, "products", pick.id), { remaining: Math.max(0, rem) }); } catch(e) {}
-  pick.remaining = Math.max(0, rem);
+  // Decrement stock in Firestore (atomic, race-safe) + local cache
+  try { await updateDoc(doc(db, "products", pick.id), { remaining: increment(-1) }); } catch(e) {}
+  pick.remaining = Math.max(0, (pick.remaining ?? pick.count) - 1);
   const cached = (window._allProductsAdmin || []).find(p => p.id === pick.id);
-  if (cached) cached.remaining = pick.remaining;
+  if (cached) cached.remaining = Math.max(0, (cached.remaining ?? cached.count) - 1);
 
   // Mark a random open slot as drawn on the shared board (this kuji type only)
   const openSlots = [];

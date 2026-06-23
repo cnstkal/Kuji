@@ -1173,13 +1173,16 @@ function renderInbox(msgs) {
 async function loadAll() {
   try {
     const [pSnap, sSnap, kSnap] = await Promise.all([
-      getDocs(query(collection(db, "products"), orderBy("createdAt", "desc"))),
+      getDocs(collection(db, "products")),
       getDoc(doc(db, "settings", "global")),
-      getDocs(query(collection(db, "kujiTypes"), orderBy("createdAt", "desc")))
+      getDocs(collection(db, "kujiTypes"))
     ]);
     const allProducts = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    window._allProductsAdmin = allProducts; // keep full list for admin
+    // createdAt 있는 건 최신순, 없는 기존 상품은 맨 아래
+    allProducts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    window._allProductsAdmin = allProducts;
     kujiTypes = kSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    kujiTypes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     // Filter products by current kuji type
     if (currentKujiId) {
       products = allProducts.filter(p => p.kujiId === currentKujiId);

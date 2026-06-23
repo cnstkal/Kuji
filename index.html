@@ -426,6 +426,12 @@ select.field-input{cursor:pointer;}
           <div style="font-size:.72rem;color:var(--sub);">₩100,000</div>
         </div>
       </div>
+      <!-- 직접 입력 -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:.72rem;color:var(--sub);margin-bottom:6px;text-align:center;">또는 직접 입력</div>
+        <input type="number" class="modal-input" id="point-amount" placeholder="충전 금액 직접 입력 (원)" min="1000" step="1000" oninput="onCustomAmountInput()" style="margin-bottom:4px;"/>
+        <div style="font-size:.7rem;color:var(--sub);text-align:center;">1원 = 1포인트 · 최소 10,000원</div>
+      </div>
       <!-- 자동 충전 설정 -->
       <div id="auto-charge-section" style="background:var(--bg2);border-radius:12px;padding:12px;margin-bottom:12px;border:1px solid var(--border);">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
@@ -437,21 +443,23 @@ select.field-input{cursor:pointer;}
         </div>
         <div id="auto-charge-config" style="display:none;">
           <div style="font-size:.72rem;color:var(--sub);margin-bottom:6px;">포인트가 이 값 이하로 떨어지면 자동 충전</div>
-          <div style="display:flex;gap:8px;margin-bottom:6px;">
-            <select id="auto-charge-threshold" class="field-input" style="flex:1;padding:8px 10px;font-size:.82rem;">
+          <div style="display:flex;gap:8px;margin-bottom:4px;">
+            <select id="auto-charge-threshold" class="field-input" style="flex:1;padding:8px 10px;font-size:.82rem;" onchange="saveAutoChargeSettings()">
               <option value="5000">5,000P 이하</option>
               <option value="10000" selected>10,000P 이하</option>
               <option value="20000">20,000P 이하</option>
               <option value="30000">30,000P 이하</option>
             </select>
-            <select id="auto-charge-amount" class="field-input" style="flex:1;padding:8px 10px;font-size:.82rem;">
-              <option value="10000">10,000P 충전</option>
-              <option value="30000" selected>30,000P 충전</option>
-              <option value="50000">50,000P 충전</option>
-              <option value="100000">100,000P 충전</option>
+            <select id="auto-charge-amount-select" class="field-input" style="flex:1;padding:8px 10px;font-size:.82rem;" onchange="onAutoChargeAmountSelect()">
+              <option value="10000">10,000P</option>
+              <option value="30000" selected>30,000P</option>
+              <option value="50000">50,000P</option>
+              <option value="100000">100,000P</option>
+              <option value="custom">직접 입력</option>
             </select>
           </div>
-          <div style="font-size:.68rem;color:var(--accent);">⚡ 포인트 부족 시 자동으로 결제됩니다</div>
+          <input type="number" id="auto-charge-amount-custom" class="modal-input" placeholder="자동충전 금액 직접 입력" min="10000" step="1000" style="display:none;margin-bottom:4px;" oninput="saveAutoChargeSettings()"/>
+          <div style="font-size:.68rem;color:var(--accent);">⚡ 포인트 부족 시 자동으로 충전됩니다</div>
         </div>
       </div>
       <button class="modal-btn" onclick="goPayStep()">결제하기 →</button>
@@ -2016,25 +2024,43 @@ async function renderMyPage() {
 // ── Point modal ──
 let payAmount = 0;
 let autoChargeEnabled = false;
-let autoChargeThreshold = 10000;
-let autoChargeAmount = 30000;
+let autoChargeThreshold = 10000;  // 포인트 이하일 때 충전 트리거
+let autoChargeAmt = 30000;        // 자동충전 금액 (DOM 독립 변수)
+let autoCharging = false;         // 중복 실행 방지 플래그
 
 function showPointModal() {
   if (!userId) { showLoginModal(); return; }
   document.getElementById("point-modal-balance").textContent = `보유: ${(userProfile?.points || 0).toLocaleString()}P`;
   document.getElementById("point-error").textContent = "";
   document.getElementById("point-success").textContent = "";
+  document.getElementById("point-amount").value = "";
+  payAmount = 0;
   document.getElementById("point-step-1").style.display = "";
   document.getElementById("point-step-2").style.display = "none";
   document.getElementById("point-step-3").style.display = "none";
-  // restore auto-charge settings UI
+  // 자동충전 UI 복원
   const toggle = document.getElementById("auto-charge-toggle");
   if (toggle) {
     toggle.checked = autoChargeEnabled;
     document.getElementById("auto-charge-config").style.display = autoChargeEnabled ? "" : "none";
     document.getElementById("auto-charge-threshold").value = autoChargeThreshold;
-    document.getElementById("auto-charge-amount").value = autoChargeAmount;
+    // select 복원
+    const sel = document.getElementById("auto-charge-amount-select");
+    const knownVals = ["10000","30000","50000","100000"];
+    if (knownVals.includes(String(autoChargeAmt))) {
+      sel.value = autoChargeAmt;
+      document.getElementById("auto-charge-amount-custom").style.display = "none";
+    } else {
+      sel.value = "custom";
+      document.getElementById("auto-charge-amount-custom").style.display = "";
+      document.getElementById("auto-charge-amount-custom").value = autoChargeAmt;
+    }
   }
+  // 패키지 선택 초기화
+  document.querySelectorAll(".point-pkg").forEach(el => {
+    el.style.border = "2px solid var(--border)";
+    el.style.background = "var(--card)";
+  });
   loadPointHistory();
   document.getElementById("point-modal").style.display = "flex";
 }
@@ -2043,31 +2069,59 @@ window.showPointModal = showPointModal;
 function toggleAutoCharge(enabled) {
   autoChargeEnabled = enabled;
   document.getElementById("auto-charge-config").style.display = enabled ? "" : "none";
-  if (enabled) {
-    autoChargeThreshold = parseInt(document.getElementById("auto-charge-threshold").value) || 10000;
-    autoChargeAmount = parseInt(document.getElementById("auto-charge-amount").value) || 30000;
-  }
+  if (enabled) saveAutoChargeSettings();
 }
 window.toggleAutoCharge = toggleAutoCharge;
 
-async function checkAutoCharge() {
-  if (!autoChargeEnabled || !userId) return;
-  const th = parseInt(document.getElementById("auto-charge-threshold")?.value) || autoChargeThreshold;
-  const amt = parseInt(document.getElementById("auto-charge-amount")?.value) || autoChargeAmount;
-  const pts = userProfile?.points || 0;
-  if (pts <= th) {
-    // Auto charge
-    try {
-      await doChargePoint(amt);
-      // Show toast
-      const toast = document.createElement("div");
-      toast.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22D3EE;color:#000;padding:10px 20px;border-radius:20px;font-weight:700;font-size:.82rem;z-index:9999;pointer-events:none;";
-      toast.textContent = `⚡ 자동 충전 ${amt.toLocaleString()}P 완료!`;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
-    } catch(e) { console.warn("자동충전 실패:", e); }
+function saveAutoChargeSettings() {
+  autoChargeThreshold = parseInt(document.getElementById("auto-charge-threshold")?.value) || 10000;
+  const sel = document.getElementById("auto-charge-amount-select")?.value;
+  if (sel === "custom") {
+    const custom = parseInt(document.getElementById("auto-charge-amount-custom")?.value);
+    if (custom && custom >= 10000) autoChargeAmt = custom;
+  } else {
+    autoChargeAmt = parseInt(sel) || 30000;
   }
 }
+window.saveAutoChargeSettings = saveAutoChargeSettings;
+
+function onAutoChargeAmountSelect() {
+  const sel = document.getElementById("auto-charge-amount-select").value;
+  const customInput = document.getElementById("auto-charge-amount-custom");
+  customInput.style.display = sel === "custom" ? "" : "none";
+  if (sel !== "custom") saveAutoChargeSettings();
+}
+window.onAutoChargeAmountSelect = onAutoChargeAmountSelect;
+
+async function checkAutoCharge() {
+  if (!autoChargeEnabled || !userId || autoCharging) return;
+  saveAutoChargeSettings(); // 최신 설정 반영
+  const pts = userProfile?.points || 0;
+  if (pts > autoChargeThreshold) return;
+  autoCharging = true;
+  try {
+    await doChargePoint(autoChargeAmt);
+    const toast = document.createElement("div");
+    toast.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22D3EE;color:#000;padding:10px 20px;border-radius:20px;font-weight:700;font-size:.82rem;z-index:9999;pointer-events:none;animation:fadeIn .3s ease;";
+    toast.textContent = `⚡ 자동 충전 ${autoChargeAmt.toLocaleString()}P 완료!`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  } catch(e) { console.warn("자동충전 실패:", e.message); }
+  finally { autoCharging = false; }
+}
+
+function onCustomAmountInput() {
+  const val = parseInt(document.getElementById("point-amount").value);
+  if (val && val >= 1000) {
+    payAmount = val;
+    // 패키지 선택 해제
+    document.querySelectorAll(".point-pkg").forEach(el => {
+      el.style.border = "2px solid var(--border)";
+      el.style.background = "var(--card)";
+    });
+  }
+}
+window.onCustomAmountInput = onCustomAmountInput;
 
 function selectPkg(amt) {
   document.querySelectorAll(".point-pkg").forEach(el => {
@@ -2076,6 +2130,8 @@ function selectPkg(amt) {
     el.style.background = isSelected ? "var(--accent)18" : "var(--card)";
   });
   payAmount = amt;
+  // 직접 입력 초기화
+  document.getElementById("point-amount").value = "";
 }
 window.selectPkg = selectPkg;
 
@@ -2095,7 +2151,10 @@ window.setColGradeFilter = setColGradeFilter;
 function goPayStep() {
   const errEl = document.getElementById("point-error");
   errEl.textContent = "";
-  if (!payAmount || payAmount < 1000) { errEl.textContent = "충전할 금액을 선택해주세요"; return; }
+  // 직접 입력값이 있으면 우선 적용
+  const customVal = parseInt(document.getElementById("point-amount")?.value);
+  if (customVal && customVal >= 10000) payAmount = customVal;
+  if (!payAmount || payAmount < 10000) { errEl.textContent = "최소 10,000원 이상 선택하거나 입력해주세요"; return; }
   const amt = payAmount;
   document.getElementById("pay-amount-display").textContent = `${amt.toLocaleString()}원`;
   document.getElementById("point-step-1").style.display = "none";
@@ -2139,11 +2198,15 @@ async function loadPointHistory() {
 }
 
 async function doChargePoint(amt) {
-  if (amt === undefined) amt = parseInt(document.getElementById("point-amount").value);
+  // amt는 항상 파라미터로 받음 — DOM input에 의존하지 않음
   const errEl = document.getElementById("point-error");
   const sucEl = document.getElementById("point-success");
-  errEl.textContent = ""; sucEl.textContent = "";
-  if (!amt || amt < 1000) { errEl.textContent = "최소 1,000원 이상 입력해주세요"; return; }
+  if (errEl) { errEl.textContent = ""; }
+  if (sucEl) { sucEl.textContent = ""; }
+  if (!amt || amt < 10000) {
+    if (errEl) errEl.textContent = "최소 10,000원 이상 입력해주세요";
+    return;
+  }
 
   try {
     const batch = writeBatch(db);
@@ -2154,18 +2217,32 @@ async function doChargePoint(amt) {
     });
     userProfile.points = (userProfile.points || 0) + amt;
     updatePointBadge();
-    // Show success
-    document.getElementById("point-step-3").style.display = "none";
-    document.getElementById("point-step-1").style.display = "";
-    sucEl.textContent = `${amt.toLocaleString()}P 충전 완료! 🎉`;
-    document.getElementById("point-modal-balance").textContent = `보유: ${(userProfile.points).toLocaleString()}P`;
-    document.getElementById("point-amount").value = "";
-    loadPointHistory();
+    payAmount = 0;
+    // 모달이 열려있을 때만 UI 업데이트 (자동충전 시에는 모달 닫혀있을 수 있음)
+    const modalOpen = document.getElementById("point-modal")?.style.display !== "none";
+    if (modalOpen) {
+      const s3 = document.getElementById("point-step-3");
+      const s1 = document.getElementById("point-step-1");
+      if (s3) s3.style.display = "none";
+      if (s1) s1.style.display = "";
+      if (sucEl) sucEl.textContent = `${amt.toLocaleString()}P 충전 완료! 🎉`;
+      const bal = document.getElementById("point-modal-balance");
+      if (bal) bal.textContent = `보유: ${(userProfile.points).toLocaleString()}P`;
+      const inp = document.getElementById("point-amount");
+      if (inp) inp.value = "";
+      loadPointHistory();
+    }
     renderMyPage();
   } catch(e) {
-    document.getElementById("point-step-3").style.display = "none";
-    document.getElementById("point-step-1").style.display = "";
-    errEl.textContent = "충전 실패: " + e.message;
+    const modalOpen = document.getElementById("point-modal")?.style.display !== "none";
+    if (modalOpen) {
+      const s3 = document.getElementById("point-step-3");
+      const s1 = document.getElementById("point-step-1");
+      if (s3) s3.style.display = "none";
+      if (s1) s1.style.display = "";
+      if (errEl) errEl.textContent = "충전 실패: " + e.message;
+    }
+    throw e; // 자동충전에서 catch할 수 있게 re-throw
   }
 }
 window.doChargePoint = doChargePoint;

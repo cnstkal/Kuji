@@ -43,19 +43,25 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Noto Sans 
 header{
   position:sticky;top:0;z-index:100;
   background:var(--bg);border-bottom:1px solid var(--border);
-  padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px;
+  padding:0 12px;display:flex;align-items:center;justify-content:space-between;height:52px;gap:6px;
 }
-.logo{font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,#38BDF8,#22D3EE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-nav{display:flex;gap:4px}
-.nav-btn{padding:6px 12px;border-radius:20px;border:none;cursor:pointer;font-size:.78rem;font-weight:600;letter-spacing:.04em;background:transparent;color:var(--sub);transition:all .2s;font-family:inherit;}
+.logo{font-size:1.1rem;font-weight:800;background:linear-gradient(135deg,#38BDF8,#22D3EE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex-shrink:0;}
+nav{display:flex;gap:2px;flex-shrink:0;}
+.nav-btn{padding:6px 10px;border-radius:20px;border:none;cursor:pointer;font-size:.75rem;font-weight:600;letter-spacing:.02em;background:transparent;color:var(--sub);transition:all .2s;font-family:inherit;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
 .nav-btn.active{background:var(--btn-grad);color:#fff}
 .nav-btn.admin-active{background:linear-gradient(135deg,#FF6B6B,#FFD700);color:#000}
-.icon-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
-.text-btn{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:.7rem;font-family:inherit;}
-.logout-btn{padding:4px 10px;border-radius:20px;border:1px solid #FF6B6B44;background:#FF6B6B22;color:#FF6B6B;cursor:pointer;font-size:.7rem;font-family:inherit;}
-.header-right{display:flex;gap:6px;align-items:center}
-.user-badge{padding:4px 10px;border-radius:20px;border:1px solid var(--accent);background:var(--accent)22;color:var(--accent);font-size:.7rem;font-weight:600;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.point-badge{padding:4px 10px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:#FFD700;font-size:.7rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+.icon-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.text-btn{padding:4px 8px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:.68rem;font-family:inherit;white-space:nowrap;}
+.logout-btn{padding:4px 8px;border-radius:20px;border:1px solid #FF6B6B44;background:#FF6B6B22;color:#FF6B6B;cursor:pointer;font-size:.68rem;font-family:inherit;white-space:nowrap;}
+.header-right{display:flex;gap:4px;align-items:center;flex-shrink:0;}
+.user-badge{padding:3px 8px;border-radius:20px;border:1px solid var(--accent);background:var(--accent)22;color:var(--accent);font-size:.67rem;font-weight:600;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}
+.point-badge{padding:3px 8px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:#FFD700;font-size:.67rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+@media(max-width:380px){
+  .logo{font-size:.95rem;}
+  .nav-btn{padding:5px 7px;font-size:.7rem;}
+  .text-btn,.logout-btn{display:none;}
+  .point-badge{font-size:.62rem;padding:3px 6px;}
+}
 
 /* ── Tabs ── */
 .tab{display:none}.tab.active{display:block}
@@ -236,39 +242,6 @@ select.field-input{cursor:pointer;}
 .reset-btn.danger{border-color:#FF6B6B44;color:#FF6B6B;}
 .reset-btn.danger:hover{background:#FF6B6B22;}
 
-/* ── Fake queue mode ── */
-.fake-queue-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--bg2);border-radius:12px;margin-bottom:12px;}
-.fake-queue-toggle-label{font-size:.88rem;font-weight:700;}
-.fake-queue-toggle-sub{font-size:.72rem;color:var(--sub);margin-top:2px;}
-.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
-.toggle-switch input{opacity:0;width:0;height:0;}
-.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:24px;cursor:pointer;transition:.3s;}
-.toggle-slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;}
-input:checked + .toggle-slider{background:var(--accent);}
-input:checked + .toggle-slider:before{transform:translateX(20px);}
-.fake-queue-panel{background:var(--bg2);border-radius:12px;padding:12px 14px;margin-top:8px;}
-.fake-queue-status{font-size:.8rem;color:var(--sub);margin-bottom:10px;}
-.fake-queue-bots{display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;}
-.fake-bot-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--card);border-radius:10px;border:1px solid var(--border);animation:fadeIn .3s ease;}
-.fake-bot-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
-.fake-bot-name{font-size:.78rem;font-weight:600;flex:1;}
-.fake-bot-status{font-size:.68rem;color:var(--sub);}
-.fake-bot-drawing{color:var(--accent);font-weight:700;}
-@keyframes queuePulse{0%,100%{opacity:1}50%{opacity:.5}}
-.fake-bot-wait{animation:queuePulse 1.5s infinite;}
-
-/* ── Queue live view (user side) ── */
-.queue-live-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:16px;}
-.queue-live-title{font-size:.82rem;font-weight:700;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
-.queue-live-list{display:flex;flex-direction:column;gap:5px;max-height:160px;overflow-y:auto;}
-.queue-live-item{display:flex;align-items:center;gap:8px;font-size:.75rem;padding:6px 8px;border-radius:8px;background:var(--bg2);}
-.queue-live-num{width:22px;height:22px;border-radius:50%;background:var(--accent)22;color:var(--accent);font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.queue-live-name{flex:1;font-weight:600;}
-.queue-live-me{background:var(--accent)11;border:1px solid var(--accent)33;}
-.queue-live-me .queue-live-num{background:var(--accent);color:#fff;}
-@keyframes drawingAnim{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
-.queue-live-drawing{animation:drawingAnim .6s ease infinite;border:1px solid var(--accent)55;}
-
 /* ── Admin user list ── */
 .user-list{display:flex;flex-direction:column;gap:8px;}
 .user-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:12px;padding:10px 12px;}
@@ -330,13 +303,21 @@ input:checked + .toggle-slider:before{transform:translateX(20px);}
 
 /* ── Kuji type selector ── */
 .kuji-type-section{margin-bottom:20px;}
-.kuji-type-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.kuji-type-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .kuji-type-scroll::-webkit-scrollbar{display:none;}
-.kuji-type-card{flex-shrink:0;min-width:120px;padding:12px 16px;border-radius:14px;background:var(--card);border:2px solid var(--border);cursor:pointer;transition:all .2s;text-align:center;}
+.kuji-type-card{
+  flex-shrink:0;min-width:130px;padding:14px 16px;border-radius:14px;
+  background:var(--card);border:2px solid var(--border);
+  cursor:pointer;transition:all .2s;text-align:center;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  touch-action:manipulation;
+}
+.kuji-type-card:active{transform:scale(.96);}
 .kuji-type-card.active{border-color:var(--accent);background:var(--accent)18;}
-.kuji-type-card-name{font-size:.85rem;font-weight:700;margin-bottom:4px;}
+.kuji-type-card-name{font-size:.88rem;font-weight:700;margin-bottom:4px;}
 .kuji-type-card-desc{font-size:.65rem;color:var(--sub);}
-.kuji-type-card-price{font-size:.7rem;color:#FFD700;font-weight:700;margin-top:4px;}
+.kuji-type-card-price{font-size:.75rem;color:#FFD700;font-weight:700;margin-top:6px;}
 .kuji-type-empty{text-align:center;padding:20px;color:var(--sub);font-size:.85rem;}
 
 /* ── Warning badge ── */
@@ -552,10 +533,27 @@ input:checked + .toggle-slider:before{transform:translateX(20px);}
       <button class="modal-btn" style="width:auto;display:inline-block;margin-top:10px;padding:8px 20px;" onclick="requestQueue()">대기 신청</button>
     </div>
 
-    <!-- Queue live view (visible when fake queue mode on) -->
-    <div class="queue-live-panel" id="queue-live-panel" style="display:none">
-      <div class="queue-live-title">🎫 실시간 대기 현황</div>
-      <div class="queue-live-list" id="queue-live-list"></div>
+    <!-- Fake Queue Waiting Room -->
+    <div id="fake-queue-room" style="display:none">
+      <div style="background:linear-gradient(135deg,#FFD70011,#C084FC11);border:1px solid #FFD70033;border-radius:16px;padding:20px;text-align:center;margin-bottom:16px;">
+        <div style="font-size:1.4rem;margin-bottom:8px;">🎟️</div>
+        <div style="font-weight:800;font-size:1rem;color:#FFD700;margin-bottom:4px;">대기 중이에요</div>
+        <div style="font-size:.82rem;color:var(--sub);margin-bottom:16px;" id="fq-position-text">내 대기 순서: <strong style="color:var(--text)">-</strong>번째</div>
+        <div style="background:var(--card);border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="font-size:.72rem;color:var(--sub);margin-bottom:8px;">현재 뽑기 중인 사람</div>
+          <div id="fq-current-user" style="font-size:.88rem;font-weight:700;">-</div>
+          <div id="fq-current-action" style="font-size:.75rem;color:var(--sub);margin-top:4px;"></div>
+        </div>
+        <div id="fq-draw-feed" style="background:var(--card);border-radius:12px;padding:10px;margin-bottom:14px;max-height:140px;overflow-y:auto;text-align:left;">
+          <div style="font-size:.72rem;color:var(--sub);margin-bottom:6px;text-align:center;">실시간 뽑기 현황</div>
+        </div>
+        <div id="fq-my-turn-banner" style="display:none;background:linear-gradient(135deg,#38BDF8,#22D3EE);border-radius:12px;padding:14px;margin-bottom:12px;">
+          <div style="font-weight:800;color:#fff;font-size:1rem;margin-bottom:4px;">🎉 내 차례예요!</div>
+          <div style="font-size:.8rem;color:#fff9;">지금 바로 뽑기를 시작하세요</div>
+        </div>
+        <button id="fq-enter-btn" onclick="fakeQueueEnterBoard()" style="display:none;padding:14px 32px;border-radius:50px;border:none;background:var(--btn-grad);color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;font-family:inherit;">✦ 뽑기 시작</button>
+        <button onclick="leaveFakeQueue()" style="margin-top:10px;padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:.78rem;font-family:inherit;">대기 취소</button>
+      </div>
     </div>
 
     <!-- Kuji type selector -->
@@ -761,6 +759,16 @@ input:checked + .toggle-slider:before{transform:translateX(20px);}
           <input class="field-input" id="kt-desc" placeholder="간단한 설명"/>
         </div>
       </div>
+      <div class="form-grid" style="margin-bottom:10px;">
+        <div>
+          <div class="field-label">1판 가격 (포인트)</div>
+          <input type="number" min="0" class="field-input" id="kt-price" placeholder="예: 9000" value="9000"/>
+        </div>
+        <div>
+          <div class="field-label">총 슬롯 수</div>
+          <input type="number" min="10" max="500" class="field-input" id="kt-slots" placeholder="예: 200" value="200"/>
+        </div>
+      </div>
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
         <button class="save-btn" id="kt-save-btn" onclick="saveKujiType()">추가</button>
         <button class="cancel-btn" id="kt-cancel-btn" style="display:none" onclick="cancelKujiTypeEdit()">취소</button>
@@ -768,35 +776,6 @@ input:checked + .toggle-slider:before{transform:translateX(20px);}
       </div>
       <div class="product-list" id="kuji-type-admin-list">
         <div style="color:var(--sub);text-align:center;padding:20px">쿠지 종류를 추가해주세요</div>
-      </div>
-    </div>
-
-    <!-- Fake Queue Mode -->
-    <div class="admin-card">
-      <div class="admin-card-title">🤖 가짜 대기 모드</div>
-      <div class="fake-queue-toggle">
-        <div>
-          <div class="fake-queue-toggle-label">가짜 대기 모드</div>
-          <div class="fake-queue-toggle-sub">봇들이 자동으로 대기줄에 들어오고 뽑기를 진행해요</div>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="fake-queue-toggle-input" onchange="toggleFakeQueueMode(this.checked)"/>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div class="fake-queue-panel" id="fake-queue-panel" style="display:none">
-        <div class="fake-queue-status" id="fake-queue-status">봇 0명 대기 중</div>
-        <div class="fake-queue-bots" id="fake-queue-bots"></div>
-        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-          <div>
-            <div class="field-label" style="margin-bottom:4px;">봇 등장 간격 (초)</div>
-            <input type="number" class="field-input" id="fake-bot-interval" value="15" min="5" max="120" style="width:100px;padding:6px 10px;font-size:.82rem;"/>
-          </div>
-          <div>
-            <div class="field-label" style="margin-bottom:4px;">봇 최대 수</div>
-            <input type="number" class="field-input" id="fake-bot-max" value="5" min="1" max="20" style="width:100px;padding:6px 10px;font-size:.82rem;"/>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -815,12 +794,35 @@ input:checked + .toggle-slider:before{transform:translateX(20px);}
       </div>
       <div class="form-grid">
         <div>
-          <div class="field-label">1판 가격 (포인트)</div>
-          <input type="number" min="0" class="field-input" id="s-price" value="3000"/>
-        </div>
-        <div>
           <div class="field-label">대기 있을 때 최대 판 수</div>
           <input type="number" min="1" max="50" class="field-input" id="s-queue-max" value="10"/>
+        </div>
+        <div>
+          <div class="field-label">가짜 대기 모드</div>
+          <select class="field-input" id="s-fake-queue">
+            <option value="off">비활성화</option>
+            <option value="on">활성화 (자동 대기줄 생성)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid" id="fake-queue-settings" style="display:none">
+        <div>
+          <div class="field-label">가짜 대기 최소 인원</div>
+          <input type="number" min="1" max="100" class="field-input" id="s-fake-min" value="3"/>
+        </div>
+        <div>
+          <div class="field-label">가짜 대기 최대 인원</div>
+          <input type="number" min="1" max="200" class="field-input" id="s-fake-max" value="15"/>
+        </div>
+      </div>
+      <div class="form-grid" id="fake-queue-speed" style="display:none">
+        <div>
+          <div class="field-label">앞사람 뽑기 간격 (초, 최소)</div>
+          <input type="number" min="3" max="300" class="field-input" id="s-fake-speed-min" value="8"/>
+        </div>
+        <div>
+          <div class="field-label">앞사람 뽑기 간격 (초, 최대)</div>
+          <input type="number" min="3" max="600" class="field-input" id="s-fake-speed-max" value="25"/>
         </div>
       </div>
       <button class="save-btn" onclick="saveSettings()">저장</button>
@@ -1181,6 +1183,18 @@ async function claimSession() {
   // Claim 30 minutes of active time
   const until = Date.now() + 30 * 60 * 1000;
   await setDoc(doc(db, "queue", "state"), { activeUid: userId, activeUntil: until });
+}
+
+async function requestQueue() {
+  if (!userId) { alert("로그인이 필요해요"); return; }
+  try {
+    await addDoc(collection(db, "queue", "list", "entries"), {
+      uid: userId,
+      email: currentUser.email,
+      requestedAt: Date.now()
+    });
+    alert("대기 신청이 완료됐어요!\n차례가 되면 알려드릴게요 😊");
+  } catch(e) { alert("대기 신청 실패: " + e.message); }
 }
 
 // ── Theme ──
@@ -1998,15 +2012,17 @@ window.doAdminLogin = doAdminLogin;
 async function saveKujiType() {
   const name = document.getElementById("kt-name").value.trim();
   const desc = document.getElementById("kt-desc").value.trim();
-  const editId = document.getElementById("kt-edit-id").value;
+  const price = parseInt(document.getElementById("kt-price").value) || 9000;
+  const slots = parseInt(document.getElementById("kt-slots").value) || 200;
+  const editIdVal = document.getElementById("kt-edit-id").value;
   if (!name) { alert("쿠지 이름을 입력하세요"); return; }
   const btn = document.getElementById("kt-save-btn");
   btn.disabled = true;
   try {
-    if (editId) {
-      await updateDoc(doc(db, "kujiTypes", editId), { name, desc });
+    if (editIdVal) {
+      await updateDoc(doc(db, "kujiTypes", editIdVal), { name, desc, price, slots });
     } else {
-      await addDoc(collection(db, "kujiTypes"), { name, desc, createdAt: Date.now() });
+      await addDoc(collection(db, "kujiTypes"), { name, desc, price, slots, createdAt: Date.now() });
     }
     cancelKujiTypeEdit();
     await loadAll();
@@ -2151,8 +2167,12 @@ window.saveNotice = saveNotice;
 async function saveSettings() {
   settings.title = document.getElementById("s-title").value;
   settings.subtitle = document.getElementById("s-subtitle").value;
-  settings.price = parseInt(document.getElementById("s-price").value) || 0;
   settings.queueMax = parseInt(document.getElementById("s-queue-max").value) || 10;
+  settings.fakeQueue = document.getElementById("s-fake-queue").value;
+  settings.fakeQueueMin = parseInt(document.getElementById("s-fake-min").value) || 3;
+  settings.fakeQueueMax = parseInt(document.getElementById("s-fake-max").value) || 15;
+  settings.fakeSpeedMin = parseInt(document.getElementById("s-fake-speed-min").value) || 8;
+  settings.fakeSpeedMax = parseInt(document.getElementById("s-fake-speed-max").value) || 25;
   try {
     await setDoc(doc(db, "settings", "global"), settings, { merge: true });
     renderDrawTab();
@@ -2196,13 +2216,6 @@ async function renderAdminTab() {
   renderAdminProducts();
   // Kuji types
   renderAdminKujiTypes();
-  // Fake queue sync toggle UI
-  const toggle = document.getElementById("fake-queue-toggle-input");
-  if (toggle) {
-    toggle.checked = fakeQueueMode;
-    document.getElementById("fake-queue-panel").style.display = fakeQueueMode ? "" : "none";
-    if (fakeQueueMode) renderAdminFakeQueue();
-  }
   // Users
   await loadAdminUsers();
 }
@@ -2454,209 +2467,8 @@ async function deleteProduct(id) {
 }
 window.deleteProduct = deleteProduct;
 
-// ── Fake Queue Mode ──
-const FAKE_BOT_NAMES = [
-  { name: "별이⭐", emoji: "🌟" }, { name: "하늘이💙", emoji: "💙" },
-  { name: "루나🌙", emoji: "🌙" }, { name: "소원이🎀", emoji: "🎀" },
-  { name: "다온이✨", emoji: "✨" }, { name: "지은이🌸", emoji: "🌸" },
-  { name: "유이🐰", emoji: "🐰" }, { name: "나온이🍀", emoji: "🍀" },
-  { name: "하린이🦋", emoji: "🦋" }, { name: "세나🌺", emoji: "🌺" },
-  { name: "이든이💫", emoji: "💫" }, { name: "아리🎵", emoji: "🎵" },
-  { name: "보라🍇", emoji: "🍇" }, { name: "시아💜", emoji: "💜" },
-  { name: "지오🌊", emoji: "🌊" }, { name: "란이🌹", emoji: "🌹" },
-];
-
-let fakeQueueMode = false;
-let fakeQueueBots = []; // { id, name, emoji, status, drawCount, joinedAt }
-let fakeQueueTimer = null;
-let fakeQueueDrawTimers = [];
-let userInFakeQueue = false;
-let userFakeQueuePos = -1;
-
-function toggleFakeQueueMode(on) {
-  fakeQueueMode = on;
-  document.getElementById("fake-queue-panel").style.display = on ? "" : "none";
-  if (on) {
-    startFakeQueueLoop();
-    renderFakeQueueLive();
-  } else {
-    stopFakeQueueMode();
-  }
-}
-window.toggleFakeQueueMode = toggleFakeQueueMode;
-
-function startFakeQueueLoop() {
-  stopFakeQueueMode();
-  // Immediately spawn 1-2 bots
-  spawnFakeBot();
-  scheduleNextBot();
-}
-
-function scheduleNextBot() {
-  if (!fakeQueueMode) return;
-  const interval = (parseInt(document.getElementById("fake-bot-interval")?.value) || 15) * 1000;
-  const jitter = (Math.random() * 0.5 + 0.75) * interval; // 75%~125% of interval
-  fakeQueueTimer = setTimeout(() => {
-    spawnFakeBot();
-    scheduleNextBot();
-  }, jitter);
-}
-
-function spawnFakeBot() {
-  const maxBots = parseInt(document.getElementById("fake-bot-max")?.value) || 5;
-  if (fakeQueueBots.length >= maxBots) return;
-  // pick unused bot name
-  const used = fakeQueueBots.map(b => b.name);
-  const pool = FAKE_BOT_NAMES.filter(b => !used.includes(b.name));
-  if (!pool.length) return;
-  const pick = pool[Math.floor(Math.random() * pool.length)];
-  const bot = { id: Date.now() + Math.random(), name: pick.name, emoji: pick.emoji, status: "waiting", drawCount: 0, joinedAt: Date.now() };
-  fakeQueueBots.push(bot);
-  renderAdminFakeQueue();
-  renderFakeQueueLive();
-
-  // After 3-8 seconds, bot starts drawing
-  const drawDelay = 3000 + Math.random() * 5000;
-  const t1 = setTimeout(() => {
-    bot.status = "drawing";
-    bot.drawCount = Math.floor(Math.random() * 8) + 1;
-    renderAdminFakeQueue();
-    renderFakeQueueLive();
-    // After drawing animation, bot leaves
-    const leaveDelay = 2000 + bot.drawCount * 300;
-    const t2 = setTimeout(() => {
-      fakeQueueBots = fakeQueueBots.filter(b => b.id !== bot.id);
-      renderAdminFakeQueue();
-      renderFakeQueueLive();
-    }, leaveDelay);
-    fakeQueueDrawTimers.push(t2);
-  }, drawDelay);
-  fakeQueueDrawTimers.push(t1);
-}
-
-function stopFakeQueueMode() {
-  fakeQueueMode = false;
-  if (fakeQueueTimer) { clearTimeout(fakeQueueTimer); fakeQueueTimer = null; }
-  fakeQueueDrawTimers.forEach(t => clearTimeout(t));
-  fakeQueueDrawTimers = [];
-  fakeQueueBots = [];
-  userInFakeQueue = false;
-  userFakeQueuePos = -1;
-  renderAdminFakeQueue();
-  renderFakeQueueLive();
-}
-
-function renderAdminFakeQueue() {
-  const panel = document.getElementById("fake-queue-bots");
-  const status = document.getElementById("fake-queue-status");
-  if (!panel) return;
-  const waiting = fakeQueueBots.filter(b => b.status === "waiting").length;
-  const drawing = fakeQueueBots.filter(b => b.status === "drawing").length;
-  if (status) status.textContent = `봇 ${fakeQueueBots.length}명 활동 중 (대기 ${waiting} / 뽑기 ${drawing})`;
-  panel.innerHTML = fakeQueueBots.map(b => `
-    <div class="fake-bot-row">
-      <div class="fake-bot-avatar" style="background:${b.status==='drawing'?'var(--accent)22':'var(--bg3)'}">${b.emoji}</div>
-      <div class="fake-bot-name">${b.name}</div>
-      <div class="fake-bot-status ${b.status==='drawing'?'fake-bot-drawing fake-bot-wait':''}">
-        ${b.status==='drawing' ? `🎰 ${b.drawCount}개 뽑는 중...` : '⏳ 대기 중'}
-      </div>
-    </div>
-  `).join("") || '<div style="color:var(--sub);font-size:.78rem;text-align:center;padding:8px">대기 중인 봇 없음</div>';
-}
-
-function renderFakeQueueLive() {
-  const panel = document.getElementById("queue-live-panel");
-  const list = document.getElementById("queue-live-list");
-  if (!panel || !list) return;
-
-  if (!fakeQueueMode || (fakeQueueBots.length === 0 && !userInFakeQueue)) {
-    panel.style.display = "none";
-    return;
-  }
-  panel.style.display = "";
-
-  // Build ordered list: bots + user (if in queue)
-  const entries = [];
-  // Currently drawing bots first (they are at the front)
-  const drawing = fakeQueueBots.filter(b => b.status === "drawing");
-  const waiting = fakeQueueBots.filter(b => b.status === "waiting");
-
-  drawing.forEach(b => entries.push({ type: "bot", ...b }));
-  if (userInFakeQueue) {
-    // Insert user at their position among waiting
-    const pos = Math.min(userFakeQueuePos, waiting.length);
-    const before = waiting.slice(0, pos);
-    const after = waiting.slice(pos);
-    before.forEach(b => entries.push({ type: "bot", ...b }));
-    entries.push({ type: "user" });
-    after.forEach(b => entries.push({ type: "bot", ...b }));
-  } else {
-    waiting.forEach(b => entries.push({ type: "bot", ...b }));
-  }
-
-  list.innerHTML = entries.map((e, i) => {
-    if (e.type === "user") {
-      return `<div class="queue-live-item queue-live-me">
-        <div class="queue-live-num">${i+1}</div>
-        <div class="queue-live-name" style="color:var(--accent)">나 (${currentUser?.email?.split("@")[0] || "나"})</div>
-        <div style="font-size:.68rem;color:var(--accent)">👈 내 차례 대기 중</div>
-      </div>`;
-    }
-    const isDrawing = e.status === "drawing";
-    return `<div class="queue-live-item ${isDrawing ? 'queue-live-drawing' : ''}">
-      <div class="queue-live-num">${i+1}</div>
-      <div class="queue-live-name">${e.emoji} ${e.name}</div>
-      <div style="font-size:.68rem;color:var(--sub)">${isDrawing ? `🎰 ${e.drawCount}개 뽑는 중` : '⏳ 대기 중'}</div>
-    </div>`;
-  }).join("") || '<div style="color:var(--sub);font-size:.75rem;text-align:center;padding:6px">대기 중인 사람 없음</div>';
-}
-
-// Hook into requestQueue to integrate with fake mode
-const _origRequestQueue = window.requestQueue;
-
 // ── Queue request (exposed) ──
-window.requestQueue = async function() {
-  if (fakeQueueMode) {
-    // Fake queue mode: just add user to visual queue
-    if (userInFakeQueue) { alert("이미 대기 중이에요!"); return; }
-    if (!userId) { alert("로그인이 필요해요"); return; }
-    userInFakeQueue = true;
-    // Insert user randomly among waiting bots
-    const waitingCount = fakeQueueBots.filter(b => b.status === "waiting").length;
-    userFakeQueuePos = waitingCount > 0 ? Math.floor(Math.random() * (waitingCount + 1)) : 0;
-    renderFakeQueueLive();
-
-    // Simulate waiting and then being called
-    const drawingBots = fakeQueueBots.filter(b => b.status === "drawing");
-    const waitBefore = fakeQueueBots.filter(b => b.status === "waiting").slice(0, userFakeQueuePos);
-    const estimatedWait = (drawingBots.length * 4000) + (waitBefore.length * 6000) + 2000;
-
-    setTimeout(() => {
-      if (!userInFakeQueue) return;
-      userInFakeQueue = false;
-      userFakeQueuePos = -1;
-      renderFakeQueueLive();
-      // Show notification that it's user's turn
-      document.getElementById("queue-banner").style.display = "none";
-      alert("🎉 차례가 됐어요! 이제 뽑기를 시작해보세요!");
-    }, Math.min(estimatedWait, 20000));
-
-    document.getElementById("queue-banner").style.display = "none";
-    document.getElementById("queue-live-panel").style.display = "";
-    alert(`대기 신청 완료! 현재 ${userFakeQueuePos + 1}번째 대기 중이에요 😊\n차례가 되면 알려드릴게요!`);
-    return;
-  }
-  // Real queue logic
-  if (!userId) { alert("로그인이 필요해요"); return; }
-  try {
-    await addDoc(collection(db, "queue", "list", "entries"), {
-      uid: userId,
-      email: currentUser.email,
-      requestedAt: Date.now()
-    });
-    alert("대기 신청이 완료됐어요!\n차례가 되면 알려드릴게요 😊");
-  } catch(e) { alert("대기 신청 실패: " + e.message); }
-};
+window.requestQueue = requestQueue;
 
 // ── Helpers ──
 function weightedDraw(items) {

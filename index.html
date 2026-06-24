@@ -402,6 +402,23 @@ select.field-input{cursor:pointer;}
 
 <!-- Modals -->
 
+<!-- Last-one Award Modal -->
+<div class="modal-overlay" id="lastone-modal" style="display:none;background:rgba(0,0,0,.92)">
+  <div style="text-align:center;padding:20px;max-width:340px;width:100%;animation:pop .4s ease;">
+    <div id="lastone-particles" style="position:relative;height:0"></div>
+    <div style="font-size:4rem;margin-bottom:8px;animation:float 2s ease infinite;">🏅</div>
+    <div style="font-size:1.6rem;font-weight:900;background:linear-gradient(135deg,#FFD700,#F472B6,#38BDF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;letter-spacing:.04em;">라스트원상 획득!</div>
+    <div style="font-size:.85rem;color:#ccc;margin-bottom:20px;line-height:1.6;">판 전체를 통털이로 완주하셨어요!<br>특별한 상품을 드립니다 ✨</div>
+    <div style="background:linear-gradient(135deg,#FFD70022,#F472B622);border:2px solid #FFD700;border-radius:20px;padding:20px;margin-bottom:20px;">
+      <div style="font-size:.72rem;color:#FFD700;font-weight:700;letter-spacing:.1em;margin-bottom:8px;">🎁 지급 상품</div>
+      <div id="lastone-modal-name" style="font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:4px;"></div>
+      <div id="lastone-modal-desc" style="font-size:.78rem;color:#ccc;"></div>
+    </div>
+    <div style="font-size:.72rem;color:#888;margin-bottom:16px;">컬렉션 최상단에 추가됐어요</div>
+    <button onclick="document.getElementById('lastone-modal').style.display='none'" style="padding:14px 40px;border-radius:50px;border:none;background:linear-gradient(135deg,#FFD700,#F472B6);color:#000;font-weight:800;font-size:1rem;cursor:pointer;font-family:inherit;">감사합니다! 🎉</button>
+  </div>
+</div>
+
 <!-- Admin Login -->
 <div class="modal-overlay" id="admin-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
   <div class="modal-box">
@@ -704,15 +721,8 @@ select.field-input{cursor:pointer;}
         </div>
       </div>
 
-      <!-- Last-one award banner (shown after successful 통털이) -->
-      <div id="lastone-banner-area" style="display:none">
-        <div class="lastone-banner">
-          <div class="lastone-title">🏅 라스트원상 획득!</div>
-          <div class="lastone-sub">판 전체를 통털이로 완료하셨어요! 특별 상품을 드립니다 🎉</div>
-          <div id="lastone-item-name" class="lastone-item-name"></div>
-          <div id="lastone-item-desc" style="font-size:.75rem;color:var(--sub);"></div>
-        </div>
-      </div>
+      <!-- Last-one award banner area (replaced by modal, keep empty placeholder) -->
+      <div id="lastone-banner-area" style="display:none"></div>
     </div>
 
     <!-- Products preview (항상 맨 아래) -->
@@ -780,7 +790,7 @@ select.field-input{cursor:pointer;}
     </div>
 
     <!-- Logged in content -->
-    <div id="mypage-content" style="display:none">
+    <div id="mypage-content" style="display:block">
       <!-- Inbox -->
       <div class="admin-card" id="inbox-card" style="display:none">
         <div class="admin-card-title">📬 받은 메시지</div>
@@ -2111,22 +2121,32 @@ async function handleDraw() {
     else playSound("reveal");
 
     // ── 라스트원상 처리 ──
-    const lastoneArea = document.getElementById("lastone-banner-area");
-    if (lastoneArea) lastoneArea.style.display = "none";
     if (lastOneEligible && lastOneProduct && lastOneProduct.name) {
       lastOneEligible = false;
-      lastoneArea.style.display = "";
-      document.getElementById("lastone-item-name").textContent = "🎁 " + lastOneProduct.name;
-      document.getElementById("lastone-item-desc").textContent = lastOneProduct.desc || "";
-      // Firestore에 라스트원상 당첨 기록
+      // Firestore에 라스트원상 당첨 기록 (컬렉션에 최상단 고정용 특수 등급)
       try {
-        await addDoc(collection(db, "draws", userId, "items"), {
+        const loRef = doc(collection(db, "draws", userId, "items"));
+        await setDoc(loRef, {
           productId: "lastone_award", name: "[라스트원상] " + lastOneProduct.name,
           grade: "SSR", imageUrl: "", description: lastOneProduct.desc || "",
           drawnAt: Date.now(), isLastOne: true
         });
+        userDraws.unshift({
+          id: loRef.id, productId: "lastone_award",
+          name: "[라스트원상] " + lastOneProduct.name,
+          grade: "SSR", imageUrl: "", description: lastOneProduct.desc || "",
+          drawnAt: Date.now(), isLastOne: true
+        });
       } catch(e) {}
-      playSound("ssr"); launchConfetti();
+      // 풀스크린 모달 표시
+      document.getElementById("lastone-modal-name").textContent = lastOneProduct.name;
+      document.getElementById("lastone-modal-desc").textContent = lastOneProduct.desc || "";
+      document.getElementById("lastone-modal").style.display = "flex";
+      // 특별 사운드 + 폭죽
+      playSound("ssr");
+      launchConfetti();
+      setTimeout(launchConfetti, 600);
+      setTimeout(launchConfetti, 1200);
     }
 
     // ── SSR 전역 실시간 알림 (다른 사용자들에게 노출용 Firestore 기록) ──
@@ -2353,9 +2373,11 @@ function renderCollectionTab() {
     stats.appendChild(t);
   });
 
-  // Group by productId
+  // Group by productId — but keep lastOne items separate (always pinned to top)
+  const lastOneItems = [];
   const grouped = {};
   userDraws.forEach(d => {
+    if (d.isLastOne) { lastOneItems.push(d); return; }
     const key = d.productId || d.name;
     if (!grouped[key]) grouped[key] = { ...d, qty: 0, firstAt: d.drawnAt, ids: [], shippedCount: 0 };
     grouped[key].qty++;
@@ -2377,6 +2399,39 @@ function renderCollectionTab() {
 
   const grid = document.getElementById("col-grid");
   grid.innerHTML = "";
+
+  // ── 라스트원상 최상단 고정 카드 ──
+  if (lastOneItems.length && (colGradeFilter === "ALL" || colGradeFilter === "SSR")) {
+    // 전체 span 카드 (그리드 상단 full width)
+    const loHeader = document.createElement("div");
+    loHeader.style.cssText = `
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #FFD70022, #F472B622);
+      border: 2px solid #FFD700;
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 4px;
+      animation: lastOnePulse 3s infinite;
+    `;
+    loHeader.innerHTML = `
+      <div style="font-size:2.2rem;flex-shrink:0;animation:float 2s ease infinite;">🏅</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.6rem;font-weight:800;letter-spacing:.15em;color:#FFD700;margin-bottom:2px;">LAST ONE AWARD</div>
+        ${lastOneItems.map(lo => `
+          <div style="font-size:.9rem;font-weight:800;color:#fff;word-break:break-all;">${escHtml(lo.name.replace("[라스트원상] ",""))}</div>
+          ${lo.description ? `<div style="font-size:.72rem;color:#ccc;">${escHtml(lo.description)}</div>` : ""}
+          <div style="font-size:.62rem;color:#FFD70099;margin-top:2px;">${lo.drawnAt ? new Date(lo.drawnAt).toLocaleDateString("ko-KR") : ""} 획득</div>
+        `).join("")}
+      </div>
+      <div style="font-size:.65rem;font-weight:700;padding:4px 10px;border-radius:20px;background:#FFD700;color:#000;flex-shrink:0;">SSR</div>
+    `;
+    grid.appendChild(loHeader);
+  }
+
+  // 나머지 일반 아이템
   window._colArrCache = arr;
   arr.forEach((item, idx) => {
     const meta = GRADE_META[item.grade] || GRADE_META.N;
@@ -2406,7 +2461,7 @@ function renderCollectionTab() {
       </div>
     `;
     el.addEventListener("click", (e) => {
-      if (e.target.closest("button")) return; // 배송 신청 버튼 클릭은 확대보기와 분리
+      if (e.target.closest("button")) return;
       showColLightbox(idx);
     });
     grid.appendChild(el);
@@ -3881,12 +3936,22 @@ function renderRoulette() {
   const doneMsg = document.getElementById("roulette-done-msg");
   const resultArea = document.getElementById("roulette-result-area");
   const spinBtn = document.getElementById("roulette-spin-btn");
+  const wheel = document.getElementById("roulette-wheel-emoji");
   if (!doneMsg || !spinBtn) return;
+
+  if (!userId) {
+    // 로그인 안 된 상태: 버튼 보이되 클릭하면 로그인 유도
+    doneMsg.style.display = "none";
+    resultArea.style.display = "none";
+    spinBtn.style.display = "";
+    spinBtn.disabled = false;
+    if (wheel) wheel.textContent = "🎰";
+    return;
+  }
 
   const key = getRouletteKey();
   const stored = localStorage.getItem(key);
   if (stored) {
-    // Already spun today
     const data = JSON.parse(stored);
     doneMsg.style.display = "";
     spinBtn.style.display = "none";
@@ -3896,27 +3961,31 @@ function renderRoulette() {
     const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); tomorrow.setHours(0,0,0,0);
     const diffH = Math.ceil((tomorrow - Date.now()) / 3600000);
     document.getElementById("roulette-next-time").textContent = `다음 룰렛까지 약 ${diffH}시간`;
+    if (wheel) wheel.textContent = data.emoji;
   } else {
     doneMsg.style.display = "none";
     resultArea.style.display = "none";
     spinBtn.style.display = "";
+    spinBtn.disabled = false;
+    if (wheel) wheel.textContent = "🎰";
   }
 }
 
 async function spinRoulette() {
   if (!userId) { showLoginModal(); return; }
   const key = getRouletteKey();
-  if (localStorage.getItem(key)) { alert("오늘은 이미 돌리셨어요!"); return; }
+  if (localStorage.getItem(key)) { renderRoulette(); return; }
 
   const btn = document.getElementById("roulette-spin-btn");
-  btn.disabled = true;
   const wheel = document.getElementById("roulette-wheel-emoji");
+  btn.disabled = true;
+  btn.textContent = "돌리는 중...";
 
-  // 애니메이션
-  const frames = ["🎰","🎲","🎯","🎪","🎠","🎡","🎢","🌟","✨","💫"];
+  // 빠른 애니메이션
+  const frames = ["🎰","7️⃣","🍀","⭐","💎","🌟","🎯","🎪","🏆","✨","💫","🎁"];
   let fi = 0;
-  const anim = setInterval(() => { wheel.textContent = frames[fi++ % frames.length]; }, 100);
-  await new Promise(r => setTimeout(r, 1800));
+  const anim = setInterval(() => { if(wheel) wheel.textContent = frames[fi++ % frames.length]; }, 80);
+  await new Promise(r => setTimeout(r, 2000));
   clearInterval(anim);
 
   // 가중치 뽑기
@@ -3925,7 +3994,7 @@ async function spinRoulette() {
   let prize = ROULETTE_PRIZES[0];
   for (const p of ROULETTE_PRIZES) { rand -= p.weight; if (rand <= 0) { prize = p; break; } }
 
-  wheel.textContent = prize.emoji;
+  if(wheel) wheel.textContent = prize.emoji;
 
   // 포인트 지급
   if (prize.points > 0 && userId) {
@@ -3939,11 +4008,23 @@ async function spinRoulette() {
     } catch(e) {}
   }
 
-  // 결과 저장
+  // 결과 저장 후 UI 갱신
   localStorage.setItem(key, JSON.stringify({ label: prize.label, emoji: prize.emoji, points: prize.points, isFree: !!prize.isFree }));
+
+  btn.textContent = "🎡 룰렛 돌리기";
   renderRoulette();
+
+  // 효과
   if (prize.points >= 1000 || prize.isFree) { playSound("ssr"); launchConfetti(); }
   else if (prize.points > 0) playSound("reveal");
+  else playSound("deselect");
+
+  // 결과 토스트
+  const t = document.createElement("div");
+  t.style.cssText = `position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:${prize.points >= 1000 ? "linear-gradient(135deg,#FFD700,#F472B6)" : "var(--card)"};color:${prize.points >= 1000 ? "#000" : "var(--text)"};border:1px solid ${prize.points > 0 ? "#FFD700" : "var(--border)"};padding:12px 24px;border-radius:20px;font-weight:800;font-size:.9rem;z-index:9999;animation:fadeIn .3s ease;white-space:nowrap;`;
+  t.textContent = prize.points > 0 ? `${prize.emoji} ${prize.label} +${prize.points.toLocaleString()}P!` : (prize.isFree ? `${prize.emoji} 1회 무료권 획득!` : `${prize.emoji} 꽝... 내일 다시!`);
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
 }
 window.spinRoulette = spinRoulette;
 

@@ -559,7 +559,17 @@ select.field-input{cursor:pointer;}
     <div class="queue-banner" id="queue-banner" style="display:none">
       <div class="queue-banner-title">⏳ 현재 다른 분이 진행 중이에요</div>
       <div class="queue-banner-sub" id="queue-banner-sub">대기를 신청하면 차례가 되면 알려드려요</div>
-      <button class="modal-btn" style="width:auto;display:inline-block;margin-top:10px;padding:8px 20px;" onclick="requestQueue()">대기 신청</button>
+      <div id="queue-wait-info" style="display:none;margin-top:8px;padding:8px 12px;background:rgba(255,107,107,0.1);border-radius:10px;">
+        <div style="font-size:.78rem;color:#FFD700;font-weight:700;" id="queue-position-text">대기 중...</div>
+        <div style="font-size:.72rem;color:var(--sub);margin-top:2px;" id="queue-eta-text"></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;" id="queue-action-btns">
+        <button class="modal-btn" style="width:auto;display:inline-block;padding:8px 20px;" onclick="requestQueue()">대기 신청</button>
+      </div>
+      <div style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:10px;" id="queue-joined-btns">
+        <button class="modal-btn" style="width:auto;padding:8px 20px;" onclick="checkMyQueueTurn()">새로고침</button>
+        <button class="text-btn" style="color:#FF6B6B;border-color:#FF6B6B44;" onclick="cancelQueueRequest()">대기 취소</button>
+      </div>
     </div>
 
     <!-- Fake Queue Waiting Room -->
@@ -607,18 +617,18 @@ select.field-input{cursor:pointer;}
     <!-- Grade summary (hidden per request) -->
     <div class="grade-grid" id="grade-grid" style="display:none"></div>
 
-    <!-- Products preview -->
-    <div class="products-section">
-      <div class="section-title">상품 목록</div>
-      <div class="products-grid" id="products-preview"></div>
-    </div>
-
     <!-- Enter board -->
     <div class="enter-board-wrap">
       <button class="enter-board-btn" id="enter-board-btn" onclick="enterBoard()">
         🎫 쿠지 고르기
       </button>
       <div style="font-size:.75rem;color:var(--sub);margin-top:8px;" id="enter-btn-hint">로그인 후 이용 가능합니다</div>
+    </div>
+
+    <!-- Products preview -->
+    <div class="products-section">
+      <div class="section-title">상품 목록</div>
+      <div class="products-grid" id="products-preview"></div>
     </div>
 
     <!-- ── Board view ── -->
@@ -634,6 +644,7 @@ select.field-input{cursor:pointer;}
       <div class="kujiboard-label">
         원하는 슬롯을 선택하세요 · <strong id="selected-count-label">0</strong>개 선택
         <button onclick="randomSelectSlots()" style="margin-left:10px;padding:4px 12px;border-radius:20px;border:1px solid var(--accent);background:var(--accent)22;color:var(--accent);cursor:pointer;font-size:.72rem;font-weight:700;font-family:inherit;">🎲 랜덤 10개</button>
+        <button onclick="selectAllSlots()" style="margin-left:6px;padding:4px 12px;border-radius:20px;border:1px solid #FFD700;background:#FFD70022;color:#FFD700;cursor:pointer;font-size:.72rem;font-weight:700;font-family:inherit;">⭐ 통털이</button>
       </div>
       <div class="kujiboard-grid" id="kujiboard-grid"></div>
 
@@ -808,6 +819,19 @@ select.field-input{cursor:pointer;}
         <input type="checkbox" id="admin-pw-disable-toggle" onchange="toggleAdminPwDisabled(this.checked)"/>
         비밀번호 비활성화 (관리자 버튼을 누르면 바로 입장돼요)
       </label>
+    </div>
+
+    <!-- Debug mode -->
+    <div class="admin-card" id="debug-mode-card" style="border:1px solid #FF6B6B44;">
+      <div class="admin-card-title" style="color:#FF6B6B;">🛠️ 디버그 모드</div>
+      <div style="font-size:.8rem;color:var(--sub);margin-bottom:12px;">켜면 포인트가 무한대가 됩니다. 사이트 점검 시 사용하세요.</div>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
+        <input type="checkbox" id="debug-mode-toggle" onchange="toggleDebugMode(this.checked)" style="accent-color:#FF6B6B;width:18px;height:18px;"/>
+        <span style="font-size:.9rem;font-weight:700;" id="debug-mode-label">디버그 모드 OFF</span>
+      </label>
+      <div id="debug-mode-active-notice" style="display:none;margin-top:10px;padding:10px;background:#FF6B6B22;border-radius:10px;border:1px solid #FF6B6B44;font-size:.78rem;color:#FF6B6B;font-weight:700;text-align:center;">
+        ⚠️ 디버그 모드 ON — 포인트 차감 없이 뽑기 가능
+      </div>
     </div>
 
     <!-- Notice -->
@@ -1043,6 +1067,7 @@ let sessionDrawnCount = 0;   // how many slots used in current session
 let totalSlots = 200;
 let sessionStartSlot = 0;    // offset for current board reset cycle
 let adminMsgTargetUid = null;
+let debugMode = localStorage.getItem("kuji_debug_mode") === "true";
 let adminMsgTargetEmail = null;
 let queueUnsub = null;
 
@@ -1131,8 +1156,13 @@ async function ensureUserProfile(user) {
 
 function updatePointBadge() {
   if (!userProfile) return;
-  document.getElementById("point-badge").textContent = `💎 ${(userProfile.points || 0).toLocaleString()}P`;
-  document.getElementById("my-points").textContent = `${(userProfile.points || 0).toLocaleString()}P`;
+  if (debugMode) {
+    document.getElementById("point-badge").textContent = "🛠️ ∞P";
+    document.getElementById("my-points").textContent = "∞P (디버그)";
+  } else {
+    document.getElementById("point-badge").textContent = `💎 ${(userProfile.points || 0).toLocaleString()}P`;
+    document.getElementById("my-points").textContent = `${(userProfile.points || 0).toLocaleString()}P`;
+  }
 }
 
 // ── Inbox listener ──
@@ -1287,17 +1317,117 @@ async function claimSession() {
   await setDoc(doc(db, "queue", "state"), { activeUid: userId, activeUntil: until });
 }
 
+let myQueueDocId = null;
+let queueCheckInterval = null;
+
 async function requestQueue() {
   if (!userId) { alert("로그인이 필요해요"); return; }
   try {
-    await addDoc(collection(db, "queue", "list", "entries"), {
-      uid: userId,
-      email: currentUser.email,
-      requestedAt: Date.now()
-    });
-    alert("대기 신청이 완료됐어요!\n차례가 되면 알려드릴게요 😊");
+    // 이미 대기 중인지 확인
+    const existing = await getDocs(query(
+      collection(db, "queue", "list", "entries"),
+      where("uid", "==", userId)
+    ));
+    if (!existing.empty) {
+      myQueueDocId = existing.docs[0].id;
+    } else {
+      const ref = await addDoc(collection(db, "queue", "list", "entries"), {
+        uid: userId,
+        email: currentUser.email,
+        requestedAt: Date.now()
+      });
+      myQueueDocId = ref.id;
+    }
+    // UI 전환: 신청 버튼 숨기고 대기 중 UI 표시
+    document.getElementById("queue-action-btns").style.display = "none";
+    document.getElementById("queue-joined-btns").style.display = "flex";
+    document.getElementById("queue-wait-info").style.display = "";
+    // 대기 정보 업데이트 시작
+    await updateQueueInfo();
+    if (queueCheckInterval) clearInterval(queueCheckInterval);
+    queueCheckInterval = setInterval(async () => {
+      await updateQueueInfo();
+    }, 10000);
   } catch(e) { alert("대기 신청 실패: " + e.message); }
 }
+
+async function updateQueueInfo() {
+  try {
+    const snap = await getDocs(query(
+      collection(db, "queue", "list", "entries"),
+      orderBy("requestedAt", "asc")
+    ));
+    const entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const myIdx = entries.findIndex(e => e.uid === userId);
+    if (myIdx === -1) {
+      // 대기 목록에서 사라짐 = 내 차례이거나 취소됨
+      clearQueueWatcher();
+      document.getElementById("queue-banner").style.display = "none";
+      // 바로 입장
+      if (userId && currentKujiId) {
+        await claimSession();
+        isBoardOpen = true;
+        document.getElementById("board-view").style.display = "block";
+        document.getElementById("enter-board-btn").style.display = "none";
+        try { document.querySelector(".enter-board-wrap > div").style.display = "none"; } catch(e) {}
+        document.getElementById("results-area").style.display = "none";
+        selectedSlots = new Set();
+        renderKujiBoard();
+      }
+      return;
+    }
+    const position = myIdx + 1; // 1-based
+    const ahead = myIdx; // 나 앞에 있는 사람 수
+    const posText = document.getElementById("queue-position-text");
+    const etaText = document.getElementById("queue-eta-text");
+    if (posText) posText.textContent = ahead === 0 ? "🎉 곧 내 차례예요!" : `대기 ${position}번째 (앞에 ${ahead}명)`;
+    // 예상 대기 시간 (1명당 평균 5~15분 가정, 중간값 10분)
+    if (etaText) {
+      if (ahead === 0) {
+        etaText.textContent = "잠시 후 뽑기를 시작할 수 있어요";
+      } else {
+        const estMin = ahead * 10;
+        etaText.textContent = `예상 대기 시간 약 ${estMin}분`;
+      }
+    }
+  } catch(e) { console.warn("queue info error", e); }
+}
+
+async function checkMyQueueTurn() {
+  await updateQueueInfo();
+}
+
+async function cancelQueueRequest() {
+  if (!confirm("대기를 취소할까요?")) return;
+  try {
+    if (myQueueDocId) {
+      await deleteDoc(doc(db, "queue", "list", "entries", myQueueDocId));
+      myQueueDocId = null;
+    } else {
+      // uid로 찾아서 삭제
+      const snap = await getDocs(query(
+        collection(db, "queue", "list", "entries"),
+        where("uid", "==", userId)
+      ));
+      const batch = writeBatch(db);
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+    }
+    clearQueueWatcher();
+    document.getElementById("queue-banner").style.display = "none";
+    document.getElementById("queue-action-btns").style.display = "flex";
+    document.getElementById("queue-joined-btns").style.display = "none";
+    document.getElementById("queue-wait-info").style.display = "none";
+  } catch(e) { alert("취소 실패: " + e.message); }
+}
+
+function clearQueueWatcher() {
+  if (queueCheckInterval) { clearInterval(queueCheckInterval); queueCheckInterval = null; }
+  myQueueDocId = null;
+}
+
+window.checkMyQueueTurn = checkMyQueueTurn;
+window.cancelQueueRequest = cancelQueueRequest;
 
 // ── Theme ──
 let isDark = true;
@@ -1388,7 +1518,10 @@ async function renderDrawTab() {
     const sortedProducts = [...products].sort((a,b) => {
       const gd = (GRADE_ORDER[a.grade]??9)-(GRADE_ORDER[b.grade]??9);
       if (gd !== 0) return gd;
-      return (a.name||"").localeCompare(b.name||"", "ko");
+      const ra = a.remaining ?? a.count ?? 0;
+      const rb = b.remaining ?? b.count ?? 0;
+      if (ra !== rb) return ra - rb;
+      return (a.name||"").localeCompare(b.name||"");
     });
     sortedProducts.forEach(p => {
     const meta = GRADE_META[p.grade] || GRADE_META.N;
@@ -1550,6 +1683,27 @@ function randomSelectSlots() {
 }
 window.randomSelectSlots = randomSelectSlots;
 
+function selectAllSlots() {
+  // 전체 슬롯 선택 (통털이)
+  selectedSlots.forEach(idx => {
+    const el = document.querySelector(`#kujiboard-grid .slot[data-idx="${idx}"]`);
+    if (el) el.className = "slot";
+  });
+  selectedSlots.clear();
+  const available = [];
+  for (let i = 0; i < totalSlots; i++) {
+    if (!drawnSlots.has(i)) available.push(i);
+  }
+  available.forEach(idx => {
+    selectedSlots.add(idx);
+    const el = document.querySelector(`#kujiboard-grid .slot[data-idx="${idx}"]`);
+    if (el) el.className = "slot selected";
+  });
+  playSound("select");
+  updateOpenBtn();
+}
+window.selectAllSlots = selectAllSlots;
+
 
 function toggleSlot(idx) {
   if (drawnSlots.has(idx)) return;
@@ -1599,9 +1753,9 @@ async function handleDraw() {
   // Points check
   const kt = kujiTypes.find(k => k.id === currentKujiId);
   const unitPrice = kt ? (kt.price || 0) : 0;
-  const cost = unitPrice * drawCount;
+  const cost = debugMode ? 0 : unitPrice * drawCount;
   const pts = userProfile?.points || 0;
-  if (pts < cost) {
+  if (!debugMode && pts < cost) {
     alert(`포인트가 부족해요!\n필요: ${cost.toLocaleString()}P · 보유: ${pts.toLocaleString()}P\n\n포인트를 충전해주세요.`);
     showPointModal();
     return;
@@ -1655,9 +1809,10 @@ async function handleDraw() {
     const poolSnap = avail.map(p => ({ ...p }));
 
     for (let i = 0; i < drawCount; i++) {
-      const eligible = poolSnap.map(p => ({
-        ...p, remaining: (p.remaining ?? p.count) - (used[p.id] || 0)
-      })).filter(p => p.remaining > 0);
+      // 재고 수량과 무관하게 상품 종류 단위로 1/N 균등 랜덤
+      const eligible = poolSnap.filter(p =>
+        ((p.remaining ?? p.count) - (used[p.id] || 0)) > 0
+      );
       const pick = weightedDraw(eligible);
       if (!pick) break;
       drawn.push(pick);
@@ -2505,6 +2660,42 @@ async function deleteKujiType(id) {
 }
 window.deleteKujiType = deleteKujiType;
 
+async function resetSingleKujiBoard(kujiId, kujiName) {
+  if (!confirm(`"${kujiName}" 판을 리셋할까요?\n\n✅ 초기화: 재고 + 슬롯 세션\n❌ 유지: 유저 컬렉션(뽑기 기록)`)) return;
+  try {
+    // Reset session doc for this kuji
+    const sRef = doc(db, "sessions", `kuji_${kujiId}`);
+    const snap = await getDoc(sRef);
+    const num = snap.exists() ? (snap.data().sessionNum || 1) + 1 : 1;
+    await setDoc(sRef, { drawnSlots: [], sessionNum: num });
+
+    // Reset remaining stock for this kuji type only
+    const pDocs = await getDocs(collection(db, "products"));
+    const batch = writeBatch(db);
+    pDocs.docs.forEach(d => {
+      const pd = d.data();
+      if (pd.kujiId === kujiId) {
+        batch.update(doc(db, "products", d.id), { remaining: pd.count });
+      }
+    });
+    await batch.commit();
+
+    // If currently viewing this kuji, reset local state too
+    if (currentKujiId === kujiId) {
+      drawnSlots = new Set();
+      selectedSlots = new Set();
+      await loadAll();
+      renderDrawTab();
+      if (isBoardOpen) renderKujiBoard();
+    } else {
+      await loadAll();
+      renderAdminProducts();
+    }
+    alert(`"${kujiName}" 판이 새로 시작됩니다! (${num}판째)`);
+  } catch(e) { alert("리셋 실패: " + e.message); }
+}
+window.resetSingleKujiBoard = resetSingleKujiBoard;
+
 function renderAdminKujiTypes() {
   const list = document.getElementById("kuji-type-admin-list");
   if (!list) return;
@@ -2525,6 +2716,7 @@ function renderAdminKujiTypes() {
       </div>
       <div class="product-actions">
         <button class="edit-btn" onclick="editKujiType('${kt.id}')">수정</button>
+        <button class="reset-btn" style="padding:6px 12px;border-radius:8px;border:1px solid #38BDF844;background:#38BDF811;color:#38BDF8;cursor:pointer;font-size:.75rem;font-family:inherit;" onclick="resetSingleKujiBoard('${kt.id}','${kt.name}')">🔄 리셋</button>
         <button class="del-btn" onclick="deleteKujiType('${kt.id}')">삭제</button>
       </div>
     `;
@@ -2603,6 +2795,24 @@ function changeAdminPw() {
 }
 window.changeAdminPw = changeAdminPw;
 
+
+function toggleDebugMode(enabled) {
+  debugMode = enabled;
+  localStorage.setItem("kuji_debug_mode", enabled ? "true" : "false");
+  const label = document.getElementById("debug-mode-label");
+  const notice = document.getElementById("debug-mode-active-notice");
+  if (label) label.textContent = enabled ? "디버그 모드 ON 🔴" : "디버그 모드 OFF";
+  if (notice) notice.style.display = enabled ? "" : "none";
+  // 포인트 배지에 표시
+  updatePointBadge();
+  // 토스트 알림
+  const toast = document.createElement("div");
+  toast.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:" + (enabled ? "#FF6B6B" : "#34D399") + ";color:#fff;padding:10px 20px;border-radius:20px;font-weight:700;font-size:.82rem;z-index:9999;pointer-events:none;animation:fadeIn .3s ease;";
+  toast.textContent = enabled ? "🛠️ 디버그 모드 ON — 포인트 무한대!" : "✅ 디버그 모드 OFF";
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+window.toggleDebugMode = toggleDebugMode;
 
 function adminLogout() {
   isAdmin = false;
@@ -2814,6 +3024,15 @@ window.handleResetAll = handleResetAll;
 async function renderAdminTab() {
   const pwToggle = document.getElementById("admin-pw-disable-toggle");
   if (pwToggle) pwToggle.checked = ADMIN_PW_DISABLED;
+  // Debug mode restore
+  const dbToggle = document.getElementById("debug-mode-toggle");
+  if (dbToggle) {
+    dbToggle.checked = debugMode;
+    const label = document.getElementById("debug-mode-label");
+    const notice = document.getElementById("debug-mode-active-notice");
+    if (label) label.textContent = debugMode ? "디버그 모드 ON 🔴" : "디버그 모드 OFF";
+    if (notice) notice.style.display = debugMode ? "" : "none";
+  }
   // Products
   renderAdminProducts();
   // Kuji types
@@ -3161,13 +3380,14 @@ window.requestQueue = requestQueue;
 
 // ── Helpers ──
 function weightedDraw(items) {
-  // 완전 랜덤: 재고가 남은 상품 중에서 확률 가중치 없이 균등 랜덤 선택
-  const pool = items.filter(item => {
-    const slots = item.remaining !== undefined ? item.remaining : (item.count || 1);
-    return slots > 0;
+  // 완전 진짜 랜덤: 재고 있는 상품 하나를 1/N 확률로 균등 선택 (재고 수량 무관)
+  // → SSR 1개짜리도 N등급 100개짜리도 동일한 1/N 확률
+  const eligible = items.filter(item => {
+    const rem = item.remaining !== undefined ? item.remaining : (item.count || 0);
+    return rem > 0;
   });
-  if (!pool.length) return null;
-  return pool[Math.floor(Math.random() * pool.length)];
+  if (!eligible.length) return null;
+  return eligible[Math.floor(Math.random() * eligible.length)];
 }
 
 function escHtml(str) {

@@ -322,6 +322,39 @@ select.field-input{cursor:pointer;}
 /* ── Warning badge ── */
 .warn-badge{display:inline-block;background:#FFD70022;color:#FFD700;border:1px solid #FFD70044;border-radius:20px;padding:2px 8px;font-size:.65rem;font-weight:700;margin-left:6px;}
 
+/* ── Last-one award banner ── */
+@keyframes lastOnePulse{0%,100%{box-shadow:0 0 20px #FFD70060,0 0 40px #F472B630}50%{box-shadow:0 0 40px #FFD700,0 0 80px #F472B6}}
+.lastone-banner{background:linear-gradient(135deg,#FFD70022,#F472B622);border:2px solid #FFD700;border-radius:20px;padding:20px;text-align:center;margin-bottom:20px;animation:lastOnePulse 2s infinite;}
+.lastone-title{font-size:1.2rem;font-weight:800;color:#FFD700;margin-bottom:6px;}
+.lastone-sub{font-size:.82rem;color:var(--sub);margin-bottom:12px;}
+.lastone-item-name{font-size:1rem;font-weight:800;color:#F472B6;margin-bottom:4px;}
+
+/* ── SSR live feed ── */
+@keyframes ssrFeedSlide{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+.ssr-feed-toast{position:fixed;bottom:80px;right:16px;z-index:9990;background:linear-gradient(135deg,#FFD70022,#FFD70044);border:1px solid #FFD70088;border-radius:14px;padding:10px 14px;max-width:220px;animation:ssrFeedSlide .4s ease;pointer-events:none;}
+.ssr-feed-title{font-size:.62rem;color:#FFD700;font-weight:700;margin-bottom:3px;}
+.ssr-feed-body{font-size:.75rem;color:var(--text);font-weight:600;line-height:1.4;}
+
+/* ── Achievement badges ── */
+.achievement-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px;margin-top:8px;}
+.ach-badge{background:var(--bg2);border-radius:14px;padding:10px 6px;text-align:center;border:1.5px solid var(--border);transition:all .2s;}
+.ach-badge.unlocked{border-color:#FFD700;background:linear-gradient(135deg,#FFD70018,#F472B618);}
+.ach-icon{font-size:1.6rem;margin-bottom:4px;}
+.ach-name{font-size:.62rem;font-weight:700;color:var(--sub);line-height:1.3;}
+.ach-badge.unlocked .ach-name{color:var(--text);}
+.ach-locked-overlay{font-size:.55rem;color:var(--sub);margin-top:2px;}
+
+/* ── Daily roulette ── */
+.roulette-result-banner{background:var(--card);border-radius:16px;padding:16px;text-align:center;border:2px solid var(--accent);margin-top:12px;}
+.roulette-result-val{font-size:1.4rem;font-weight:800;color:#FFD700;}
+
+/* ── VIP grade ── */
+.vip-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-size:.68rem;font-weight:800;letter-spacing:.04em;}
+.vip-bronze{background:#CD7F3222;color:#CD7F32;border:1px solid #CD7F3244;}
+.vip-silver{background:#C0C0C022;color:#C0C0C0;border:1px solid #C0C0C044;}
+.vip-gold{background:#FFD70022;color:#FFD700;border:1px solid #FFD70044;}
+.vip-platinum{background:linear-gradient(135deg,#E5E4E222,#B9F2FF22);color:#B9F2FF;border:1px solid #B9F2FF55;}
+
 /* ── Mobile responsive ── */
 @media(max-width:480px){
   .col-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
@@ -356,6 +389,7 @@ select.field-input{cursor:pointer;}
   <nav>
     <button class="nav-btn active" id="nav-draw" onclick="switchTab('draw')">뽑기</button>
     <button class="nav-btn" id="nav-collection" onclick="switchTab('collection')">컬렉션</button>
+    <button class="nav-btn" id="nav-mypage" onclick="switchTab('mypage')">마이</button>
     <button class="nav-btn" id="nav-admin" style="display:none" onclick="switchTab('admin')">관리자</button>
   </nav>
   <div class="header-right">
@@ -669,6 +703,16 @@ select.field-input{cursor:pointer;}
           <div class="result-tags" id="result-tags"></div>
         </div>
       </div>
+
+      <!-- Last-one award banner (shown after successful 통털이) -->
+      <div id="lastone-banner-area" style="display:none">
+        <div class="lastone-banner">
+          <div class="lastone-title">🏅 라스트원상 획득!</div>
+          <div class="lastone-sub">판 전체를 통털이로 완료하셨어요! 특별 상품을 드립니다 🎉</div>
+          <div id="lastone-item-name" class="lastone-item-name"></div>
+          <div id="lastone-item-desc" style="font-size:.75rem;color:var(--sub);"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Products preview (항상 맨 아래) -->
@@ -767,6 +811,46 @@ select.field-input{cursor:pointer;}
           <div class="profile-label">총 결제 금액</div>
           <div class="profile-value" style="color:#FFD700;" id="my-total-spent">0원</div>
         </div>
+      </div>
+
+      <!-- VIP Grade -->
+      <div class="admin-card" id="vip-card">
+        <div class="admin-card-title">💎 VIP 등급</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span id="my-vip-badge" class="vip-badge vip-bronze">🥉 브론즈</span>
+          <span style="font-size:.78rem;color:var(--sub);">총 결제금액 기준</span>
+        </div>
+        <div style="background:var(--bg2);border-radius:12px;padding:12px;font-size:.8rem;line-height:2;">
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--sub);">충전 적립 포인트</span><span id="vip-cashback-total" style="color:#FFD700;font-weight:700;">0P</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--sub);">내 적립률</span><span id="vip-rate-display" style="color:var(--accent);font-weight:700;">0.5%</span></div>
+        </div>
+        <div style="margin-top:10px;font-size:.72rem;color:var(--sub);line-height:1.8;">
+          🥉 브론즈 0원+ · 적립 0.5% &nbsp;|&nbsp; 🥈 실버 50,000원+ · 적립 1%<br>🥇 골드 200,000원+ · 적립 1.5% &nbsp;|&nbsp; 💠 플래티넘 500,000원+ · 적립 2%
+        </div>
+      </div>
+
+      <!-- Daily Roulette -->
+      <div class="admin-card" id="roulette-card">
+        <div class="admin-card-title">🎡 오늘의 출석 룰렛</div>
+        <div style="text-align:center;padding:8px 0 4px;">
+          <div style="font-size:3.5rem;margin-bottom:6px;line-height:1;" id="roulette-wheel-emoji">🎰</div>
+          <div style="font-size:.8rem;color:var(--sub);margin-bottom:14px;">하루 한 번 룰렛을 돌려보세요!</div>
+          <button class="modal-btn" id="roulette-spin-btn" onclick="spinRoulette()" style="max-width:200px;margin:0 auto;">🎡 룰렛 돌리기</button>
+        </div>
+        <div id="roulette-result-area" style="display:none" class="roulette-result-banner">
+          <div style="font-size:.78rem;color:var(--sub);margin-bottom:4px;">오늘의 결과</div>
+          <div class="roulette-result-val" id="roulette-result-val">-</div>
+          <div id="roulette-result-sub" style="font-size:.72rem;color:var(--sub);margin-top:4px;"></div>
+        </div>
+        <div id="roulette-done-msg" style="display:none;text-align:center;padding:12px;color:var(--sub);font-size:.82rem;">
+          오늘은 이미 돌리셨어요 😊<br><span id="roulette-next-time" style="font-size:.72rem;"></span>
+        </div>
+      </div>
+
+      <!-- Achievements -->
+      <div class="admin-card">
+        <div class="admin-card-title">🏆 업적 컬렉션</div>
+        <div class="achievement-grid" id="achievement-grid"></div>
       </div>
 
       <!-- Shipping Info -->
@@ -938,6 +1022,26 @@ select.field-input{cursor:pointer;}
       <button class="save-btn" onclick="saveSettings()">저장</button>
     </div>
 
+    <!-- Last-one award product -->
+    <div class="admin-card">
+      <div class="admin-card-title">🏅 라스트원상 설정</div>
+      <div style="font-size:.78rem;color:var(--sub);margin-bottom:12px;">통털이(판 시작부터 전체 슬롯을 한 번에)를 성공한 유저에게 추가로 지급되는 특별 상품입니다.</div>
+      <div class="form-grid" style="margin-bottom:10px;">
+        <div>
+          <div class="field-label">라스트원상 상품명</div>
+          <input class="field-input" id="lo-name" placeholder="예: 한정 포토카드"/>
+        </div>
+        <div>
+          <div class="field-label">설명</div>
+          <input class="field-input" id="lo-desc" placeholder="간단한 설명"/>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;">
+        <button class="save-btn" onclick="saveLastOneProduct()">저장</button>
+      </div>
+      <div id="lo-current" style="font-size:.8rem;color:var(--sub);">현재: 없음</div>
+    </div>
+
     <!-- Product form -->
     <div class="admin-card">
       <div class="admin-card-title" id="form-title">➕ 상품 추가</div>
@@ -1099,6 +1203,8 @@ let slotMap = {};  // { slotIdx: productId } — 미리 배정된 슬롯맵
 let debugMode = localStorage.getItem("kuji_debug_mode") === "true";
 let adminMsgTargetEmail = null;
 let queueUnsub = null;
+// ── New feature state ──
+let lastOneProduct = null; // { name, desc } from Firestore settings
 
 // ── Failsafe: if Firebase never responds (blocked network, etc), force-hide loading ──
 setTimeout(() => {
@@ -1139,6 +1245,8 @@ onAuthStateChanged(auth, async (user) => {
       } catch(e) {
         console.error("setupInboxListener error:", e);
       }
+      // SSR 실시간 피드
+      try { startSsrFeed(); } catch(e) {}
     } else {
       userId = null;
       userProfile = null;
@@ -1248,7 +1356,10 @@ async function loadAll() {
     } else {
       products = allProducts;
     }
-    if (sSnap.exists()) Object.assign(settings, sSnap.data());
+    if (sSnap.exists()) {
+      Object.assign(settings, sSnap.data());
+      if (sSnap.data().lastOneProduct) lastOneProduct = sSnap.data().lastOneProduct;
+    }
     // 기존에 이 기기(localStorage)에만 저장돼 있던 관리자 비밀번호를
     // Firestore(settings.global)에 아직 한 번도 옮기지 않았다면 1회 마이그레이션
     if (!adminPwSettingsLoaded) {
@@ -1999,6 +2110,41 @@ async function handleDraw() {
     else if (hasRare) launchConfetti();
     else playSound("reveal");
 
+    // ── 라스트원상 처리 ──
+    const lastoneArea = document.getElementById("lastone-banner-area");
+    if (lastoneArea) lastoneArea.style.display = "none";
+    if (lastOneEligible && lastOneProduct && lastOneProduct.name) {
+      lastOneEligible = false;
+      lastoneArea.style.display = "";
+      document.getElementById("lastone-item-name").textContent = "🎁 " + lastOneProduct.name;
+      document.getElementById("lastone-item-desc").textContent = lastOneProduct.desc || "";
+      // Firestore에 라스트원상 당첨 기록
+      try {
+        await addDoc(collection(db, "draws", userId, "items"), {
+          productId: "lastone_award", name: "[라스트원상] " + lastOneProduct.name,
+          grade: "SSR", imageUrl: "", description: lastOneProduct.desc || "",
+          drawnAt: Date.now(), isLastOne: true
+        });
+      } catch(e) {}
+      playSound("ssr"); launchConfetti();
+    }
+
+    // ── SSR 전역 실시간 알림 (다른 사용자들에게 노출용 Firestore 기록) ──
+    if (hasSSR) {
+      const ssrItem = drawn.find(d => d.grade === "SSR");
+      const kt2 = kujiTypes.find(k => k.id === currentKujiId);
+      try {
+        await setDoc(doc(db, "ssrFeed", "latest"), {
+          kujiName: kt2 ? kt2.name : "쿠지",
+          itemName: ssrItem ? ssrItem.name : "SSR 상품",
+          at: Date.now()
+        });
+      } catch(e) {}
+    }
+
+    // ── 업적 체크 ──
+    try { await checkAndGrantAchievements(); } catch(e) {}
+
     // Auto new round if all drawn
     if (drawnSlots.size >= totalSlots) {
       setTimeout(async () => {
@@ -2309,9 +2455,10 @@ async function renderMyPage() {
     : "없음";
   document.getElementById("my-draws").textContent = `${userDraws.length}회`;
   // Total amount spent (sum of point charges, in 원, 1P = 1원)
+  let total = 0;
   try {
     const hSnap = await getDocs(collection(db, "users", userId, "pointHistory"));
-    const total = hSnap.docs.reduce((sum, d) => {
+    total = hSnap.docs.reduce((sum, d) => {
       const a = d.data().amount || 0;
       return a > 0 ? sum + a : sum;
     }, 0);
@@ -2323,6 +2470,13 @@ async function renderMyPage() {
   if (document.getElementById("my-phone-input")) document.getElementById("my-phone-input").value = sp.phone || "";
   if (document.getElementById("my-shipping-email-input")) document.getElementById("my-shipping-email-input").value = currentUser?.email || "";
   if (document.getElementById("my-address-input")) document.getElementById("my-address-input").value = sp.address || "";
+
+  // VIP 등급 렌더링
+  renderVipSection(total);
+  // 업적 렌더링
+  renderAchievements();
+  // 출석 룰렛 상태
+  renderRoulette();
 }
 
 // ── Point modal ──
@@ -2513,13 +2667,25 @@ async function doChargePoint(amt) {
   }
 
   try {
+    // ── VIP 적립 계산 ──
+    const totalSpent = await getTotalSpent();
+    const vipRate = getVipRate(totalSpent);
+    const cashback = Math.floor(amt * vipRate);
+
     const batch = writeBatch(db);
     batch.update(doc(db, "users", userId), { points: increment(amt) });
     await batch.commit();
     await addDoc(collection(db, "users", userId, "pointHistory"), {
       amount: amt, reason: `포인트 충전`, at: Date.now()
     });
-    userProfile.points = (userProfile.points || 0) + amt;
+    // VIP 적립금
+    if (cashback > 0) {
+      await updateDoc(doc(db, "users", userId), { points: increment(cashback) });
+      await addDoc(collection(db, "users", userId, "pointHistory"), {
+        amount: cashback, reason: `VIP 적립금 (${(vipRate*100).toFixed(1)}%)`, at: Date.now()
+      });
+    }
+    userProfile.points = (userProfile.points || 0) + amt + cashback;
     updatePointBadge();
     payAmount = 0;
     // 모달이 열려있을 때만 UI 업데이트 (자동충전 시에는 모달 닫혀있을 수 있음)
@@ -2529,7 +2695,7 @@ async function doChargePoint(amt) {
       const s1 = document.getElementById("point-step-1");
       if (s3) s3.style.display = "none";
       if (s1) s1.style.display = "";
-      if (sucEl) sucEl.textContent = `${amt.toLocaleString()}P 충전 완료! 🎉`;
+      if (sucEl) sucEl.textContent = `${amt.toLocaleString()}P 충전 완료!` + (cashback > 0 ? ` VIP 적립 +${cashback}P 🎉` : " 🎉");
       const bal = document.getElementById("point-modal-balance");
       if (bal) bal.textContent = `보유: ${(userProfile.points).toLocaleString()}P`;
       const inp = document.getElementById("point-amount");
@@ -3215,6 +3381,8 @@ async function renderAdminTab() {
   renderAdminProducts();
   // Kuji types
   renderAdminKujiTypes();
+  // Last-one product
+  renderAdminLastOne();
   // Users
   await loadAdminUsers();
 }
@@ -3566,6 +3734,277 @@ function weightedDraw(items) {
   });
   if (!eligible.length) return null;
   return eligible[Math.floor(Math.random() * eligible.length)];
+}
+
+// ════════════════════════════════════════
+// ── Feature 1: Last-one award (라스트원상) ──
+// ════════════════════════════════════════
+async function saveLastOneProduct() {
+  const name = document.getElementById("lo-name").value.trim();
+  const desc = document.getElementById("lo-desc").value.trim();
+  if (!name) { alert("라스트원상 상품명을 입력하세요"); return; }
+  try {
+    await setDoc(doc(db, "settings", "global"), { lastOneProduct: { name, desc } }, { merge: true });
+    lastOneProduct = { name, desc };
+    document.getElementById("lo-current").textContent = `현재: ${name} (${desc || "설명 없음"})`;
+    alert("라스트원상 저장 완료!");
+  } catch(e) { alert("저장 실패: " + e.message); }
+}
+window.saveLastOneProduct = saveLastOneProduct;
+
+function renderAdminLastOne() {
+  const el = document.getElementById("lo-current");
+  if (!el) return;
+  if (lastOneProduct && lastOneProduct.name) {
+    el.textContent = `현재: ${lastOneProduct.name}${lastOneProduct.desc ? " (" + lastOneProduct.desc + ")" : ""}`;
+    document.getElementById("lo-name").value = lastOneProduct.name;
+    document.getElementById("lo-desc").value = lastOneProduct.desc || "";
+  } else {
+    el.textContent = "현재: 없음";
+  }
+}
+
+// ════════════════════════════════════════
+// ── Feature 2: 실시간 SSR 알림 피드 ──
+// ════════════════════════════════════════
+let ssrFeedLastAt = 0;
+let ssrFeedUnsub = null;
+
+function setupSsrFeedListener() {
+  if (ssrFeedUnsub) return; // 이미 구독 중
+  try {
+    ssrFeedUnsub = onSnapshot(doc(db, "ssrFeed", "latest"), (snap) => {
+      if (!snap.exists()) return;
+      const d = snap.data();
+      if (!d.at || d.at <= ssrFeedLastAt) return;
+      ssrFeedLastAt = d.at;
+      // 내가 방금 뽑은 것은 표시 안 함 (3초 이내)
+      if (Date.now() - d.at < 3000) return;
+      showSsrFeedToast(d.kujiName, d.itemName);
+    });
+  } catch(e) {}
+}
+
+function showSsrFeedToast(kujiName, itemName) {
+  const existing = document.querySelector(".ssr-feed-toast");
+  if (existing) existing.remove();
+  const t = document.createElement("div");
+  t.className = "ssr-feed-toast";
+  t.innerHTML = `
+    <div class="ssr-feed-title">✨ [${escHtml(kujiName)}] SSR 당첨!</div>
+    <div class="ssr-feed-body">${escHtml(itemName)}</div>
+  `;
+  document.body.appendChild(t);
+  setTimeout(() => { if (t.parentNode) t.remove(); }, 5000);
+}
+
+// ════════════════════════════════════════
+// ── Feature 3: 업적 시스템 ──
+// ════════════════════════════════════════
+const ACHIEVEMENTS = [
+  { id: "draw100",   name: "뽑기 100회",    icon: "🎯", check: (draws, _) => draws >= 100 },
+  { id: "draw200",   name: "뽑기 200회",    icon: "🎰", check: (draws, _) => draws >= 200 },
+  { id: "draw300",   name: "뽑기 300회",    icon: "🏹", check: (draws, _) => draws >= 300 },
+  { id: "draw500",   name: "뽑기 500회",    icon: "⭐", check: (draws, _) => draws >= 500 },
+  { id: "draw1000",  name: "뽑기 1000회",   icon: "👑", check: (draws, _) => draws >= 1000 },
+  { id: "firstSSR",  name: "첫 SSR 획득",   icon: "✨", check: (_, col) => col.some(d => d.grade === "SSR") },
+  { id: "allGrades", name: "전 등급 수집",   icon: "🌈", check: (_, col) => { const gs = new Set(col.map(d => d.grade)); return ["SSR","SR","R","N"].every(g => gs.has(g)); } },
+  { id: "lastone",   name: "라스트원상",     icon: "🏅", check: (_, col) => col.some(d => d.isLastOne) },
+  { id: "vipGold",   name: "골드 VIP",      icon: "🥇", check: async () => { const t = await getTotalSpent(); return t >= 200000; } },
+];
+
+async function checkAndGrantAchievements() {
+  if (!userId) return;
+  const draws = userDraws.length;
+  const unlocked = userProfile?.achievements || {};
+  const newUnlocks = [];
+  for (const ach of ACHIEVEMENTS) {
+    if (unlocked[ach.id]) continue;
+    let passed = false;
+    try { passed = await ach.check(draws, userDraws); } catch(e) {}
+    if (passed) {
+      newUnlocks.push(ach);
+      unlocked[ach.id] = Date.now();
+    }
+  }
+  if (newUnlocks.length) {
+    await updateDoc(doc(db, "users", userId), { achievements: unlocked });
+    userProfile.achievements = unlocked;
+    // 업적 달성 토스트
+    newUnlocks.forEach((ach, i) => {
+      setTimeout(() => {
+        const t = document.createElement("div");
+        t.style.cssText = `position:fixed;bottom:${80 + i * 60}px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FFD700,#F472B6);color:#000;padding:10px 20px;border-radius:20px;font-weight:800;font-size:.82rem;z-index:9999;animation:fadeIn .3s ease;`;
+        t.textContent = `🏆 업적 달성! ${ach.icon} ${ach.name}`;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+      }, i * 600);
+    });
+  }
+}
+
+function renderAchievements() {
+  const grid = document.getElementById("achievement-grid");
+  if (!grid) return;
+  const unlocked = userProfile?.achievements || {};
+  const draws = userDraws.length;
+  grid.innerHTML = ACHIEVEMENTS.map(ach => {
+    const isUnlocked = !!unlocked[ach.id];
+    const dateStr = isUnlocked ? new Date(unlocked[ach.id]).toLocaleDateString("ko-KR") : "";
+    return `<div class="ach-badge ${isUnlocked ? "unlocked" : ""}">
+      <div class="ach-icon">${ach.icon}</div>
+      <div class="ach-name">${escHtml(ach.name)}</div>
+      ${isUnlocked ? `<div class="ach-locked-overlay" style="color:var(--accent);">${dateStr}</div>` : `<div class="ach-locked-overlay">🔒 미달성</div>`}
+    </div>`;
+  }).join("");
+}
+
+// ════════════════════════════════════════
+// ── Feature 4: 출석 룰렛 ──
+// ════════════════════════════════════════
+const ROULETTE_PRIZES = [
+  { label: "꽝",      emoji: "😢", points: 0,     weight: 50 },
+  { label: "꽝",      emoji: "😢", points: 0,     weight: 20 },
+  { label: "100P",    emoji: "🎁", points: 100,   weight: 15 },
+  { label: "1000P",   emoji: "🎉", points: 1000,  weight: 8  },
+  { label: "2000P",   emoji: "🎊", points: 2000,  weight: 5  },
+  { label: "1회 무료권", emoji: "🎫", points: 0,  weight: 2, isFree: true },
+  { label: "50000P",  emoji: "💰", points: 50000, weight: 0.1 },
+];
+
+function getRouletteKey() {
+  const now = new Date();
+  return `roulette_${userId}_${now.getFullYear()}_${now.getMonth()}_${now.getDate()}`;
+}
+
+function renderRoulette() {
+  const doneMsg = document.getElementById("roulette-done-msg");
+  const resultArea = document.getElementById("roulette-result-area");
+  const spinBtn = document.getElementById("roulette-spin-btn");
+  if (!doneMsg || !spinBtn) return;
+
+  const key = getRouletteKey();
+  const stored = localStorage.getItem(key);
+  if (stored) {
+    // Already spun today
+    const data = JSON.parse(stored);
+    doneMsg.style.display = "";
+    spinBtn.style.display = "none";
+    resultArea.style.display = "";
+    document.getElementById("roulette-result-val").textContent = data.label + " " + data.emoji;
+    document.getElementById("roulette-result-sub").textContent = data.points > 0 ? `+${data.points.toLocaleString()}P 지급됨` : (data.isFree ? "1회 무료권 지급됨" : "아쉽지만 다음 기회에!");
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); tomorrow.setHours(0,0,0,0);
+    const diffH = Math.ceil((tomorrow - Date.now()) / 3600000);
+    document.getElementById("roulette-next-time").textContent = `다음 룰렛까지 약 ${diffH}시간`;
+  } else {
+    doneMsg.style.display = "none";
+    resultArea.style.display = "none";
+    spinBtn.style.display = "";
+  }
+}
+
+async function spinRoulette() {
+  if (!userId) { showLoginModal(); return; }
+  const key = getRouletteKey();
+  if (localStorage.getItem(key)) { alert("오늘은 이미 돌리셨어요!"); return; }
+
+  const btn = document.getElementById("roulette-spin-btn");
+  btn.disabled = true;
+  const wheel = document.getElementById("roulette-wheel-emoji");
+
+  // 애니메이션
+  const frames = ["🎰","🎲","🎯","🎪","🎠","🎡","🎢","🌟","✨","💫"];
+  let fi = 0;
+  const anim = setInterval(() => { wheel.textContent = frames[fi++ % frames.length]; }, 100);
+  await new Promise(r => setTimeout(r, 1800));
+  clearInterval(anim);
+
+  // 가중치 뽑기
+  const total = ROULETTE_PRIZES.reduce((a, b) => a + b.weight, 0);
+  let rand = Math.random() * total;
+  let prize = ROULETTE_PRIZES[0];
+  for (const p of ROULETTE_PRIZES) { rand -= p.weight; if (rand <= 0) { prize = p; break; } }
+
+  wheel.textContent = prize.emoji;
+
+  // 포인트 지급
+  if (prize.points > 0 && userId) {
+    try {
+      await updateDoc(doc(db, "users", userId), { points: increment(prize.points) });
+      await addDoc(collection(db, "users", userId, "pointHistory"), {
+        amount: prize.points, reason: "출석 룰렛 보상", at: Date.now()
+      });
+      if (userProfile) userProfile.points = (userProfile.points || 0) + prize.points;
+      updatePointBadge();
+    } catch(e) {}
+  }
+
+  // 결과 저장
+  localStorage.setItem(key, JSON.stringify({ label: prize.label, emoji: prize.emoji, points: prize.points, isFree: !!prize.isFree }));
+  renderRoulette();
+  if (prize.points >= 1000 || prize.isFree) { playSound("ssr"); launchConfetti(); }
+  else if (prize.points > 0) playSound("reveal");
+}
+window.spinRoulette = spinRoulette;
+
+// ════════════════════════════════════════
+// ── Feature 5: VIP 등급 ──
+// ════════════════════════════════════════
+async function getTotalSpent() {
+  if (!userId) return 0;
+  try {
+    const hSnap = await getDocs(collection(db, "users", userId, "pointHistory"));
+    return hSnap.docs.reduce((sum, d) => {
+      const a = d.data().amount || 0;
+      return a > 0 && d.data().reason?.includes("충전") ? sum + a : sum;
+    }, 0);
+  } catch { return 0; }
+}
+
+function getVipTier(spent) {
+  if (spent >= 500000) return { tier: "platinum", label: "💠 플래티넘", cls: "vip-platinum" };
+  if (spent >= 200000) return { tier: "gold",     label: "🥇 골드",    cls: "vip-gold"     };
+  if (spent >= 50000)  return { tier: "silver",   label: "🥈 실버",    cls: "vip-silver"   };
+  return                      { tier: "bronze",   label: "🥉 브론즈",  cls: "vip-bronze"   };
+}
+
+function getVipRate(spent) {
+  if (spent >= 500000) return 0.02;
+  if (spent >= 200000) return 0.015;
+  if (spent >= 50000)  return 0.01;
+  return 0.005;
+}
+
+async function renderVipSection(totalSpent) {
+  const badge = document.getElementById("my-vip-badge");
+  const rateEl = document.getElementById("vip-rate-display");
+  const cashEl = document.getElementById("vip-cashback-total");
+  if (!badge) return;
+
+  const spent = totalSpent !== undefined ? totalSpent : await getTotalSpent();
+  const vip = getVipTier(spent);
+  const rate = getVipRate(spent);
+
+  badge.textContent = vip.label;
+  badge.className = `vip-badge ${vip.cls}`;
+  if (rateEl) rateEl.textContent = (rate * 100).toFixed(1) + "%";
+
+  // 총 VIP 적립 포인트 계산
+  if (cashEl && userId) {
+    try {
+      const hSnap = await getDocs(collection(db, "users", userId, "pointHistory"));
+      const total = hSnap.docs.reduce((s, d) => {
+        const a = d.data().amount || 0;
+        return a > 0 && d.data().reason?.includes("VIP") ? s + a : s;
+      }, 0);
+      cashEl.textContent = total.toLocaleString() + "P";
+    } catch { cashEl.textContent = "0P"; }
+  }
+}
+
+// SSR 피드 구독 시작 (로그인 후)
+function startSsrFeed() {
+  setupSsrFeedListener();
 }
 
 function escHtml(str) {

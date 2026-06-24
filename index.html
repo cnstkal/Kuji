@@ -1803,18 +1803,20 @@ async function handleDraw() {
   try {
     await new Promise(r => setTimeout(r, 200));
 
-    // Pick items (local simulation only — no network calls)
+    // Pick items — 완전 균등 랜덤 (상품 종류 1/N, 재고 수량 무관)
     const drawn = [];
     const used = {};
-    const poolSnap = avail.map(p => ({ ...p }));
+    // remaining 명시적으로 정규화
+    const pool = avail.map(p => ({
+      ...p,
+      _rem: (p.remaining !== undefined ? p.remaining : p.count) || 0
+    }));
 
     for (let i = 0; i < drawCount; i++) {
-      // 재고 수량과 무관하게 상품 종류 단위로 1/N 균등 랜덤
-      const eligible = poolSnap.filter(p =>
-        ((p.remaining ?? p.count) - (used[p.id] || 0)) > 0
-      );
-      const pick = weightedDraw(eligible);
-      if (!pick) break;
+      // 아직 재고 남은 상품 종류만 추림 (수량 가중치 없음 — 종류 단위 1/N)
+      const eligible = pool.filter(p => p._rem - (used[p.id] || 0) > 0);
+      if (!eligible.length) break;
+      const pick = eligible[Math.floor(Math.random() * eligible.length)];
       drawn.push(pick);
       used[pick.id] = (used[pick.id] || 0) + 1;
     }

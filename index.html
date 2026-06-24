@@ -378,6 +378,19 @@ select.field-input{cursor:pointer;}
   </div>
 </div>
 
+<!-- Collection item lightbox (크게보기) -->
+<div class="modal-overlay" id="img-lightbox-modal" style="display:none" onclick="if(event.target===this)closeLightbox()">
+  <div class="modal-box" style="max-width:420px;padding:18px;">
+    <div id="lightbox-img-wrap" style="border-radius:14px;overflow:hidden;margin-bottom:14px;"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <span id="lightbox-grade" style="font-size:.72rem;font-weight:800;padding:2px 10px;border-radius:20px;"></span>
+      <span id="lightbox-name" style="font-size:1.05rem;font-weight:800;"></span>
+    </div>
+    <div id="lightbox-desc" style="font-size:.85rem;color:var(--sub);line-height:1.5;"></div>
+    <button class="modal-btn" style="margin-top:16px;" onclick="closeLightbox()">닫기</button>
+  </div>
+</div>
+
 <!-- User Auth -->
 <div class="modal-overlay" id="auth-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
   <div class="modal-box">
@@ -625,12 +638,6 @@ select.field-input{cursor:pointer;}
       <div style="font-size:.75rem;color:var(--sub);margin-top:8px;" id="enter-btn-hint">로그인 후 이용 가능합니다</div>
     </div>
 
-    <!-- Products preview -->
-    <div class="products-section">
-      <div class="section-title">상품 목록</div>
-      <div class="products-grid" id="products-preview"></div>
-    </div>
-
     <!-- ── Board view ── -->
     <div id="board-view">
       <div class="board-top-bar">
@@ -662,6 +669,12 @@ select.field-input{cursor:pointer;}
           <div class="result-tags" id="result-tags"></div>
         </div>
       </div>
+    </div>
+
+    <!-- Products preview (항상 맨 아래) -->
+    <div class="products-section">
+      <div class="section-title">상품 목록</div>
+      <div class="products-grid" id="products-preview"></div>
     </div>
 
   </div>
@@ -1028,8 +1041,10 @@ const CLOUD = "dbljkloal";
 const PRESET = "Everything";
 
 // ── Admin password ──
-let ADMIN_PW = localStorage.getItem("kuji_admin_pw") || "2026";
-let ADMIN_PW_DISABLED = localStorage.getItem("kuji_admin_pw_disabled") === "true";
+// 모든 기기에서 동일하게 적용되도록 Firestore(settings.global)에 저장합니다.
+// (예전 버전에서 쓰던 localStorage 값이 있으면 최초 1회 마이그레이션에 사용)
+const LEGACY_LOCAL_ADMIN_PW = localStorage.getItem("kuji_admin_pw");
+const LEGACY_LOCAL_ADMIN_PW_DISABLED = localStorage.getItem("kuji_admin_pw_disabled") === "true";
 
 // ── Grade meta ──
 const GRADE_META = {
@@ -1040,6 +1055,15 @@ const GRADE_META = {
 };
 const GRADE_ORDER = { SSR:0, SR:1, R:2, N:3 };
 
+// 관리자가 직접 지정한 순서(order)가 있으면 그 순서로, 없으면 기존 방식(최신 추가순)으로 정렬
+function sortedKujiTypes(arr) {
+  const list = [...arr];
+  const hasOrder = list.length > 0 && list.every(k => typeof k.order === "number");
+  if (hasOrder) list.sort((a, b) => a.order - b.order);
+  else list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  return list;
+}
+
 // ── State ──
 let products = [];
 let kujiTypes = []; // list of { id, name, desc, price, active }
@@ -1049,8 +1073,12 @@ let settings = {
   subtitle: "당신의 운명을 뽑아보세요",
   price: 3000,
   queueMax: 10,
-  notice: ""
+  notice: "",
+  adminPw: LEGACY_LOCAL_ADMIN_PW || "2026",
+  adminPwDisabled: LEGACY_LOCAL_ADMIN_PW_DISABLED
 };
+let adminPwSettingsLoaded = false;
+let lastOneEligible = false; // 통털이(슬롯1~끝 전체를 한번에) 성공 시에만 true
 let userDraws = [];
 let currentUser = null;
 let userId = null;
@@ -1221,6 +1249,14 @@ async function loadAll() {
       products = allProducts;
     }
     if (sSnap.exists()) Object.assign(settings, sSnap.data());
+    // 기존에 이 기기(localStorage)에만 저장돼 있던 관리자 비밀번호를
+    // Firestore(settings.global)에 아직 한 번도 옮기지 않았다면 1회 마이그레이션
+    if (!adminPwSettingsLoaded) {
+      adminPwSettingsLoaded = true;
+      if (!sSnap.exists() || sSnap.data().adminPw === undefined) {
+        try { await setDoc(doc(db, "settings", "global"), { adminPw: settings.adminPw, adminPwDisabled: settings.adminPwDisabled }, { merge: true }); } catch(e) {}
+      }
+    }
 
     if (userId) {
       const dSnap = await getDocs(query(collection(db, "draws", userId, "items"), orderBy("drawnAt", "desc")));
@@ -1349,6 +1385,23 @@ async function getSessionNum() {
 }
 
 // ── Queue system ──
+// 대기 신청 후 일정 시간(연결 끊김 등으로) 응답이 없으면 자동으로 정리해서,
+// 실제로는 아무도 대기하지 않는데 "대기 있음"으로 잘못 표시되는 문제를 막습니다.
+const QUEUE_STALE_MS = 10 * 60 * 1000; // 10분
+
+async function cleanupStaleQueueEntries(entries) {
+  const now = Date.now();
+  const stale = entries.filter(e => now - (e.lastSeenAt || e.requestedAt || 0) > QUEUE_STALE_MS);
+  if (stale.length) {
+    try {
+      const batch = writeBatch(db);
+      stale.forEach(e => batch.delete(doc(db, "queue", "list", "entries", e.id)));
+      await batch.commit();
+    } catch(e) {}
+  }
+  return entries.filter(e => now - (e.lastSeenAt || e.requestedAt || 0) <= QUEUE_STALE_MS);
+}
+
 async function checkQueue() {
   // Check if someone else is currently "active"
   try {
@@ -1387,7 +1440,8 @@ async function requestQueue() {
       const ref = await addDoc(collection(db, "queue", "list", "entries"), {
         uid: userId,
         email: currentUser.email,
-        requestedAt: Date.now()
+        requestedAt: Date.now(),
+        lastSeenAt: Date.now()
       });
       myQueueDocId = ref.id;
     }
@@ -1410,7 +1464,8 @@ async function updateQueueInfo() {
       collection(db, "queue", "list", "entries"),
       orderBy("requestedAt", "asc")
     ));
-    const entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    let entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    entries = await cleanupStaleQueueEntries(entries); // 끊긴 접속(유령 대기) 자동 정리
     const myIdx = entries.findIndex(e => e.uid === userId);
     if (myIdx === -1) {
       // 대기 목록에서 사라짐 = 내 차례이거나 취소됨
@@ -1431,6 +1486,8 @@ async function updateQueueInfo() {
     }
     const position = myIdx + 1; // 1-based
     const ahead = myIdx; // 나 앞에 있는 사람 수
+    // 실제로 대기 중인 사람은 살아있다는 신호(heartbeat)를 남겨서 자동 정리 대상이 되지 않게 함
+    try { await updateDoc(doc(db, "queue", "list", "entries", entries[myIdx].id), { lastSeenAt: Date.now() }); } catch(e) {}
     const posText = document.getElementById("queue-position-text");
     const etaText = document.getElementById("queue-eta-text");
     if (posText) posText.textContent = ahead === 0 ? "🎉 곧 내 차례예요!" : `대기 ${position}번째 (앞에 ${ahead}명)`;
@@ -1659,10 +1716,18 @@ async function enterBoard() {
 
 async function exitBoard() {
   isBoardOpen = false;
+  lastOneEligible = false;
   document.getElementById("board-view").style.display = "none";
   document.getElementById("enter-board-btn").style.display = "";
   document.querySelector(".enter-board-wrap > div").style.display = "";
   selectedSlots = new Set();
+  // 내가 잡고 있던 "진행 중" 락을 풀어줘서 다른 사람이 바로 들어올 수 있게 함
+  try {
+    const qSnap = await getDoc(doc(db, "queue", "state"));
+    if (qSnap.exists() && qSnap.data().activeUid === userId) {
+      await setDoc(doc(db, "queue", "state"), { activeUid: null, activeUntil: 0 });
+    }
+  } catch(e) {}
 }
 window.exitBoard = exitBoard;
 window.enterBoard = enterBoard;
@@ -1703,11 +1768,14 @@ async function renderKujiBoard() {
 async function checkQueueHasOthers() {
   try {
     const snap = await getDocs(collection(db, "queue", "list", "entries"));
-    return snap.docs.some(d => d.data().uid !== userId);
+    let entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    entries = await cleanupStaleQueueEntries(entries);
+    return entries.some(e => e.uid !== userId);
   } catch { return false; }
 }
 
 function randomSelectSlots() {
+  lastOneEligible = false;
   // Clear current selection
   selectedSlots.forEach(idx => {
     const el = document.querySelector(`#kujiboard-grid .slot[data-idx="${idx}"]`);
@@ -1737,7 +1805,9 @@ function randomSelectSlots() {
 window.randomSelectSlots = randomSelectSlots;
 
 function selectAllSlots() {
-  // 전체 슬롯 선택 (통털이)
+  // 전체 슬롯 선택 (통털이) — 판이 시작부터(드로우된 슬롯이 0개) 일 때 한 번에 전체를 선택해야만
+  // 라스트원상 자격이 주어짐
+  lastOneEligible = (drawnSlots.size === 0);
   selectedSlots.forEach(idx => {
     const el = document.querySelector(`#kujiboard-grid .slot[data-idx="${idx}"]`);
     if (el) el.className = "slot";
@@ -1762,6 +1832,7 @@ function toggleSlot(idx) {
   if (drawnSlots.has(idx)) return;
   const avail = products.filter(p => (p.remaining ?? p.count) > 0);
   if (!avail.length) { alert("남은 상품이 없어요!"); return; }
+  lastOneEligible = false; // 개별 선택/해제가 들어가면 "통째로" 조건이 깨짐
 
   // Check queue max limit
   // (only enforce at purchase time in handleDraw)
@@ -2160,11 +2231,13 @@ function renderCollectionTab() {
 
   const grid = document.getElementById("col-grid");
   grid.innerHTML = "";
-  arr.forEach(item => {
+  window._colArrCache = arr;
+  arr.forEach((item, idx) => {
     const meta = GRADE_META[item.grade] || GRADE_META.N;
     const el = document.createElement("div");
     el.className = "col-item";
     el.style.border = `1px solid ${meta.color}44`;
+    el.style.cursor = "pointer";
     const imgHtml = item.imageUrl
       ? `<img class="col-item-img" src="${item.imageUrl}" alt="${item.name}" loading="lazy"/>`
       : `<div class="col-item-no-img" style="background:${meta.color}18">🎁</div>`;
@@ -2186,10 +2259,38 @@ function renderCollectionTab() {
           : `<div class="col-item-date" style="color:var(--accent)">배송 신청 완료</div>`}
       </div>
     `;
+    el.addEventListener("click", (e) => {
+      if (e.target.closest("button")) return; // 배송 신청 버튼 클릭은 확대보기와 분리
+      showColLightbox(idx);
+    });
     grid.appendChild(el);
   });
 }
 window.renderCollectionTab = renderCollectionTab;
+
+// ── 컬렉션 상품 크게보기 ──
+function showColLightbox(idx) {
+  const item = (window._colArrCache || [])[idx];
+  if (!item) return;
+  const meta = GRADE_META[item.grade] || GRADE_META.N;
+  const gradeEl = document.getElementById("lightbox-grade");
+  gradeEl.textContent = item.grade;
+  gradeEl.style.color = meta.color;
+  gradeEl.style.background = meta.bg;
+  document.getElementById("lightbox-name").textContent = item.name;
+  document.getElementById("lightbox-desc").textContent = item.description || "";
+  const imgWrap = document.getElementById("lightbox-img-wrap");
+  imgWrap.innerHTML = item.imageUrl
+    ? `<img src="${escHtml(item.imageUrl)}" alt="${escHtml(item.name)}" style="width:100%;display:block;"/>`
+    : `<div style="font-size:4rem;text-align:center;padding:60px 0;background:${meta.color}18;">🎁</div>`;
+  document.getElementById("img-lightbox-modal").style.display = "flex";
+}
+window.showColLightbox = showColLightbox;
+
+function closeLightbox() {
+  document.getElementById("img-lightbox-modal").style.display = "none";
+}
+window.closeLightbox = closeLightbox;
 
 // ── My Page ──
 async function renderMyPage() {
@@ -2595,7 +2696,7 @@ window.doDeleteAccount = doDeleteAccount;
 
 // ── Admin Auth ──
 function showAdminLogin() {
-  if (ADMIN_PW_DISABLED) { grantAdminAccess(); return; }
+  if (settings.adminPwDisabled) { grantAdminAccess(); return; }
   document.getElementById("admin-modal").style.display = "flex";
   setTimeout(() => document.getElementById("admin-pw-input").focus(), 100);
 }
@@ -2615,15 +2716,16 @@ window.grantAdminAccess = grantAdminAccess;
 
 function doAdminLogin() {
   const pw = document.getElementById("admin-pw-input").value;
-  if (ADMIN_PW_DISABLED || pw === ADMIN_PW) {
+  if (settings.adminPwDisabled || pw === settings.adminPw) {
     grantAdminAccess();
   } else { alert("비밀번호가 틀렸어요"); }
 }
 window.doAdminLogin = doAdminLogin;
 
-function toggleAdminPwDisabled(checked) {
-  ADMIN_PW_DISABLED = checked;
-  localStorage.setItem("kuji_admin_pw_disabled", checked ? "true" : "false");
+async function toggleAdminPwDisabled(checked) {
+  settings.adminPwDisabled = checked;
+  try { await setDoc(doc(db, "settings", "global"), { adminPwDisabled: checked }, { merge: true }); }
+  catch(e) { alert("저장 실패: " + e.message); }
 }
 window.toggleAdminPwDisabled = toggleAdminPwDisabled;
 
@@ -2752,7 +2854,8 @@ function renderAdminKujiTypes() {
     return;
   }
   list.innerHTML = "";
-  [...kujiTypes].sort((a,b) => (b.createdAt||0)-(a.createdAt||0)).forEach(kt => {
+  const sortedTypes = sortedKujiTypes(kujiTypes);
+  sortedTypes.forEach((kt, i) => {
     const el = document.createElement("div");
     el.className = "product-item";
     el.innerHTML = `
@@ -2763,6 +2866,8 @@ function renderAdminKujiTypes() {
         <div class="product-meta">${escHtml(kt.desc || "")} · ${(kt.price||0).toLocaleString()}P/판 · ${kt.slots||200}슬롯</div>
       </div>
       <div class="product-actions">
+        <button class="reset-btn" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;font-size:.8rem;font-family:inherit;" ${i===0?'disabled style="opacity:.3"':''} onclick="moveKujiType('${kt.id}',-1)">▲</button>
+        <button class="reset-btn" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;font-size:.8rem;font-family:inherit;" ${i===sortedTypes.length-1?'disabled style="opacity:.3"':''} onclick="moveKujiType('${kt.id}',1)">▼</button>
         <button class="edit-btn" onclick="editKujiType('${kt.id}')">수정</button>
         <button class="reset-btn" style="padding:6px 12px;border-radius:8px;border:1px solid #38BDF844;background:#38BDF811;color:#38BDF8;cursor:pointer;font-size:.75rem;font-family:inherit;" onclick="resetSingleKujiBoard('${kt.id}','${kt.name}')">🔄 리셋</button>
         <button class="del-btn" onclick="deleteKujiType('${kt.id}')">삭제</button>
@@ -2775,9 +2880,30 @@ function renderAdminKujiTypes() {
   if (sel) {
     const cur = sel.value;
     sel.innerHTML = '<option value="">-- 쿠지 종류 선택 --</option>' +
-      kujiTypes.map(k => `<option value="${k.id}" ${cur===k.id?'selected':''}>${escHtml(k.name)}</option>`).join("");
+      sortedTypes.map(k => `<option value="${k.id}" ${cur===k.id?'selected':''}>${escHtml(k.name)}</option>`).join("");
   }
 }
+
+async function moveKujiType(id, dir) {
+  const list = sortedKujiTypes(kujiTypes);
+  const idx = list.findIndex(k => k.id === id);
+  const swapIdx = idx + dir;
+  if (idx === -1 || swapIdx < 0 || swapIdx >= list.length) return;
+  // 모든 항목에 순차적인 order 값을 부여(아직 없던 항목 포함)한 뒤 두 항목을 교체
+  list.forEach((k, i) => { k.order = i; });
+  const tmp = list[idx].order;
+  list[idx].order = list[swapIdx].order;
+  list[swapIdx].order = tmp;
+  try {
+    const batch = writeBatch(db);
+    list.forEach(k => batch.update(doc(db, "kujiTypes", k.id), { order: k.order }));
+    await batch.commit();
+    kujiTypes = list;
+    renderAdminKujiTypes();
+    renderKujiTypeSelector();
+  } catch(e) { alert("순서 변경 실패: " + e.message); }
+}
+window.moveKujiType = moveKujiType;
 
 // Render kuji type cards on draw tab
 function renderKujiTypeSelector() {
@@ -2789,7 +2915,8 @@ function renderKujiTypeSelector() {
     return;
   }
   section.style.display = "";
-  list.innerHTML = kujiTypes.map(kt => `
+  const sortedTypes = sortedKujiTypes(kujiTypes);
+  list.innerHTML = sortedTypes.map(kt => `
     <div class="kuji-type-card ${currentKujiId === kt.id ? 'active' : ''}"
          data-kujitypeid="${kt.id}"
          style="cursor:pointer">
@@ -2830,17 +2957,19 @@ async function selectKujiType(id) {
 window.selectKujiType = selectKujiType;
 
 
-function changeAdminPw() {
+async function changeAdminPw() {
   const np = document.getElementById("new-admin-pw").value;
   const np2 = document.getElementById("new-admin-pw2").value;
   if (!np) { alert("새 비밀번호를 입력하세요"); return; }
   if (np !== np2) { alert("비밀번호가 일치하지 않아요"); return; }
   if (np.length < 4) { alert("비밀번호는 4자 이상이어야 해요"); return; }
-  ADMIN_PW = np;
-  localStorage.setItem("kuji_admin_pw", np);
-  document.getElementById("new-admin-pw").value = "";
-  document.getElementById("new-admin-pw2").value = "";
-  alert("비밀번호가 변경됐어요!");
+  try {
+    await setDoc(doc(db, "settings", "global"), { adminPw: np }, { merge: true });
+    settings.adminPw = np;
+    document.getElementById("new-admin-pw").value = "";
+    document.getElementById("new-admin-pw2").value = "";
+    alert("비밀번호가 변경됐어요! (모든 기기에 동일하게 적용됩니다)");
+  } catch(e) { alert("변경 실패: " + e.message); }
 }
 window.changeAdminPw = changeAdminPw;
 
@@ -3072,7 +3201,7 @@ window.handleResetAll = handleResetAll;
 
 async function renderAdminTab() {
   const pwToggle = document.getElementById("admin-pw-disable-toggle");
-  if (pwToggle) pwToggle.checked = ADMIN_PW_DISABLED;
+  if (pwToggle) pwToggle.checked = !!settings.adminPwDisabled;
   // Debug mode restore
   const dbToggle = document.getElementById("debug-mode-toggle");
   if (dbToggle) {
@@ -3139,8 +3268,8 @@ function renderAdminProducts() {
     list.appendChild(el);
   };
 
-  // Render each kuji type section (최신순)
-  [...kujiTypes].sort((a,b) => (b.createdAt||0)-(a.createdAt||0)).forEach(kt => {
+  // Render each kuji type section (관리자 지정 순서)
+  sortedKujiTypes(kujiTypes).forEach(kt => {
     const items = grouped[kt.id];
     if (!items || !items.length) return;
     const header = document.createElement("div");

@@ -1067,6 +1067,7 @@ let sessionDrawnCount = 0;   // how many slots used in current session
 let totalSlots = 200;
 let sessionStartSlot = 0;    // offset for current board reset cycle
 let adminMsgTargetUid = null;
+let slotMap = {};  // { slotIdx: productId } — 미리 배정된 슬롯맵
 let debugMode = localStorage.getItem("kuji_debug_mode") === "true";
 let adminMsgTargetEmail = null;
 let queueUnsub = null;
@@ -1244,27 +1245,76 @@ async function loadSessionState() {
   try {
     const sRef = doc(db, "sessions", sessionDocId());
     const sSnap = await getDoc(sRef);
-    // Total slots for this kuji type
     const kt = kujiTypes.find(k => k.id === currentKujiId);
     totalSlots = (kt && kt.slots) ? kt.slots : 200;
     if (sSnap.exists()) {
       const d = sSnap.data();
-      const drawn = d.drawnSlots || [];
-      drawnSlots = new Set(drawn);
+      drawnSlots = new Set(d.drawnSlots || []);
+      slotMap = d.slotMap || {};  // { "0": productId, "1": productId, ... }
       if (drawnSlots.size >= totalSlots) {
         await resetSession();
+      } else if (!d.slotMap || Object.keys(d.slotMap).length === 0) {
+        // slotMap 없으면 새로 배정
+        await generateSlotMap();
       }
     } else {
-      await setDoc(sRef, { drawnSlots: [], sessionNum: 1 });
+      await setDoc(sRef, { drawnSlots: [], sessionNum: 1, slotMap: {} });
       drawnSlots = new Set();
+      slotMap = {};
+      await generateSlotMap();
     }
   } catch(e) { console.warn("session load err", e); }
+}
+
+// 슬롯에 상품 미리 배정 (진짜 쿠지처럼)
+async function generateSlotMap() {
+  const kt = kujiTypes.find(k => k.id === currentKujiId);
+  totalSlots = (kt && kt.slots) ? kt.slots : 200;
+
+  // 재고 기반으로 슬롯 풀 만들기: remaining 수만큼 해당 productId를 넣음
+  const pool = [];
+  for (const p of products) {
+    const rem = (p.remaining !== undefined ? p.remaining : p.count) || 0;
+    for (let i = 0; i < rem; i++) pool.push(p.id);
+  }
+
+  // 풀이 비어있으면 배정 불가
+  if (!pool.length) { slotMap = {}; return; }
+
+  // 슬롯 수보다 재고가 적으면 풀을 반복해서 채움
+  // 슬롯 수보다 재고가 많으면 슬롯 수만큼 잘라냄
+  const filled = [];
+  while (filled.length < totalSlots) {
+    // 셔플해서 이어붙이기
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+    filled.push(...shuffled);
+  }
+  const slotPool = filled.slice(0, totalSlots);
+
+  // 최종 셔플
+  for (let i = slotPool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [slotPool[i], slotPool[j]] = [slotPool[j], slotPool[i]];
+  }
+
+  // slotMap 구성
+  slotMap = {};
+  for (let i = 0; i < totalSlots; i++) {
+    slotMap[String(i)] = slotPool[i];
+  }
+
+  // Firestore에 저장
+  try {
+    const sRef = doc(db, "sessions", sessionDocId());
+    await updateDoc(sRef, { slotMap });
+  } catch(e) { console.warn("slotMap save err", e); }
 }
 
 async function saveSessionState() {
   try {
     const sRef = doc(db, "sessions", sessionDocId());
     await updateDoc(sRef, { drawnSlots: [...drawnSlots] });
+    // slotMap은 generateSlotMap에서 별도 저장하므로 여기선 drawnSlots만
   } catch(e) {}
 }
 
@@ -1272,8 +1322,9 @@ async function resetSession() {
   const sRef = doc(db, "sessions", sessionDocId());
   const snap = await getDoc(sRef);
   const num = snap.exists() ? (snap.data().sessionNum || 1) + 1 : 1;
-  await setDoc(sRef, { drawnSlots: [], sessionNum: num });
+  await setDoc(sRef, { drawnSlots: [], sessionNum: num, slotMap: {} });
   drawnSlots = new Set();
+  slotMap = {};
   selectedSlots = new Set();
   // Reset remaining stock for this kuji type only
   const pDocs = await getDocs(collection(db, "products"));
@@ -1286,6 +1337,8 @@ async function resetSession() {
   });
   await batch.commit();
   await loadAll();
+  // 재고 리셋 후 슬롯맵 재생성
+  await generateSlotMap();
 }
 
 async function getSessionNum() {
@@ -1770,14 +1823,10 @@ async function handleDraw() {
     return;
   }
 
-  const avail = products.filter(p => (p.remaining ?? p.count) > 0);
-  if (!avail.length) { alert("남은 상품이 없어요!"); return; }
-
   isDrawing = true;
   const btn = document.getElementById("open-btn");
   btn.disabled = true;
   btn.innerHTML = `<span class="spinner"></span> 오픈 중...`;
-  // Clear previous results completely before new draw
   const resultsArea = document.getElementById("results-area");
   resultsArea.style.display = "none";
   document.getElementById("results-grid").innerHTML = "";
@@ -1790,7 +1839,6 @@ async function handleDraw() {
     if (el) el.className = "slot spinning";
   });
 
-  // Safety watchdog: never let the button stay locked for more than 15s
   const watchdog = setTimeout(() => {
     if (isDrawing) {
       isDrawing = false;
@@ -1803,25 +1851,21 @@ async function handleDraw() {
   try {
     await new Promise(r => setTimeout(r, 200));
 
-    // Pick items — 완전 균등 랜덤 (상품 종류 1/N, 재고 수량 무관)
+    // ── 슬롯에 미리 박힌 상품을 그대로 읽기 ──
     const drawn = [];
     const used = {};
-    // remaining 명시적으로 정규화
-    const pool = avail.map(p => ({
-      ...p,
-      _rem: (p.remaining !== undefined ? p.remaining : p.count) || 0
-    }));
+    const allProds = window._allProductsAdmin || products;
 
-    for (let i = 0; i < drawCount; i++) {
-      // 아직 재고 남은 상품 종류만 추림 (수량 가중치 없음 — 종류 단위 1/N)
-      const eligible = pool.filter(p => p._rem - (used[p.id] || 0) > 0);
-      if (!eligible.length) break;
-      const pick = eligible[Math.floor(Math.random() * eligible.length)];
-      drawn.push(pick);
-      used[pick.id] = (used[pick.id] || 0) + 1;
+    for (const idx of slotsToOpen) {
+      const productId = slotMap[String(idx)];
+      if (!productId) continue;
+      const item = allProds.find(p => p.id === productId);
+      if (!item) continue;
+      drawn.push(item);
+      used[item.id] = (used[item.id] || 0) + 1;
     }
 
-    if (!drawn.length) throw new Error("뽑을 수 있는 상품이 없어요");
+    if (!drawn.length) throw new Error("슬롯에 배정된 상품이 없어요. 쿠지판을 리셋해주세요.");
 
     // Single atomic batch: stock decrement (via increment, race-safe),
     // point deduction, draw records, and point history — one round trip.
@@ -2685,8 +2729,10 @@ async function resetSingleKujiBoard(kujiId, kujiName) {
     // If currently viewing this kuji, reset local state too
     if (currentKujiId === kujiId) {
       drawnSlots = new Set();
+      slotMap = {};
       selectedSlots = new Set();
       await loadAll();
+      await generateSlotMap();
       renderDrawTab();
       if (isBoardOpen) renderKujiBoard();
     } else {
@@ -2768,9 +2814,10 @@ function renderKujiTypeSelector() {
 }
 
 async function selectKujiType(id) {
-  if (currentKujiId === id) return; // 이미 선택된 경우 무시
+  if (currentKujiId === id) return;
   currentKujiId = id;
   drawnSlots = new Set();
+  slotMap = {};
   selectedSlots = new Set();
   isBoardOpen = false;
   document.getElementById("board-view").style.display = "none";

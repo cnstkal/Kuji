@@ -2135,7 +2135,7 @@ async function handleDraw() {
     btn.innerHTML = `✦ <span id="open-btn-label">슬롯을 선택해주세요</span>`;
     btn.disabled = true;
 
-    // Show results immediately — don't make the user wait on a network reload
+    // Show results immediately
     renderKujiBoard();
     renderGradeGrid();
     renderResults(drawn);
@@ -2149,7 +2149,6 @@ async function handleDraw() {
     // ── 라스트원상 처리 ──
     if (lastOneEligible && lastOneProduct && lastOneProduct.name) {
       lastOneEligible = false;
-      // Firestore에 라스트원상 당첨 기록 (컬렉션에 최상단 고정용 특수 등급)
       try {
         const loRef = doc(collection(db, "draws", userId, "items"));
         await setDoc(loRef, {
@@ -2164,34 +2163,33 @@ async function handleDraw() {
           drawnAt: Date.now(), isLastOne: true
         });
       } catch(e) {}
-      // 풀스크린 모달 표시
       document.getElementById("lastone-modal-name").textContent = lastOneProduct.name;
       document.getElementById("lastone-modal-desc").textContent = lastOneProduct.desc || "";
       document.getElementById("lastone-modal").style.display = "flex";
-      // 특별 사운드 + 폭죽
       playSound("ssr");
       launchConfetti();
       setTimeout(launchConfetti, 600);
       setTimeout(launchConfetti, 1200);
     }
 
-    // ── SSR 전역 실시간 알림 (다른 사용자들에게 노출용 Firestore 기록) ──
+    // ── SSR 전역 알림 (비차단) ──
     if (hasSSR) {
       const ssrItem = drawn.find(d => d.grade === "SSR");
       const kt2 = kujiTypes.find(k => k.id === currentKujiId);
-      try {
-        await setDoc(doc(db, "ssrFeed", "latest"), {
-          kujiName: kt2 ? kt2.name : "쿠지",
-          itemName: ssrItem ? ssrItem.name : "SSR 상품",
-          at: Date.now()
-        });
-      } catch(e) {}
+      setDoc(doc(db, "ssrFeed", "latest"), {
+        kujiName: kt2 ? kt2.name : "쿠지",
+        itemName: ssrItem ? ssrItem.name : "SSR 상품",
+        at: Date.now()
+      }).catch(() => {});
     }
 
-    // ── 업적 체크 ──
-    try { await checkAndGrantAchievements(); } catch(e) {}
+    // ── 업적 체크 (비차단, 결과 표시 후 실행) ──
+    setTimeout(() => checkAndGrantAchievements().catch(() => {}), 1000);
 
-    // Auto new round if all drawn
+    // ── 자동충전 체크 (비차단) ──
+    setTimeout(() => checkAutoCharge().catch(() => {}), 500);
+
+    // 판 소진 시 리셋
     if (drawnSlots.size >= totalSlots) {
       setTimeout(async () => {
         alert("🎉 200개 슬롯이 모두 소진됐어요! 새 판이 시작됩니다.");
@@ -2199,10 +2197,8 @@ async function handleDraw() {
         await loadAll();
         renderDrawTab();
       }, 2000);
-    } else {
-      // Quietly resync with the server in the background (no UI blocking)
-      loadAll().then(() => { renderKujiBoard(); renderGradeGrid(); }).catch(() => {});
     }
+    // ※ 백그라운드 loadAll 제거 — 로컬 캐시만으로 UI 업데이트 완료
   } catch(err) {
     console.error("draw failed:", err);
     clearTimeout(watchdog);
@@ -3902,20 +3898,29 @@ async function checkAndGrantAchievements() {
   for (const ach of ACHIEVEMENTS) {
     if (unlocked[ach.id]) continue;
     let passed = false;
-    try { passed = await ach.check(draws, userDraws); } catch(e) {}
+    try {
+      // vipGold는 로컬 캐시로 근사치 확인 (Firestore 읽기 없음)
+      if (ach.id === "vipGold") {
+        passed = (userProfile?.totalSpentCache || 0) >= 200000;
+      } else {
+        passed = await ach.check(draws, userDraws);
+      }
+    } catch(e) {}
     if (passed) {
       newUnlocks.push(ach);
       unlocked[ach.id] = Date.now();
     }
   }
   if (newUnlocks.length) {
-    await updateDoc(doc(db, "users", userId), { achievements: unlocked });
-    userProfile.achievements = unlocked;
-    // 업적 달성 토스트
+    // 업데이트는 merge로 최소화
+    try {
+      await updateDoc(doc(db, "users", userId), { achievements: unlocked });
+      userProfile.achievements = unlocked;
+    } catch(e) {}
     newUnlocks.forEach((ach, i) => {
       setTimeout(() => {
         const t = document.createElement("div");
-        t.style.cssText = `position:fixed;bottom:${80 + i * 60}px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FFD700,#F472B6);color:#000;padding:10px 20px;border-radius:20px;font-weight:800;font-size:.82rem;z-index:9999;animation:fadeIn .3s ease;`;
+        t.style.cssText = `position:fixed;bottom:${80 + i * 60}px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FFD700,#F472B6);color:#000;padding:10px 20px;border-radius:20px;font-weight:800;font-size:.82rem;z-index:9999;animation:fadeIn .3s ease;pointer-events:none;`;
         t.textContent = `🏆 업적 달성! ${ach.icon} ${ach.name}`;
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 3500);

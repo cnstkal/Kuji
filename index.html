@@ -1428,9 +1428,23 @@ async function generateSlotMap() {
   const kt = kujiTypes.find(k => k.id === currentKujiId);
   totalSlots = (kt && kt.slots) ? kt.slots : 200;
 
+  // 반드시 현재 쿠지판의 상품만 쓰도록 Firestore에서 직접 조회
+  let kujiProducts = products.filter(p => p.kujiId === currentKujiId);
+
+  // products가 아직 안 로딩됐거나 필터 결과가 비어있으면 Firestore fallback
+  if (!kujiProducts.length && currentKujiId) {
+    try {
+      const pSnap = await getDocs(query(
+        collection(db, "products"),
+        where("kujiId", "==", currentKujiId)
+      ));
+      kujiProducts = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch(e) { console.warn("product fetch fallback err", e); }
+  }
+
   // 재고 기반으로 슬롯 풀 만들기: remaining 수만큼 해당 productId를 넣음
   const pool = [];
-  for (const p of products) {
+  for (const p of kujiProducts) {
     const rem = (p.remaining !== undefined ? p.remaining : p.count) || 0;
     for (let i = 0; i < rem; i++) pool.push(p.id);
   }
@@ -1439,22 +1453,19 @@ async function generateSlotMap() {
   if (!pool.length) { slotMap = {}; return; }
 
   // 슬롯 수보다 재고가 적으면 풀을 반복해서 채움
-  // 슬롯 수보다 재고가 많으면 슬롯 수만큼 잘라냄
   const filled = [];
   while (filled.length < totalSlots) {
-    // 셔플해서 이어붙이기
     const shuffled = [...pool].sort(() => Math.random() - 0.5);
     filled.push(...shuffled);
   }
   const slotPool = filled.slice(0, totalSlots);
 
-  // 최종 셔플
+  // 최종 셔플 (Fisher-Yates)
   for (let i = slotPool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [slotPool[i], slotPool[j]] = [slotPool[j], slotPool[i]];
   }
 
-  // slotMap 구성
   slotMap = {};
   for (let i = 0; i < totalSlots; i++) {
     slotMap[String(i)] = slotPool[i];
@@ -2046,7 +2057,22 @@ async function handleDraw() {
     // ── 슬롯에 미리 박힌 상품을 그대로 읽기 ──
     const drawn = [];
     const used = {};
-    const allProds = window._allProductsAdmin || products;
+    // 현재 쿠지판 상품만 참조 (삭제된 상품 제거)
+    const allProds = (window._allProductsAdmin || []).length
+      ? window._allProductsAdmin
+      : products;
+    const validProductIds = new Set(allProds.filter(p => p.kujiId === currentKujiId).map(p => p.id));
+
+    // slotMap에 유효하지 않은 productId가 있으면 즉시 재생성
+    const slotMapProductIds = new Set(Object.values(slotMap));
+    const hasInvalidSlots = [...slotMapProductIds].some(id => !validProductIds.has(id));
+    if (hasInvalidSlots || !slotMapProductIds.size) {
+      await generateSlotMap();
+      // 재생성 후 pool이 비었으면 에러
+      if (!Object.keys(slotMap).length) {
+        throw new Error("상품 재고가 없어요. 관리자에게 문의하거나 쿠지판을 리셋해주세요.");
+      }
+    }
 
     for (const idx of slotsToOpen) {
       const productId = slotMap[String(idx)];

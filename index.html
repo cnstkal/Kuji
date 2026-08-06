@@ -2939,9 +2939,7 @@ window.doDeleteAccount = doDeleteAccount;
 
 // ── Admin Auth ──
 function showAdminLogin() {
-  if (settings.adminPwDisabled) { grantAdminAccess(); return; }
-  document.getElementById("admin-modal").style.display = "flex";
-  setTimeout(() => document.getElementById("admin-pw-input").focus(), 100);
+  grantAdminAccess();
 }
 window.showAdminLogin = showAdminLogin;
 

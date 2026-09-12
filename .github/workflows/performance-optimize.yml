@@ -1,0 +1,193 @@
+name: Apply Kuji performance optimizations
+
+on:
+  push:
+    paths:
+      - '.github/workflows/performance-optimize.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Patch performance without changing data logic
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          if 'data-kuji-performance-v1' in s:
+              print('Performance patch already present')
+              raise SystemExit(0)
+          patch = r'''<style data-kuji-performance-v1>
+/* Performance-only layer: preserve existing data/UI logic while reducing layout, paint and animation cost. */
+.kujiboard-grid,.products-grid,.results-grid{contain:layout style;}
+.prod-card,.kuji-card-wrap,.slot{contain:layout paint;}
+#products-preview,.products-section,#results-area{content-visibility:auto;contain-intrinsic-size:1px 700px;}
+.kuji-card-wrap.glow-ssr,.kuji-card-wrap.glow-sr,.kuji-card-wrap.glow-r,.kuji-card-wrap.glow-n{animation-duration:3.5s;}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.fade-in{animation:none!important}.slot.spinning{animation:none!important}}
+</style>
+<script data-kuji-performance-v1>
+(() => {
+  'use strict';
+  const gridId = 'kujiboard-grid';
+  let boardNodes = new Map();
+  let boardRenderBusy = false;
+  let sessionCache = {key:null,value:null,at:0};
+
+  // Avoid duplicate simultaneous Firebase reads caused by repeated renders/taps.
+  if (typeof loadAll === 'function') {
+    const originalLoadAll = loadAll;
+    let pendingLoad = null;
+    loadAll = function() {
+      if (pendingLoad) return pendingLoad;
+      pendingLoad = Promise.resolve().then(() => originalLoadAll()).finally(() => { pendingLoad = null; });
+      return pendingLoad;
+    };
+  }
+
+  if (typeof getSessionNum === 'function') {
+    const originalGetSessionNum = getSessionNum;
+    getSessionNum = async function() {
+      const key = typeof sessionDocId === 'function' ? sessionDocId() : 'global';
+      const now = Date.now();
+      if (sessionCache.key === key && now - sessionCache.at < 3000 && sessionCache.value != null) return sessionCache.value;
+      const value = await originalGetSessionNum();
+      sessionCache = {key, value, at:Date.now()};
+      return value;
+    };
+  }
+
+  function getGrid(){ return document.getElementById(gridId); }
+  function syncSlot(idx){
+    const el = boardNodes.get(idx);
+    if (!el) return;
+    const drawn = drawnSlots.has(idx), selected = selectedSlots.has(idx);
+    el.className = 'slot' + (drawn ? ' drawn' : selected ? ' selected' : '');
+  }
+  function syncAllSlots(){ boardNodes.forEach((_, idx) => syncSlot(idx)); }
+
+  // One delegated listener replaces up to 200 per-slot onclick closures.
+  const grid = getGrid();
+  if (grid) {
+    grid.addEventListener('click', (ev) => {
+      const slot = ev.target.closest('.slot');
+      if (!slot || !grid.contains(slot)) return;
+      const idx = Number(slot.dataset.idx);
+      if (!Number.isInteger(idx) || drawnSlots.has(idx)) return;
+      if (typeof toggleSlot === 'function') toggleSlot(idx);
+    });
+  }
+
+  if (typeof renderKujiBoard === 'function') {
+    renderKujiBoard = async function(){
+      if (boardRenderBusy) return;
+      boardRenderBusy = true;
+      try {
+        const remain = totalSlots - drawnSlots.size;
+        const remainEl = document.getElementById('board-remain-slots');
+        if (remainEl) remainEl.textContent = remain;
+        const sNum = await getSessionNum();
+        const sessionEl = document.getElementById('board-session-num');
+        if (sessionEl) sessionEl.textContent = sNum;
+        const hasQueue = await checkQueueHasOthers();
+        const limitWarn = document.getElementById('board-limit-warn');
+        const qMax = settings.queueMax || 10;
+        if (limitWarn) {
+          limitWarn.style.display = hasQueue ? '' : 'none';
+          if (hasQueue) limitWarn.textContent = `대기 있음: 최대 ${qMax}판`;
+        }
+        const target = getGrid();
+        if (!target) return;
+        const fragment = document.createDocumentFragment();
+        boardNodes = new Map();
+        for (let i=0;i<totalSlots;i++) {
+          const slot = document.createElement('div');
+          const isDrawn = drawnSlots.has(i), isSel = selectedSlots.has(i);
+          slot.className = 'slot' + (isDrawn ? ' drawn' : isSel ? ' selected' : '');
+          slot.dataset.idx = i;
+          slot.innerHTML = `<span class="slot-num">${String(i+1).padStart(3,'0')}</span>`;
+          boardNodes.set(i, slot);
+          fragment.appendChild(slot);
+        }
+        target.replaceChildren(fragment);
+        updateOpenBtn();
+      } finally { boardRenderBusy = false; }
+    };
+  }
+
+  if (typeof toggleSlot === 'function') {
+    toggleSlot = function(idx){
+      if (drawnSlots.has(idx)) return;
+      const avail = products.filter(p => (p.remaining ?? p.count) > 0);
+      if (!avail.length) { alert('남은 상품이 없어요!'); return; }
+      lastOneEligible = false;
+      if (selectedSlots.has(idx)) { selectedSlots.delete(idx); playSound('deselect'); }
+      else { selectedSlots.add(idx); playSound('select'); }
+      syncSlot(idx);
+      updateOpenBtn();
+    };
+  }
+
+  if (typeof randomSelectSlots === 'function') {
+    randomSelectSlots = function(){
+      lastOneEligible = false;
+      selectedSlots.clear();
+      const available=[];
+      for(let i=0;i<totalSlots;i++) if(!drawnSlots.has(i)) available.push(i);
+      for(let i=available.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[available[i],available[j]]=[available[j],available[i]];}
+      available.slice(0,10).forEach(i=>selectedSlots.add(i));
+      syncAllSlots(); playSound('select'); updateOpenBtn();
+    };
+  }
+
+  if (typeof selectAllSlots === 'function') {
+    selectAllSlots = function(){
+      lastOneEligible = (drawnSlots.size === 0);
+      selectedSlots.clear();
+      for(let i=0;i<totalSlots;i++) if(!drawnSlots.has(i)) selectedSlots.add(i);
+      syncAllSlots(); playSound('select'); updateOpenBtn();
+    };
+  }
+
+  // Avoid layout-heavy smooth scrolling on every result render.
+  if (typeof renderResults === 'function') {
+    const originalRenderResults = renderResults;
+    renderResults = function(items){
+      originalRenderResults(items);
+      const area = document.getElementById('results-area');
+      if (area) requestAnimationFrame(() => area.scrollIntoView({behavior:'auto',block:'nearest'}));
+    };
+  }
+
+  // Keep browser from spending paint time on hidden tabs.
+  if (typeof switchTab === 'function') {
+    const originalSwitchTab = switchTab;
+    switchTab = function(name){
+      originalSwitchTab(name);
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.tab').forEach(el => { el.style.contentVisibility = el.id === `tab-${name}` ? 'visible' : 'hidden'; });
+      });
+    };
+  }
+})();
+</script>'''
+          marker = '</body>'
+          if marker not in s:
+              raise SystemExit('Could not find </body>')
+          s = s.replace(marker, patch + '\n' + marker, 1)
+          p.write_text(s, encoding='utf-8')
+      - name: Remove temporary workflow and commit patch
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git rm .github/workflows/performance-optimize.yml
+          git commit -m 'perf: reduce Kuji UI render and layout overhead'
+          git push
